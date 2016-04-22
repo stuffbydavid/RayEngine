@@ -81,8 +81,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(CUDA_INC_PATH);C:\Libs\optix\include;C:\Libs\glew-1.13.0\include;C:\Libs\imagemagick-6.9.3-Q16\include;C:\Libs\glfw-3.1.2.bin.WIN64\include;C:\Libs\embree-2.8.0.x64.windows\include;C:\Libs\embree-2.8.0\common;C:\Libs\freetype\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Libs\optix\lib64;C:\Libs\glew-1.13.0\lib\Release\x64;C:\Libs\imagemagick-6.9.3-Q16\lib;C:\Libs\embree-2.8.0.x64.windows\lib;C:\Libs\glfw-3.1.2.bin.WIN64\lib-vc2013;C:\Libs\freetype\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(CUDA_INC_PATH);C:\Libs\optix-3.8.0\include;C:\Libs\glew-1.13.0\include;C:\Libs\imagemagick-6.9.3-Q16\include;C:\Libs\glfw-3.1.2.bin.WIN64\include;C:\Libs\embree-2.9.0.x64.windows\include;C:\Libs\embree-2.9.0\common;C:\Libs\freetype\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Libs\optix-3.8.0\lib64;C:\Libs\glew-1.13.0\lib\Release\x64;C:\Libs\imagemagick-6.9.3-Q16\lib;C:\Libs\embree-2.9.0.x64.windows\lib;C:\Libs\glfw-3.1.2.bin.WIN64\lib-vc2013;C:\Libs\freetype\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(ProjectName)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -141,6 +141,7 @@
       <OpenMPSupport>true</OpenMPSupport>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,12 +165,12 @@
     <ClCompile Include="embree_renderer.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="graphic.cpp" />
+    <ClCompile Include="material.cpp" />
     <ClCompile Include="object.cpp" />
-    <ClCompile Include="object_loader.cpp" />
     <ClCompile Include="opengl_renderer.cpp" />
     <ClCompile Include="optix_handler.cpp" />
     <ClCompile Include="rayengine.cpp" />
-    <ClCompile Include="rayengine.h" />
+    <ClInclude Include="rayengine.h" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="scene.cpp" />
@@ -191,7 +192,6 @@
     <ClInclude Include="mat4x4.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="object.h" />
-    <ClInclude Include="object_loader.h" />
     <ClInclude Include="optix_handler.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="scene.h" />

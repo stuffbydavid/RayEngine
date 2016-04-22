@@ -4,11 +4,10 @@ int main(int argc, char **argv) {
 
 	RayEngine rayEngine;
 
-
 	Scene* myScene = rayEngine.createScene("myScene");
-	cout << myScene->name << endl;
 
 	// Add some objects...
+	myScene->loadObject("obj/cornell_box.obj");
 
 
 	rayEngine.launch();

@@ -17,9 +17,6 @@
     <ClCompile Include="object.cpp">
       <Filter>RayEngine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="object_loader.cpp">
-      <Filter>RayEngine\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="renderer.cpp">
       <Filter>RayEngine\Render</Filter>
     </ClCompile>
@@ -44,13 +41,13 @@
     <ClCompile Include="rayengine.cpp">
       <Filter>RayEngine</Filter>
     </ClCompile>
-    <ClCompile Include="rayengine.h">
-      <Filter>RayEngine</Filter>
-    </ClCompile>
     <ClCompile Include="window.cpp">
       <Filter>RayEngine</Filter>
     </ClCompile>
     <ClCompile Include="scene.cpp">
+      <Filter>RayEngine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="material.cpp">
       <Filter>RayEngine\Scene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,9 +71,6 @@
       <Filter>RayEngine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="object.h">
-      <Filter>RayEngine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="object_loader.h">
       <Filter>RayEngine\Scene</Filter>
     </ClInclude>
     <ClInclude Include="material.h">
@@ -126,6 +120,9 @@
     </ClInclude>
     <ClInclude Include="scene.h">
       <Filter>RayEngine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="rayengine.h">
+      <Filter>RayEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

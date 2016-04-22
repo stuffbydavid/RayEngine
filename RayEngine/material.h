@@ -1,18 +1,11 @@
-//
-// Project: RenderBase
-// Author(s): BG
-//
-// Version: 0.1.0 - Initial version
-//
-
-// Reference:
-// http://www.fileformat.info/format/material/
-
 #pragma once
-
-#include <string>
+#include "common.h"
 
 struct Material {
+
+	Material(string name = "");
+
+	string name;
 
 	int id;
 	Color ambient, diffuse, specular;
