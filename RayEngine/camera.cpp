@@ -4,7 +4,7 @@ Camera::Camera() {
 	xaxis = { 1, 0, 0 };
 	yaxis = { 0, 1, 0 };
 	zaxis = { 0, 0, -1 };
-	position = { 0, 0, 50 };
+	position = { 0, 10, 50 };
 	fov = 90.f;
 }
 

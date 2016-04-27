@@ -6,8 +6,6 @@
 
 struct TrianglePrimitive {
 
-	uint indices[3];
-
 	// Constructors
 	TrianglePrimitive() {}
 	TrianglePrimitive(uint i0, uint i1, uint i2) {
@@ -16,15 +14,12 @@ struct TrianglePrimitive {
 		indices[2] = i2;
 	}
 
+	// Triangle indices
+	uint indices[3];
+
 };
 
 struct TriangleMesh : Geometry {
-
-	vector<Vec3> posData;
-	vector<Vec3> normalData;
-	vector<Vec2> texCoordData;
-	vector<TrianglePrimitive> primitives;
-	GLuint vbo, ibo;
 
 	// Returns an interpolated normal
 	Vec3 getNormal(int primID, float u, float v);
@@ -32,9 +27,22 @@ struct TriangleMesh : Geometry {
 	// Returns an interpolated texture coordinate
 	Vec2 getTexCoord(int primID, float u, float v);
 
+	// Variables
+	vector<Vec3> posData;
+	vector<Vec3> normalData;
+	vector<Vec2> texCoordData;
+	vector<TrianglePrimitive> indexData;
+	GLuint vboPos, vboNormal, vboTexCoord, ibo;
+
 	// Embree
 	void initEmbree(RTCScene scene);
 
 	// OptiX
+	struct {
+		optix::Geometry geometry;
+		optix::GeometryInstance geometryInstance;
+		optix::Buffer posBuffer, indexBuffer;
+	} OptixData;
 	void initOptix(optix::Context context);
+
 };

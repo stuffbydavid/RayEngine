@@ -115,6 +115,9 @@
     <ClInclude Include="font.h">
       <Filter>RayEngine\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="common.cuh">
+      <Filter>RayEngine\OptiX\CUDA</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RayEngine">
@@ -164,6 +167,9 @@
       <Filter>RayEngine\OptiX\CUDA</Filter>
     </CudaCompile>
     <CudaCompile Include="triangle_mesh_program.cu">
+      <Filter>RayEngine\OptiX\CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="material_program.cu">
       <Filter>RayEngine\OptiX\CUDA</Filter>
     </CudaCompile>
   </ItemGroup>

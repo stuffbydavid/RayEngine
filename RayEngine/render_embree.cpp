@@ -9,11 +9,10 @@ void RayEngine::renderEmbree() {
 	Vec3 ryaxis = scenes[0]->camera.yaxis * tfov;
 	Vec3 rzaxis = scenes[0]->camera.zaxis;
 
-	Color* pixels = new Color[window.width * window.height];
-
 	// TODO: Add ray 1..8 and use queue system depending on branko's results
+    //#pragma omp parallel for schedule(dynamic)
 	for (int y = 0; y < window.height; y++) {
-		for (int x = 0; x < window.width; x++) {
+		for (int x = 0; x < window.width * (rayTracingTarget == RTT_HYBRID ? hybridPartition : 1.0); x++) {
 
 			float dx = ((float)x / window.width) * 2 - 1;
 			float dy = ((float)y / window.height) * 2 - 1;
@@ -32,20 +31,35 @@ void RayEngine::renderEmbree() {
 			ray.mask = -1;
 			ray.time = 0;
 
-			rtcIntersect(scenes[0]->root.EmbreeData.scene, ray);
+			rtcIntersect(scenes[0]->EmbreeData.scene, ray);
 
 			if (ray.geomID != RTC_INVALID_GEOMETRY_ID) {
 				Vec3 n = Vec3::normalize(Vec3(ray.Ng)) * 0.5 + Vec3(0.5);
-				pixels[y * window.width + x] = Color(n.x(), n.y(), n.z(), 1); // getRayColor(&ray, Scene);
+				EmbreeData.buffer[y * window.width + x] = Color(n.x(), n.y(), n.z(), 1); // getRayColor(&ray, Scene);
 			} else
-				pixels[y * window.width + x] = Color(0, 0, 0, 1);
+				EmbreeData.buffer[y * window.width + x] = Color(0, 0, 0, 1);
 
 		}
 	}
 
-	glDrawPixels(window.width, window.height, GL_RGBA, GL_FLOAT, pixels);
-	delete pixels;
+	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window.width, window.height, 0, GL_RGBA, GL_FLOAT, EmbreeData.buffer);
 
+	// TODO: buffer for this?
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.f, 0.f);
+	glVertex2f(0.f, 0.f);
+	glTexCoord2f(1.f, 0.f);
+	glVertex2f(1.f, 0.f);
+	glTexCoord2f(1.f, 1.f);
+	glVertex2f(1.f, 1.f);
+	glTexCoord2f(0.f, 1.f);
+	glVertex2f(0.f, 1.f);
+	glEnd();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 }
 
@@ -277,7 +291,7 @@ Color Renderer::getRayColor(RTCRay* pRay, Scene* Scene, int iteration) {
 
 		Object* hitObj = Scene->objectsMap[pRay->instID];
 		TriangleMesh* mesh = (TriangleMesh*)hitObj->geometry;
-		Material* hitMat = mesh->primitives[pRay->primID].material;
+		Material* hitMat = mesh->indexData[pRay->primID].material;
 		Vec3 hitNorm = mesh->getNormal(pRay->primID, pRay->u, pRay->v);
 		Color texColor = { 1, 1, 1, 1 };
 
@@ -346,7 +360,7 @@ Color Renderer::getRayColor(RTCRay8* pRay, const int index, Scene* Scene, int it
 
 		Object* hitObj = Scene->objectsMap[pRay->instID[index]];
 		TriangleMesh* mesh = (TriangleMesh*)hitObj->geometry;
-		Material* hitMat = mesh->primitives[pRay->primID[index]].material;
+		Material* hitMat = mesh->indexData[pRay->primID[index]].material;
 		Vec3 hitNorm = mesh->getNormal(pRay->primID[index], pRay->u[index], pRay->v[index]);
 		Color texColor = { 1, 1, 1, 1 };
 

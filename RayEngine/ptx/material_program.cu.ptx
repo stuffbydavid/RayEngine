@@ -10,8 +10,8 @@
 .target sm_20
 .address_size 64
 
-	// .globl	_Z4missv
-.global .align 8 .b8 bgColor[12];
+	// .globl	_Z10closestHitv
+.global .align 4 .b8 normal[12];
 .global .align 8 .b8 rayData[12];
 .global .align 8 .u64 _ZN21rti_internal_register20reg_bitness_detectorE;
 .global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail0E;
@@ -37,28 +37,36 @@
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_xE;
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_yE;
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_zE;
-.global .align 4 .b8 _ZN21rti_internal_typeinfo7bgColorE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
+.global .align 4 .b8 _ZN21rti_internal_typeinfo6normalE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo7rayDataE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
-.global .align 1 .b8 _ZN21rti_internal_typename7bgColorE[7] = {102, 108, 111, 97, 116, 51, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename6normalE[7] = {102, 108, 111, 97, 116, 51, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename7rayDataE[8] = {82, 97, 121, 68, 97, 116, 97, 0};
-.global .align 4 .u32 _ZN21rti_internal_typeenum7bgColorE = 4919;
+.global .align 4 .u32 _ZN21rti_internal_typeenum6normalE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum7rayDataE = 4919;
-.global .align 1 .b8 _ZN21rti_internal_semantic7bgColorE[1];
+.global .align 1 .b8 _ZN21rti_internal_semantic6normalE[17] = {97, 116, 116, 114, 105, 98, 117, 116, 101, 32, 110, 111, 114, 109, 97, 108, 0};
 .global .align 1 .b8 _ZN21rti_internal_semantic7rayDataE[10] = {114, 116, 80, 97, 121, 108, 111, 97, 100, 0};
-.global .align 1 .b8 _ZN23rti_internal_annotation7bgColorE[1];
+.global .align 1 .b8 _ZN23rti_internal_annotation6normalE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation7rayDataE[1];
 
-.visible .entry _Z4missv(
+.visible .entry _Z10closestHitv(
 
 )
 {
-	.reg .f32 	%f<6>;
+	.reg .f32 	%f<7>;
+	.reg .s64 	%rd<4>;
 
 
-	ld.global.f32 	%f1, [bgColor+8];
-	ld.global.v2.f32 	{%f2, %f3}, [bgColor];
-	st.global.v2.f32 	[rayData], {%f2, %f3};
-	st.global.f32 	[rayData+8], %f1;
+	ldu.global.f32 	%f1, [normal];
+	mov.u64 	%rd1, normal;
+	add.s64 	%rd2, %rd1, 4;
+	ldu.global.f32 	%f2, [%rd2];
+	add.s64 	%rd3, %rd1, 8;
+	ldu.global.f32 	%f3, [%rd3];
+	fma.rn.f32 	%f4, %f3, 0f3F000000, 0f3F000000;
+	fma.rn.f32 	%f5, %f1, 0f3F000000, 0f3F000000;
+	fma.rn.f32 	%f6, %f2, 0f3F000000, 0f3F000000;
+	st.global.v2.f32 	[rayData], {%f5, %f6};
+	st.global.f32 	[rayData+8], %f4;
 	ret;
 }
 

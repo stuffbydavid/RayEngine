@@ -10,5 +10,242 @@
 .target sm_20
 .address_size 64
 
+	// .globl	_Z9intersecti
+.global .align 1 .b8 posData[1];
+.global .align 1 .b8 indexData[1];
+.global .align 8 .b8 normal[12];
+.global .align 4 .b8 ray[36];
+.global .align 8 .u64 _ZN21rti_internal_register20reg_bitness_detectorE;
+.global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail0E;
+.global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail1E;
+.global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail2E;
+.global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail3E;
+.global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail4E;
+.global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail5E;
+.global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail6E;
+.global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail7E;
+.global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail8E;
+.global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail9E;
+.global .align 4 .u32 _ZN21rti_internal_register21reg_exception_detail0E;
+.global .align 4 .u32 _ZN21rti_internal_register21reg_exception_detail1E;
+.global .align 4 .u32 _ZN21rti_internal_register21reg_exception_detail2E;
+.global .align 4 .u32 _ZN21rti_internal_register21reg_exception_detail3E;
+.global .align 4 .u32 _ZN21rti_internal_register21reg_exception_detail4E;
+.global .align 4 .u32 _ZN21rti_internal_register21reg_exception_detail5E;
+.global .align 4 .u32 _ZN21rti_internal_register21reg_exception_detail6E;
+.global .align 4 .u32 _ZN21rti_internal_register21reg_exception_detail7E;
+.global .align 4 .u32 _ZN21rti_internal_register21reg_exception_detail8E;
+.global .align 4 .u32 _ZN21rti_internal_register21reg_exception_detail9E;
+.global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_xE;
+.global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_yE;
+.global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_zE;
+.global .align 4 .b8 _ZN21rti_internal_typeinfo6normalE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
+.global .align 4 .b8 _ZN21rti_internal_typeinfo3rayE[8] = {82, 97, 121, 0, 36, 0, 0, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename6normalE[7] = {102, 108, 111, 97, 116, 51, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename3rayE[4] = {82, 97, 121, 0};
+.global .align 4 .u32 _ZN21rti_internal_typeenum6normalE = 4919;
+.global .align 4 .u32 _ZN21rti_internal_typeenum3rayE = 4919;
+.global .align 1 .b8 _ZN21rti_internal_semantic6normalE[17] = {97, 116, 116, 114, 105, 98, 117, 116, 101, 32, 110, 111, 114, 109, 97, 108, 0};
+.global .align 1 .b8 _ZN21rti_internal_semantic3rayE[13] = {114, 116, 67, 117, 114, 114, 101, 110, 116, 82, 97, 121, 0};
+.global .align 1 .b8 _ZN23rti_internal_annotation6normalE[1];
+.global .align 1 .b8 _ZN23rti_internal_annotation3rayE[1];
+
+.visible .entry _Z9intersecti(
+	.param .u32 _Z9intersecti_param_0
+)
+{
+	.reg .pred 	%p<11>;
+	.reg .f32 	%f<71>;
+	.reg .s32 	%r<12>;
+	.reg .s64 	%rd<27>;
+
+
+	ld.param.s32 	%rd3, [_Z9intersecti_param_0];
+	mov.u64 	%rd25, indexData;
+	cvta.global.u64 	%rd2, %rd25;
+	mov.u32 	%r7, 1;
+	mov.u32 	%r8, 12;
+	mov.u64 	%rd24, 0;
+	// inline asm
+	call (%rd1), _rt_buffer_get_64, (%rd2, %r7, %r8, %rd3, %rd24, %rd24, %rd24);
+	// inline asm
+	ld.u32 	%rd9, [%rd1];
+	mov.u64 	%rd26, posData;
+	cvta.global.u64 	%rd8, %rd26;
+	ld.u32 	%rd15, [%rd1+4];
+	ld.u32 	%rd21, [%rd1+8];
+	// inline asm
+	call (%rd7), _rt_buffer_get_64, (%rd8, %r7, %r8, %rd9, %rd24, %rd24, %rd24);
+	// inline asm
+	ld.f32 	%f5, [%rd7+8];
+	ld.f32 	%f6, [%rd7+4];
+	ld.f32 	%f7, [%rd7];
+	// inline asm
+	call (%rd13), _rt_buffer_get_64, (%rd8, %r7, %r8, %rd15, %rd24, %rd24, %rd24);
+	// inline asm
+	ld.f32 	%f8, [%rd13+8];
+	ld.f32 	%f9, [%rd13+4];
+	ld.f32 	%f10, [%rd13];
+	// inline asm
+	call (%rd19), _rt_buffer_get_64, (%rd8, %r7, %r8, %rd21, %rd24, %rd24, %rd24);
+	// inline asm
+	sub.f32 	%f11, %f10, %f7;
+	sub.f32 	%f12, %f9, %f6;
+	sub.f32 	%f13, %f8, %f5;
+	ld.f32 	%f14, [%rd19+8];
+	ld.f32 	%f15, [%rd19+4];
+	ld.f32 	%f16, [%rd19];
+	sub.f32 	%f17, %f7, %f16;
+	sub.f32 	%f18, %f6, %f15;
+	sub.f32 	%f19, %f5, %f14;
+	mul.f32 	%f20, %f13, %f18;
+	mul.f32 	%f21, %f12, %f19;
+	sub.f32 	%f1, %f20, %f21;
+	mul.f32 	%f22, %f11, %f19;
+	mul.f32 	%f23, %f13, %f17;
+	sub.f32 	%f2, %f22, %f23;
+	mul.f32 	%f24, %f12, %f17;
+	mul.f32 	%f25, %f11, %f18;
+	sub.f32 	%f3, %f24, %f25;
+	ld.global.f32 	%f26, [ray+12];
+	ld.global.f32 	%f27, [ray+16];
+	mul.f32 	%f28, %f27, %f2;
+	fma.rn.f32 	%f29, %f26, %f1, %f28;
+	ld.global.f32 	%f30, [ray+20];
+	fma.rn.f32 	%f31, %f30, %f3, %f29;
+	rcp.rn.f32 	%f32, %f31;
+	ld.global.f32 	%f33, [ray];
+	sub.f32 	%f34, %f7, %f33;
+	ld.global.f32 	%f35, [ray+4];
+	sub.f32 	%f36, %f6, %f35;
+	ld.global.f32 	%f37, [ray+8];
+	sub.f32 	%f38, %f5, %f37;
+	mul.f32 	%f39, %f32, %f34;
+	mul.f32 	%f40, %f32, %f36;
+	mul.f32 	%f41, %f32, %f38;
+	mul.f32 	%f42, %f27, %f41;
+	mul.f32 	%f43, %f40, %f30;
+	sub.f32 	%f44, %f42, %f43;
+	mul.f32 	%f45, %f39, %f30;
+	mul.f32 	%f46, %f41, %f26;
+	sub.f32 	%f47, %f45, %f46;
+	mul.f32 	%f48, %f40, %f26;
+	mul.f32 	%f49, %f39, %f27;
+	sub.f32 	%f50, %f48, %f49;
+	mul.f32 	%f51, %f18, %f47;
+	fma.rn.f32 	%f52, %f17, %f44, %f51;
+	fma.rn.f32 	%f53, %f19, %f50, %f52;
+	mul.f32 	%f54, %f12, %f47;
+	fma.rn.f32 	%f55, %f11, %f44, %f54;
+	fma.rn.f32 	%f56, %f13, %f50, %f55;
+	mul.f32 	%f57, %f2, %f40;
+	fma.rn.f32 	%f58, %f1, %f39, %f57;
+	fma.rn.f32 	%f4, %f3, %f41, %f58;
+	ld.global.f32 	%f59, [ray+32];
+	setp.lt.f32	%p1, %f4, %f59;
+	ld.global.f32 	%f60, [ray+28];
+	setp.gt.f32	%p2, %f4, %f60;
+	and.pred  	%p3, %p1, %p2;
+	setp.ge.f32	%p4, %f53, 0f00000000;
+	and.pred  	%p5, %p3, %p4;
+	setp.ge.f32	%p6, %f56, 0f00000000;
+	and.pred  	%p7, %p5, %p6;
+	add.f32 	%f61, %f53, %f56;
+	setp.le.f32	%p8, %f61, 0f3F800000;
+	and.pred  	%p9, %p7, %p8;
+	@!%p9 bra 	BB0_3;
+	bra.uni 	BB0_1;
+
+BB0_1:
+	// inline asm
+	call (%r9), _rt_potential_intersection, (%f4);
+	// inline asm
+	setp.eq.s32	%p10, %r9, 0;
+	@%p10 bra 	BB0_3;
+
+	mul.f32 	%f63, %f2, %f2;
+	fma.rn.f32 	%f64, %f1, %f1, %f63;
+	fma.rn.f32 	%f65, %f3, %f3, %f64;
+	sqrt.rn.f32 	%f66, %f65;
+	rcp.rn.f32 	%f67, %f66;
+	mul.f32 	%f68, %f3, %f67;
+	mul.f32 	%f69, %f2, %f67;
+	mul.f32 	%f70, %f1, %f67;
+	st.global.v2.f32 	[normal], {%f70, %f69};
+	st.global.f32 	[normal+8], %f68;
+	mov.u32 	%r11, 0;
+	// inline asm
+	call (%r10), _rt_report_intersection, (%r11);
+	// inline asm
+
+BB0_3:
+	ret;
+}
+
+	// .globl	_Z6boundsiPf
+.visible .entry _Z6boundsiPf(
+	.param .u32 _Z6boundsiPf_param_0,
+	.param .u64 _Z6boundsiPf_param_1
+)
+{
+	.reg .f32 	%f<22>;
+	.reg .s32 	%r<9>;
+	.reg .s64 	%rd<29>;
+
+
+	ld.param.u64 	%rd25, [_Z6boundsiPf_param_1];
+	ld.param.s32 	%rd3, [_Z6boundsiPf_param_0];
+	mov.u64 	%rd26, indexData;
+	cvta.global.u64 	%rd2, %rd26;
+	mov.u32 	%r7, 1;
+	mov.u32 	%r8, 12;
+	mov.u64 	%rd24, 0;
+	// inline asm
+	call (%rd1), _rt_buffer_get_64, (%rd2, %r7, %r8, %rd3, %rd24, %rd24, %rd24);
+	// inline asm
+	ld.u32 	%rd9, [%rd1];
+	mov.u64 	%rd27, posData;
+	cvta.global.u64 	%rd8, %rd27;
+	ld.u32 	%rd15, [%rd1+4];
+	ld.u32 	%rd21, [%rd1+8];
+	// inline asm
+	call (%rd7), _rt_buffer_get_64, (%rd8, %r7, %r8, %rd9, %rd24, %rd24, %rd24);
+	// inline asm
+	ld.f32 	%f1, [%rd7+8];
+	ld.f32 	%f2, [%rd7+4];
+	ld.f32 	%f3, [%rd7];
+	// inline asm
+	call (%rd13), _rt_buffer_get_64, (%rd8, %r7, %r8, %rd15, %rd24, %rd24, %rd24);
+	// inline asm
+	ld.f32 	%f4, [%rd13+8];
+	ld.f32 	%f5, [%rd13+4];
+	ld.f32 	%f6, [%rd13];
+	// inline asm
+	call (%rd19), _rt_buffer_get_64, (%rd8, %r7, %r8, %rd21, %rd24, %rd24, %rd24);
+	// inline asm
+	ld.f32 	%f7, [%rd19+8];
+	ld.f32 	%f8, [%rd19+4];
+	ld.f32 	%f9, [%rd19];
+	cvta.to.global.u64 	%rd28, %rd25;
+	min.f32 	%f10, %f3, %f6;
+	min.f32 	%f11, %f2, %f5;
+	min.f32 	%f12, %f1, %f4;
+	min.f32 	%f13, %f10, %f9;
+	min.f32 	%f14, %f11, %f8;
+	min.f32 	%f15, %f12, %f7;
+	st.global.f32 	[%rd28], %f13;
+	st.global.f32 	[%rd28+4], %f14;
+	st.global.f32 	[%rd28+8], %f15;
+	max.f32 	%f16, %f3, %f6;
+	max.f32 	%f17, %f2, %f5;
+	max.f32 	%f18, %f1, %f4;
+	max.f32 	%f19, %f16, %f9;
+	max.f32 	%f20, %f17, %f8;
+	max.f32 	%f21, %f18, %f7;
+	st.global.f32 	[%rd28+12], %f19;
+	st.global.f32 	[%rd28+16], %f20;
+	st.global.f32 	[%rd28+20], %f21;
+	ret;
+}
 
 

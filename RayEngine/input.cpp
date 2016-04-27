@@ -17,6 +17,27 @@ void RayEngine::input() {
 		glfwSetInputMode(window.handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 
+	// Render mode
+
+	if (window.keyPressed[GLFW_KEY_F1]) {
+		renderMode = RM_OPENGL;
+	}
+
+	if (window.keyPressed[GLFW_KEY_F2]) {
+		renderMode = RM_RAYTRACING;
+		rayTracingTarget = RTT_CPU;
+	}
+
+	if (window.keyPressed[GLFW_KEY_F3]) {
+		renderMode = RM_RAYTRACING;
+		rayTracingTarget = RTT_GPU;
+	}
+
+	if (window.keyPressed[GLFW_KEY_F4]) {
+		renderMode = RM_RAYTRACING;
+		rayTracingTarget = RTT_HYBRID;
+	}
+
 	// Move the camera
 
 	if (moveCamera) {

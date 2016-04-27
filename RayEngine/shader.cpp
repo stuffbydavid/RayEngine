@@ -94,25 +94,25 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 	// Start up shader
 	glUseProgram(program);
 	GLint aPos = glGetAttribLocation(program, "aPos");
-	GLint aNorm = glGetAttribLocation(program, "aNorm");
+	GLint aNormal = glGetAttribLocation(program, "aNormal");
 	GLint aTexCoord = glGetAttribLocation(program, "aTexCoord");
 	GLint uMat = glGetUniformLocation(program, "uMat");
 	GLint uTex = glGetUniformLocation(program, "uTex");
-	
-	// Select current resources
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
-	uint vertices = mesh->posData.size();
-	uint sizePositions = vertices * sizeof(Vec3);
-	uint sizeNormals = vertices * sizeof(Vec3);
 
 	// Pass buffers
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboPos);
 	glEnableVertexAttribArray(aPos);
-	glEnableVertexAttribArray(aNorm);
-	glEnableVertexAttribArray(aTexCoord);
 	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glVertexAttribPointer(aNorm, 3, GL_FLOAT, GL_FALSE, 0, (void*)sizePositions);
-	glVertexAttribPointer(aTexCoord, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizePositions + sizeNormals));
+
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboNormal);
+	glEnableVertexAttribArray(aNormal);
+	glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboTexCoord);
+	glEnableVertexAttribArray(aTexCoord);
+	glVertexAttribPointer(aTexCoord, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
 
 	// Pass the viewing transform to the shader
 	glUniformMatrix4fv(uMat, 1, GL_FALSE, matrix.e);
@@ -132,7 +132,13 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 	// Draw all triangles
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-	glDrawElements(GL_TRIANGLES, mesh->primitives.size() * 3, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, mesh->indexData.size() * 3, GL_UNSIGNED_INT, 0);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+
+	// Disable shader
+	glUseProgram(0);
+
 }
 /*
 void Shader::use(Graphic* graphic, Mat4x4 matrix, void* caller) {

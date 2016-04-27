@@ -52,9 +52,7 @@ void windowKeyCallback(GLFWwindow* handle, int key, int scancode, int action, in
 
 void windowSizeCallback(GLFWwindow* handle, int width, int height) {
 
-	/*if (w->buffer)
-		delete w->buffer;
-	w->buffer = new Color[width * height];*/
+	w->resizeFunc();
 
 }
 
@@ -79,11 +77,6 @@ void Window::init(int width, int height) {
 	// Initialize window
 
 	handle = glfwCreateWindow(width, height, "", NULL, NULL);
-	glfwSetMouseButtonCallback(handle, windowMouseButtonCallback);
-	glfwSetCursorPosCallback(handle, windowCursorPosCallback);
-	glfwSetKeyCallback(handle, windowKeyCallback);
-	glfwSetWindowSizeCallback(handle, windowSizeCallback);
-	windowSizeCallback(handle, width, height);
 	glfwMakeContextCurrent(handle);
 
 	// Init GLEW
@@ -109,16 +102,19 @@ void Window::init(int width, int height) {
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	
-	/// Generate buffers
-	glGenBuffers(1, &vbo);
-	glGenTextures(1, &texture);
-
 }
 
-void Window::open(function<void(void)> updateFunc) {
+void Window::open(function<void(void)> updateFunc, function<void(void)> resizeFunc) {
 
 	int lastTime = -1, frame = 0;
 	fps = 0;
+
+	this->resizeFunc = resizeFunc;
+	glfwSetMouseButtonCallback(handle, windowMouseButtonCallback);
+	glfwSetCursorPosCallback(handle, windowCursorPosCallback);
+	glfwSetKeyCallback(handle, windowKeyCallback);
+	glfwSetWindowSizeCallback(handle, windowSizeCallback);
+	windowSizeCallback(handle, width, height);
 
 	while (!glfwWindowShouldClose(handle)) {
 
@@ -126,9 +122,6 @@ void Window::open(function<void(void)> updateFunc) {
 
 		// Call update function
 
-		glViewport(0, 0, width, height);
-		glClearColor(0.1, 0.1, 0.1, 1);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		updateFunc();
 
 		// Reset input

@@ -1,7 +1,7 @@
 #include "triangle_mesh.h"
 
 Vec3 TriangleMesh::getNormal(int primID, float u, float v) {
-	TrianglePrimitive& prim = primitives[primID];
+	TrianglePrimitive& prim = indexData[primID];
 
 	return
 		(1.f - u - v) * normalData[prim.indices[0]] +
@@ -10,7 +10,7 @@ Vec3 TriangleMesh::getNormal(int primID, float u, float v) {
 }
 
 Vec2 TriangleMesh::getTexCoord(int primID, float u, float v) {
-	TrianglePrimitive& prim = primitives[primID];
+	TrianglePrimitive& prim = indexData[primID];
 
 	return
 		(1.f - u - v) * texCoordData[prim.indices[0]] +

@@ -22,7 +22,8 @@ struct RayEngine {
 	RayEngine(int windowWidth = 900,
 			  int windowHeight = 600,
 			  RenderMode renderMode = RM_RAYTRACING,
-			  RayTracingTarget rayTracingTarget = RTT_CPU);
+			  RayTracingTarget rayTracingTarget = RTT_GPU,
+			  float hybridPartition = 0.5);
 
 	~RayEngine();
 
@@ -37,6 +38,8 @@ private:
 	// Embree
 	struct {
 		RTCDevice device;
+		GLuint texture;
+		Color* buffer;
 	} EmbreeData;
 	void initEmbree();
 
@@ -44,6 +47,8 @@ private:
 	struct {
 		optix::Context context;
 		optix::Buffer buffer;
+		GLuint vbo;
+		GLuint texture;
 	} OptixData;
 	void initOptix();
 
@@ -51,9 +56,13 @@ private:
 	Window window;
 	RenderMode renderMode;
 	RayTracingTarget rayTracingTarget;
+	float hybridPartition;
 	Shader* shdrOGL;
 
 	void update();
+	void resize();
+	void resizeEmbree();
+	void resizeOptix();
 	void renderOpenGL();
 	void renderEmbree();
 	void renderOptix();

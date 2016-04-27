@@ -2,10 +2,10 @@
 
 Scene::Scene(string name) : name(name) {}
 
-Object* Scene::loadObject(string file, Material* defaultMaterial) {
+Object* Scene::loadObject(string name, string file, Material* defaultMaterial) {
 
-	Object* obj = Object::load(file, defaultMaterial);
-	root.children.push_back(obj);
+	Object* obj = Object::load(name, file, defaultMaterial);
+	objects.push_back(obj);
 	return obj;
 
 }

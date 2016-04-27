@@ -192,6 +192,7 @@
     <ClCompile Include="render_opengl.cpp" />
     <ClCompile Include="optix_handler.cpp" />
     <ClCompile Include="rayengine.cpp" />
+    <ClInclude Include="common.cuh" />
     <ClInclude Include="rayengine.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="render_optix.cpp" />
@@ -231,6 +232,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="camera_program.cu" />
+    <CudaCompile Include="material_program.cu" />
     <CudaCompile Include="miss_program.cu" />
     <CudaCompile Include="triangle_mesh_program.cu" />
   </ItemGroup>

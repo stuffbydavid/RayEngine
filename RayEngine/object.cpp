@@ -2,8 +2,7 @@
 #include "tiny_obj_loader.h"
 
 Object::Object(string name) :
-  name(name),
-  geometry(nullptr)
+  name(name)
 {
 	
 }
@@ -12,34 +11,23 @@ Object::~Object() {
 	//delete geometry;
 }
 
-void Object::render(Shader* shader, Mat4x4 proj) {
-
-	if (geometry)
-		shader->use((TriangleMesh*)geometry, proj, this);
-	for (uint i = 0; i < children.size(); i++)
-		children[i]->render(shader, proj);
-
-}
-
-
-Object* Object::load(string file, Material* defaultMaterial) {
+Object* Object::load(string name, string file, Material* defaultMaterial) {
 
 	vector<tinyobj::shape_t> fileShapes;
 	vector<tinyobj::material_t> fileMaterials;
 	string err;
 	string path = file.substr(0, file.find_last_of("/\\") + 1);
-	Object* ret = nullptr;
 
 	cout << "Loading " << file << "..." << endl;
 	tinyobj::LoadObj(fileShapes, fileMaterials, err, &file[0], &path[0]);
 
 	if (!err.empty()) {
 		cerr << err << endl;
-		return ret;
+		return nullptr;
 	}
 	if (fileShapes.empty()) {
 		cerr << "No objects found" << endl;
-		return ret;
+		return nullptr;
 	}
 	cout << "Objects found: " << fileShapes.size() << endl;
 
@@ -86,21 +74,14 @@ Object* Object::load(string file, Material* defaultMaterial) {
 		materials.push_back(defaultMaterial);
 
 	// Create a root
-	if (fileShapes.size() > 1)
-		ret = new Object();
+	Object* obj = new Object(name);
 
 	for (uint i = 0; i < fileShapes.size(); i++) {
 
-		Object* obj = new Object(fileShapes[i].name);
-		//obj->id = i;
-		if (obj->name == "")
-			obj->name = "Untitled";
-
 		TriangleMesh* triangleMesh = new TriangleMesh();
-		//triangleMesh->id = i;
-		obj->geometry = triangleMesh;
+		obj->geometries.push_back(triangleMesh);
 
-		cout << "  " << obj->name << endl;
+		cout << "  " << fileShapes[i].name << endl;
 
 		// Vertices
 		uint vertices = fileShapes[i].mesh.positions.size() / 3;
@@ -128,10 +109,9 @@ Object* Object::load(string file, Material* defaultMaterial) {
 
 		// Triangles
 		int triangles = fileShapes[i].mesh.indices.size() / 3;
-		triangleMesh->primitives = vector<TrianglePrimitive>(triangles);
+		triangleMesh->indexData = vector<TrianglePrimitive>(triangles);
 		for (int t = 0; t < triangles; t++) {
-			//triangleMesh->primitives[t].id = t;
-			triangleMesh->primitives[t] = {
+			triangleMesh->indexData[t] = {
 				(uint)fileShapes[i].mesh.indices[3 * t + 0],
 				(uint)fileShapes[i].mesh.indices[3 * t + 1],
 				(uint)fileShapes[i].mesh.indices[3 * t + 2]
@@ -142,7 +122,7 @@ Object* Object::load(string file, Material* defaultMaterial) {
 				material_id = 0;
 			for (uint m = 0; m < materials.size(); m++) {
 				if (materials[m]->id == material_id) {
-					//triangleMesh->primitives[t].material = materials[m]; // TODO
+					//triangleMesh->indexData[t].material = materials[m]; // TODO
 					break;
 				}
 			}
@@ -159,7 +139,7 @@ Object* Object::load(string file, Material* defaultMaterial) {
 		//TODO: Check if obj file has normals
 		// Calculate normals by going through each triangle
 		for (uint i = 0; i < triangles; i++) {
-			TrianglePrimitive& currentTriangle = triangleMesh->primitives[i];
+			TrianglePrimitive& currentTriangle = triangleMesh->indexData[i];
 
 			// Calculate normal of the triangle
 			Vec3 normal = Vec3::cross(
@@ -178,29 +158,25 @@ Object* Object::load(string file, Material* defaultMaterial) {
 			triangleMesh->normalData[n] = Vec3::normalize(triangleMesh->normalData[n]);
 
 		// Set up vbo (Vertex buffer object) and ibo (Index buffer object)
-		glGenBuffers(1, &triangleMesh->vbo);
+		glGenBuffers(1, &triangleMesh->vboPos);
+		glGenBuffers(1, &triangleMesh->vboNormal);
+		glGenBuffers(1, &triangleMesh->vboTexCoord);
 		glGenBuffers(1, &triangleMesh->ibo);
-		uint sizePositions = vertices * sizeof(Vec3);
-		uint sizeNormals = vertices * sizeof(Vec3);
-		uint sizeTexCoords = vertices * sizeof(Vec2);
-		uint sizeIndices = triangles * sizeof(TrianglePrimitive);
 
-		glBindBuffer(GL_ARRAY_BUFFER, triangleMesh->vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizePositions + sizeNormals + sizeTexCoords, NULL, GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizePositions, &triangleMesh->posData[0]); // OptiX doesn't like this?
-		glBufferSubData(GL_ARRAY_BUFFER, sizePositions, sizeNormals, &triangleMesh->normalData[0]);
-		glBufferSubData(GL_ARRAY_BUFFER, sizePositions + sizeNormals, sizeTexCoords, &triangleMesh->texCoordData[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, triangleMesh->vboPos);
+		glBufferData(GL_ARRAY_BUFFER, vertices * sizeof(Vec3), &triangleMesh->posData[0], GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, triangleMesh->vboNormal);
+		glBufferData(GL_ARRAY_BUFFER, vertices * sizeof(Vec3), &triangleMesh->normalData[0], GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, triangleMesh->vboTexCoord);
+		glBufferData(GL_ARRAY_BUFFER, vertices * sizeof(Vec2), &triangleMesh->texCoordData[0], GL_STATIC_DRAW);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleMesh->ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeIndices, &triangleMesh->primitives[0], GL_STATIC_DRAW);
-
-		if (ret)
-			ret->children.push_back(obj);
-		else
-			ret = obj;
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangles * sizeof(TrianglePrimitive), &triangleMesh->indexData[0], GL_STATIC_DRAW);
 
 	}
 
-	return ret;
+	return obj;
 
 }

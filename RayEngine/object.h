@@ -8,18 +8,19 @@
 
 struct Object {
 
+	// Constructor
 	Object(string name = "");
 	~Object();
 
-	// Loads object(s) from a file. If more than one object is available in the file,
-	// a root object is returned with all the file objects as children.
-	static Object* load(string file, Material* defaultMaterial = nullptr);
+	// Loads object(s) from a file.
+	static Object* load(string name, string file, Material* defaultMaterial = nullptr);
 	
-	void render(Shader* shader, Mat4x4 proj);
+	// Renders using an OpenGL shader.
+	void renderOpenGL(Shader* shader, Mat4x4 proj);
 
+	// Variables
 	string name;
-	vector<Object*> children;
-	Geometry* geometry;
+	vector<Geometry*> geometries;
 
 	// Embree
 	struct {
@@ -27,6 +28,13 @@ struct Object {
 		uint instID;
 	} EmbreeData;
 	void initEmbree(RTCDevice device);
+
+	// OptiX
+	struct {
+		optix::Transform transform;
+		optix::GeometryGroup geometryGroup;
+	} OptixData;
+	void initOptix(optix::Context context);
 
 };
 
