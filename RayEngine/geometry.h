@@ -1,17 +1,20 @@
-// Stores a mesh or custom geometry
-
 #pragma once
+
 #include "common.h"
 
+// Stores a mesh or custom geometry
 struct Geometry {
 
-	enum GeometryType
-	{
-		TriangleMesh,
-		QuadMesh,
-		Custom
-	};
+	// Embree
+	struct {
+		uint geomID;
+	} EmbreeData;
+	virtual void initEmbree(RTCScene scene) = 0;
 
-	virtual GeometryType getGeometryType() = 0;
+	// OptiX
+	struct {
+		optix::Geometry geometry;
+	};
+	virtual void initOptix(optix::Context context) = 0;
 
 };

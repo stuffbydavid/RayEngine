@@ -3,34 +3,10 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="tiny_obj_loader.cc">
-      <Filter>RayEngine\TinyObjLoader</Filter>
-    </ClCompile>
-    <ClCompile Include="opengl_renderer.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="embree_renderer.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="embree_optix_renderer.cpp">
-      <Filter>RayEngine\Render</Filter>
+      <Filter>RayEngine\Scene\TinyObjLoader</Filter>
     </ClCompile>
     <ClCompile Include="object.cpp">
       <Filter>RayEngine\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="renderer.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="shading.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="shader.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="graphic.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="font.cpp">
-      <Filter>RayEngine\Render</Filter>
     </ClCompile>
     <ClCompile Include="embree_handler.cpp">
       <Filter>RayEngine\Embree</Filter>
@@ -50,6 +26,36 @@
     <ClCompile Include="material.cpp">
       <Filter>RayEngine\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>RayEngine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="graphic.cpp">
+      <Filter>RayEngine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="font.cpp">
+      <Filter>RayEngine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>RayEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>RayEngine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="triangle_mesh.cpp">
+      <Filter>RayEngine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="render_hybrid.cpp">
+      <Filter>RayEngine\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="render_embree.cpp">
+      <Filter>RayEngine\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="render_opengl.cpp">
+      <Filter>RayEngine\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="render_optix.cpp">
+      <Filter>RayEngine\Render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -59,7 +65,7 @@
       <Filter>RayEngine\Data</Filter>
     </ClInclude>
     <ClInclude Include="tiny_obj_loader.h">
-      <Filter>RayEngine\TinyObjLoader</Filter>
+      <Filter>RayEngine\Scene\TinyObjLoader</Filter>
     </ClInclude>
     <ClInclude Include="vec2.h">
       <Filter>RayEngine\Data</Filter>
@@ -79,38 +85,14 @@
     <ClInclude Include="triangle_mesh.h">
       <Filter>RayEngine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="triangle_primitive.h">
-      <Filter>RayEngine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="renderer.h">
-      <Filter>RayEngine\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="shading.h">
-      <Filter>RayEngine\Render</Filter>
-    </ClInclude>
     <ClInclude Include="light.h">
       <Filter>RayEngine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="font.h">
-      <Filter>RayEngine\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="graphic.h">
-      <Filter>RayEngine\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="shader.h">
-      <Filter>RayEngine\Render</Filter>
     </ClInclude>
     <ClInclude Include="mat4x3.h">
       <Filter>RayEngine\Data</Filter>
     </ClInclude>
     <ClInclude Include="mat4x4.h">
       <Filter>RayEngine\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="embree_handler.h">
-      <Filter>RayEngine\Embree</Filter>
-    </ClInclude>
-    <ClInclude Include="optix_handler.h">
-      <Filter>RayEngine\OptiX</Filter>
     </ClInclude>
     <ClInclude Include="common.h">
       <Filter>RayEngine</Filter>
@@ -123,6 +105,15 @@
     </ClInclude>
     <ClInclude Include="rayengine.h">
       <Filter>RayEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>RayEngine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="graphic.h">
+      <Filter>RayEngine\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="font.h">
+      <Filter>RayEngine\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -147,8 +138,33 @@
     <Filter Include="RayEngine\Scene">
       <UniqueIdentifier>{a108bd94-9742-4aa9-a251-1a4801e40493}</UniqueIdentifier>
     </Filter>
-    <Filter Include="RayEngine\TinyObjLoader">
+    <Filter Include="RayEngine\OpenGL">
+      <UniqueIdentifier>{92fbfd7f-d676-4f98-9e75-141016f51b74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RayEngine\OpenGL\Shaders">
+      <UniqueIdentifier>{0b5171b9-29c4-442a-8dc7-18c52bc6d1fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RayEngine\Scene\TinyObjLoader">
       <UniqueIdentifier>{6be24712-5a84-460f-be8f-dff61e3d7897}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ogl.vshader">
+      <Filter>RayEngine\OpenGL\Shaders</Filter>
+    </None>
+    <None Include="ogl.fshader">
+      <Filter>RayEngine\OpenGL\Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="miss_program.cu">
+      <Filter>RayEngine\OptiX\CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="camera_program.cu">
+      <Filter>RayEngine\OptiX\CUDA</Filter>
+    </CudaCompile>
+    <CudaCompile Include="triangle_mesh_program.cu">
+      <Filter>RayEngine\OptiX\CUDA</Filter>
+    </CudaCompile>
   </ItemGroup>
 </Project>

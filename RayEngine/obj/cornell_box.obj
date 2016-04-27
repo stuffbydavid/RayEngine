@@ -7,6 +7,7 @@
 
 mtllib cornell_box.mtl
 
+o box
 #o floor
 usemtl white
 v 552.8 0.0   0.0
@@ -76,7 +77,7 @@ v    556.0 548.8 559.2
 v    556.0 548.8   0.0
 f -4 -3 -2 -1
 
-#o short_block
+o short_block
 usemtl blue
 
 v    130.0 165.0  65.0
@@ -109,7 +110,7 @@ v     82.0 165.0 225.0
 v     82.0   0.0 225.0
 f -4 -3 -2 -1
 
-#o tall_block
+o tall_block
 usemtl blue
 
 v    423.0 330.0 247.0

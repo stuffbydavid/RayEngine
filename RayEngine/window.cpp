@@ -91,7 +91,25 @@ void Window::init(int width, int height) {
 	if (glewInit() != GLEW_OK)
 		cout << "ERROR";
 
-	// Generate buffers
+	cout << "GLEW version: " << glewGetString(GLEW_VERSION) << endl;
+	cout << "OpenGL version: " << glGetString(GL_VERSION) << endl;
+	cout << "OpenGL SL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+	cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << endl;
+	cout << endl;
+
+	// Culling
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+
+	// Transparent blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Texture settings
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	
+	/// Generate buffers
 	glGenBuffers(1, &vbo);
 	glGenTextures(1, &texture);
 
@@ -108,11 +126,10 @@ void Window::open(function<void(void)> updateFunc) {
 
 		// Call update function
 
+		glViewport(0, 0, width, height);
+		glClearColor(0.1, 0.1, 0.1, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		updateFunc();
-
-		// Render
-
-		//glDrawPixels(width, height, GL_RGBA, GL_FLOAT, buffer);
 
 		// Reset input
 
@@ -138,6 +155,7 @@ void Window::open(function<void(void)> updateFunc) {
 
 		glfwSwapBuffers(handle);
 		glfwPollEvents();
+
 	}
 
 	glfwTerminate();

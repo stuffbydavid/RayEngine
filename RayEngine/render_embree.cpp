@@ -1,6 +1,102 @@
-#include "renderer.h"
+#include "rayengine.h"
 
-/*
+void RayEngine::renderEmbree() {
+
+	float ratio = (float)window.width / window.height;
+	float tfov = embree::tan(embree::deg2rad(scenes[0]->camera.fov / 2.f));
+
+	Vec3 rxaxis = scenes[0]->camera.xaxis * ratio * tfov;
+	Vec3 ryaxis = scenes[0]->camera.yaxis * tfov;
+	Vec3 rzaxis = scenes[0]->camera.zaxis;
+
+	Color* pixels = new Color[window.width * window.height];
+
+	// TODO: Add ray 1..8 and use queue system depending on branko's results
+	for (int y = 0; y < window.height; y++) {
+		for (int x = 0; x < window.width; x++) {
+
+			float dx = ((float)x / window.width) * 2 - 1;
+			float dy = ((float)y / window.height) * 2 - 1;
+			Vec3 dir = dx * rxaxis + dy * ryaxis + rzaxis;
+
+			RTCRay ray;
+			ray.org[0] = scenes[0]->camera.position.x();
+			ray.org[1] = scenes[0]->camera.position.y();
+			ray.org[2] = scenes[0]->camera.position.z();
+			ray.dir[0] = dir.x();
+			ray.dir[1] = dir.y();
+			ray.dir[2] = dir.z();
+			ray.tnear = 0.1f;
+			ray.tfar = FLT_MAX;
+			ray.instID = ray.geomID = ray.primID = RTC_INVALID_GEOMETRY_ID;
+			ray.mask = -1;
+			ray.time = 0;
+
+			rtcIntersect(scenes[0]->root.EmbreeData.scene, ray);
+
+			if (ray.geomID != RTC_INVALID_GEOMETRY_ID) {
+				Vec3 n = Vec3::normalize(Vec3(ray.Ng)) * 0.5 + Vec3(0.5);
+				pixels[y * window.width + x] = Color(n.x(), n.y(), n.z(), 1); // getRayColor(&ray, Scene);
+			} else
+				pixels[y * window.width + x] = Color(0, 0, 0, 1);
+
+		}
+	}
+
+	glDrawPixels(window.width, window.height, GL_RGBA, GL_FLOAT, pixels);
+	delete pixels;
+
+
+}
+
+/*#include "renderer.h"
+
+EmbreeRenderer::EmbreeRenderer(EmbreeHandler* handler) {
+	this->handler = handler;
+}
+
+void EmbreeRenderer::getPixels(Color* pixels, int width, int height, Scene* Scene) {
+
+	float ratio = (float)width / height;
+	float tfov = embree::tan(embree::deg2rad(Scene->camera.fov / 2.f));
+
+	// TODO: Add ray 1..8 and use queue system depending on branko's results
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+
+			float dx = ((float)x / width) * 2 - 1;
+			float dy = ((float)y / height) * 2 - 1;
+			Vec3 dir = dx * Scene->camera.xaxis * ratio * tfov + dy * Scene->camera.yaxis * tfov + Scene->camera.zaxis;
+
+			RTCRay ray;
+			ray.org[0] = Scene->camera.position.x();
+			ray.org[1] = Scene->camera.position.y();
+			ray.org[2] = Scene->camera.position.z();
+			ray.dir[0] = dir.x();
+			ray.dir[1] = dir.y();
+			ray.dir[2] = dir.z();
+			ray.tnear = 0.1f;
+			ray.tfar = FLT_MAX;
+			ray.instID = ray.geomID = ray.primID = RTC_INVALID_GEOMETRY_ID;
+			ray.mask = -1;
+			ray.time = 0;
+
+			//rtcIntersect(Scene->embreeScene, ray);
+
+			if (ray.geomID != RTC_INVALID_GEOMETRY_ID)
+				pixels[y * width + x] = Color(ray.u, ray.v, 1, 1); // getRayColor(&ray, Scene);
+			else
+				pixels[y * width + x] = Color(0, 0, 0, 1);
+
+		}
+	}
+
+}*/
+
+
+/*#include "renderer.h"
+
+
 Renderer::Renderer() {
 #ifdef EMBREE_RENDERER
 	device = rtcNewDevice(NULL);

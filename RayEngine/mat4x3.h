@@ -27,19 +27,22 @@ struct Mat4x3 {
 	Mat4x3(const embree::AffineSpace3fa& m) {
 		eMat = m;
 	}
-	Mat4x3(const Vec3& l1, const Vec3& l2, const Vec3& l3, const Vec3& pos) {
+	Mat4x3(const Vec3& l1, const Vec3& l2, const Vec3& l3, const Vec3& pos = { 0.f, 0.f, 0.f }) {
 		eMat = embree::AffineSpace3fa(l1.eVec, l2.eVec, l3.eVec, pos.eVec);
 	}
 
 	// Functions
-	static __forceinline Mat4x3 translate(const Vec3& v) {
-		return embree::AffineSpace3fa::translate(v.eVec);
+	static __forceinline Mat4x3 translate(const Vec3& vec) {
+		return embree::AffineSpace3fa::translate(vec.eVec);
 	}
 	static __forceinline Mat4x3 scale(const Vec3& s) {
 		return embree::AffineSpace3fa::scale(s.eVec);
 	}
 	static __forceinline Vec3 rotate(const Vec3& vec, const Vec3& around, float angle) {
 		return embree::xfmVector(embree::AffineSpace3fa::rotate(around.eVec, embree::deg2rad(angle)), vec.eVec);
+	}
+	static __forceinline Mat4x3 lookat(const Vec3& from, const Vec3& to, const Vec3& up) {
+		return embree::AffineSpace3fa::lookat(from.eVec, to.eVec, up.eVec);
 	}
 
 };

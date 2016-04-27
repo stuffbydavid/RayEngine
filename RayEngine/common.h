@@ -1,5 +1,5 @@
 #pragma once
-#pragma warning(disable: 4005) // Macro redefinitions
+#pragma warning(disable: 4005) // Macro redefinitions from Embree+OptiX
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")

@@ -9,21 +9,18 @@ struct Scene {
 
 	Scene(string name);
 
-	string name;
-
-	void initEmbreeScene(RTCDevice device);
-
 	// Loads object(s) from a file and adds it to the scene.
-	// If more than one object is available in the file, a root object is
+	// If more than one object is available in the file, a parent object is
 	// returned with all the file objects as children.
 	Object* loadObject(string file, Material* defaultMaterial = nullptr);
 
+	string name;
 	Camera camera;
 	Object root;
-	//map<int, Object*> objectsMap; // Put in EmbreeHandler?
-	vector<Material*> materials;
+
+	//map<int, Object*> objectsMap; // TODO: Put in EmbreeHandler?
+
 	vector<Light*> lights;
 	Color ambient, background;
-	RTCScene embreeScene;
 
 };

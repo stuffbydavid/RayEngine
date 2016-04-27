@@ -2,8 +2,6 @@
 
 #include "common.h"
 #include "window.h"
-#include "embree_handler.h"
-#include "optix_handler.h"
 #include "scene.h"
 
 struct RayEngine {
@@ -28,23 +26,38 @@ struct RayEngine {
 
 	~RayEngine();
 
-	// Adds a new scene
+	// Adds a new, empty scene.
 	Scene* createScene(string name);
 
-	// Launches the program and starts rendering
+	// Launches the program and starts rendering.
 	void launch();
 
 private:
 
+	// Embree
+	struct {
+		RTCDevice device;
+	} EmbreeData;
+	void initEmbree();
+
+	// OptiX
+	struct {
+		optix::Context context;
+		optix::Buffer buffer;
+	} OptixData;
+	void initOptix();
+
 	vector<Scene*> scenes;
-
-	EmbreeHandler embreeHandler;
-	OptixHandler optixHandler;
-
 	Window window;
 	RenderMode renderMode;
 	RayTracingTarget rayTracingTarget;
+	Shader* shdrOGL;
 
 	void update();
+	void renderOpenGL();
+	void renderEmbree();
+	void renderOptix();
+	void renderHybrid();
+	void input();
 
 };

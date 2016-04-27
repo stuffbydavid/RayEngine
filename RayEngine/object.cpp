@@ -1,4 +1,5 @@
 #include "object.h"
+#include "tiny_obj_loader.h"
 
 Object::Object(string name) :
   name(name),
@@ -11,46 +12,12 @@ Object::~Object() {
 	//delete geometry;
 }
 
-void Object::initEmbreeScene(RTCDevice device) {
+void Object::render(Shader* shader, Mat4x4 proj) {
 
-	//TODO: Check other instance modes
-	RTCSceneFlags sFlags = RTC_SCENE_DYNAMIC | RTC_SCENE_COMPACT;
-	RTCAlgorithmFlags aFlags = RTC_INTERSECT1 | RTC_INTERSECT4 | RTC_INTERSECT8;
-
-	embreeScene = rtcDeviceNewScene(device, sFlags, aFlags);
-
-	switch (geometry->getGeometryType()) {
-		case Geometry::TriangleMesh:
-
-			TriangleMesh* pMesh = (TriangleMesh*)geometry;
-			pMesh->id = rtcNewTriangleMesh(embreeScene, RTC_GEOMETRY_STATIC, pMesh->primitives.size(), pMesh->posData.size());
-
-			struct Vertex   { float x, y, z, a; };
-			struct Triangle { int v0, v1, v2; };
-
-			Vertex* vertices = (Vertex*)rtcMapBuffer(embreeScene, pMesh->id, RTC_VERTEX_BUFFER);
-			// fill vertices here
-			for (int i = 0; i < pMesh->posData.size(); i++) {
-				vertices[i].x = pMesh->posData[i].x();
-				vertices[i].y = pMesh->posData[i].y();
-				vertices[i].z = pMesh->posData[i].z();
-				vertices[i].a = 0;
-			}
-			rtcUnmapBuffer(embreeScene, pMesh->id, RTC_VERTEX_BUFFER);
-
-			Triangle* triangles = (Triangle*)rtcMapBuffer(embreeScene, pMesh->id, RTC_INDEX_BUFFER);
-			// fill triangle indices here
-			for (int i = 0; i < pMesh->primitives.size(); i++) {
-				triangles[i].v0 = pMesh->primitives[i].indices[0];
-				triangles[i].v1 = pMesh->primitives[i].indices[1];
-				triangles[i].v2 = pMesh->primitives[i].indices[2];
-			}
-			rtcUnmapBuffer(embreeScene, pMesh->id, RTC_INDEX_BUFFER);
-
-			break;
-	}
-
-	rtcCommit(embreeScene);
+	if (geometry)
+		shader->use((TriangleMesh*)geometry, proj, this);
+	for (uint i = 0; i < children.size(); i++)
+		children[i]->render(shader, proj);
 
 }
 
@@ -59,8 +26,8 @@ Object* Object::load(string file, Material* defaultMaterial) {
 
 	vector<tinyobj::shape_t> fileShapes;
 	vector<tinyobj::material_t> fileMaterials;
-	string path = file.substr(0, file.find_last_of("/\\") + 1);
 	string err;
+	string path = file.substr(0, file.find_last_of("/\\") + 1);
 	Object* ret = nullptr;
 
 	cout << "Loading " << file << "..." << endl;
@@ -125,12 +92,12 @@ Object* Object::load(string file, Material* defaultMaterial) {
 	for (uint i = 0; i < fileShapes.size(); i++) {
 
 		Object* obj = new Object(fileShapes[i].name);
-		obj->id = i;
+		//obj->id = i;
 		if (obj->name == "")
 			obj->name = "Untitled";
 
 		TriangleMesh* triangleMesh = new TriangleMesh();
-		triangleMesh->id = i;
+		//triangleMesh->id = i;
 		obj->geometry = triangleMesh;
 
 		cout << "  " << obj->name << endl;
@@ -163,7 +130,7 @@ Object* Object::load(string file, Material* defaultMaterial) {
 		int triangles = fileShapes[i].mesh.indices.size() / 3;
 		triangleMesh->primitives = vector<TrianglePrimitive>(triangles);
 		for (int t = 0; t < triangles; t++) {
-			triangleMesh->primitives[t].id = t;
+			//triangleMesh->primitives[t].id = t;
 			triangleMesh->primitives[t] = {
 				(uint)fileShapes[i].mesh.indices[3 * t + 0],
 				(uint)fileShapes[i].mesh.indices[3 * t + 1],
@@ -175,14 +142,14 @@ Object* Object::load(string file, Material* defaultMaterial) {
 				material_id = 0;
 			for (uint m = 0; m < materials.size(); m++) {
 				if (materials[m]->id == material_id) {
-					triangleMesh->primitives[t].material = materials[m];
+					//triangleMesh->primitives[t].material = materials[m]; // TODO
 					break;
 				}
 			}
 		}
 
-		cout << "  Vertices: " << vertices << endl;
-		cout << "  Triangles: " << triangles << endl;
+		cout << "    Vertices: " << vertices << endl;
+		cout << "    Triangles: " << triangles << endl;
 
 		// Normals
 		triangleMesh->normalData = vector<Vec3>(vertices);
@@ -198,7 +165,7 @@ Object* Object::load(string file, Material* defaultMaterial) {
 			Vec3 normal = Vec3::cross(
 				triangleMesh->posData[currentTriangle.indices[1]] - triangleMesh->posData[currentTriangle.indices[0]],
 				triangleMesh->posData[currentTriangle.indices[2]] - triangleMesh->posData[currentTriangle.indices[0]]
-				);
+			);
 
 			// Add triangle normal to each vertex
 			triangleMesh->normalData[currentTriangle.indices[0]] = triangleMesh->normalData[currentTriangle.indices[0]] + normal;
@@ -220,7 +187,7 @@ Object* Object::load(string file, Material* defaultMaterial) {
 
 		glBindBuffer(GL_ARRAY_BUFFER, triangleMesh->vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizePositions + sizeNormals + sizeTexCoords, NULL, GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizePositions, &triangleMesh->posData[0]);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizePositions, &triangleMesh->posData[0]); // OptiX doesn't like this?
 		glBufferSubData(GL_ARRAY_BUFFER, sizePositions, sizeNormals, &triangleMesh->normalData[0]);
 		glBufferSubData(GL_ARRAY_BUFFER, sizePositions + sizeNormals, sizeTexCoords, &triangleMesh->texCoordData[0]);
 

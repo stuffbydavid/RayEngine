@@ -5,6 +5,10 @@
 
 struct Camera {
 
+	Camera();
+
+	Mat4x4 getMatrix(float ratio);
+
 	Vec3 xaxis, yaxis, zaxis, position;
 	float fov;
 

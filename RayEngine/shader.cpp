@@ -1,6 +1,9 @@
 #include "shader.h"
 
+void Shader::setupOGL(GLuint program, void* caller) {}
+
 Shader::Shader(string name, function<void(GLuint, void*)> setup, string vertexFilename, string fragmentFilename, string geometryFilename) {
+
 	string vsString, fsString, gsString, line;
 	const GLchar *vsSource, *fsSource, *gsSource;
 	GLint isCompiled, vs, fs, gs;
@@ -9,7 +12,7 @@ Shader::Shader(string name, function<void(GLuint, void*)> setup, string vertexFi
 	program = glCreateProgram();
 	this->name = name;
 	this->setup = setup;
-	glGenBuffers(1, &vbo);
+	//glGenBuffers(1, &vbo);
 
 	// Vertex shader
 	file.open(vertexFilename);
@@ -86,6 +89,52 @@ Shader::Shader(string name, function<void(GLuint, void*)> setup, string vertexFi
 	glLinkProgram(program);
 }
 
+void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
+
+	// Start up shader
+	glUseProgram(program);
+	GLint aPos = glGetAttribLocation(program, "aPos");
+	GLint aNorm = glGetAttribLocation(program, "aNorm");
+	GLint aTexCoord = glGetAttribLocation(program, "aTexCoord");
+	GLint uMat = glGetUniformLocation(program, "uMat");
+	GLint uTex = glGetUniformLocation(program, "uTex");
+	
+	// Select current resources
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
+	uint vertices = mesh->posData.size();
+	uint sizePositions = vertices * sizeof(Vec3);
+	uint sizeNormals = vertices * sizeof(Vec3);
+
+	// Pass buffers
+	glEnableVertexAttribArray(aPos);
+	glEnableVertexAttribArray(aNorm);
+	glEnableVertexAttribArray(aTexCoord);
+	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(aNorm, 3, GL_FLOAT, GL_FALSE, 0, (void*)sizePositions);
+	glVertexAttribPointer(aTexCoord, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizePositions + sizeNormals));
+
+	// Pass the viewing transform to the shader
+	glUniformMatrix4fv(uMat, 1, GL_FALSE, matrix.e);
+
+	// Send in texture
+	/*glActiveTexture(GL_TEXTURE0);
+	if (mesh->material)
+		glBindTexture(GL_TEXTURE_2D, mesh->material->texture->texture);
+	else
+		glBindTexture(GL_TEXTURE_2D, 0);*/
+	glUniform1i(uTex, 0);
+
+	// Set up shader specific uniforms
+	if (setup)
+		setup(program, caller);
+
+	// Draw all triangles
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+	glDrawElements(GL_TRIANGLES, mesh->primitives.size() * 3, GL_UNSIGNED_INT, 0);
+}
+/*
 void Shader::use(Graphic* graphic, Mat4x4 matrix, void* caller) {
 
 	// Start up shader
@@ -135,54 +184,4 @@ void Shader::use(Graphic* graphic, Mat4x4 matrix, void* caller) {
 	glDrawArrays(GL_TRIANGLES, 0, vertices);
 
 }
-
-void Shader::use(Graphic* graphic, Mat4x4 matrix) {
-	use(graphic, matrix, this);
-}
-
-void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
-
-	// Start up shader
-	glUseProgram(program);
-	GLint aPos = glGetAttribLocation(program, "aPos");
-	GLint aNorm = glGetAttribLocation(program, "aNorm");
-	GLint aTexCoord = glGetAttribLocation(program, "aTexCoord");
-	GLint uMat = glGetUniformLocation(program, "uMat");
-	GLint uTex = glGetUniformLocation(program, "uTex");
-
-	// Select current resources
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
-
-	// Pass buffers
-	uint vertices = mesh->posData.size();
-	uint sizePositions = vertices * sizeof(Vec3);
-	uint sizeNormals = vertices * sizeof(Vec3);
-	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glVertexAttribPointer(aNorm, 3, GL_FLOAT, GL_FALSE, 0, (void*)sizePositions);
-	glVertexAttribPointer(aTexCoord, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizePositions + sizeNormals));
-
-	// Pass the viewing transform to the shader
-	glUniformMatrix4fv(uMat, 1, GL_FALSE, matrix.e);
-
-	// Send in texture
-	/*glActiveTexture(GL_TEXTURE0);
-	if (mesh->material)
-		glBindTexture(GL_TEXTURE_2D, mesh->material->texture->texture);
-	else
-		glBindTexture(GL_TEXTURE_2D, 0);
-	glUniform1i(uTex, 0);*/
-
-	// Set up shader specific uniforms
-	if (setup)
-		setup(program, caller);
-
-	// Draw all triangles
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-	glDrawElements(GL_TRIANGLES, mesh->primitives.size() * 3, GL_UNSIGNED_INT, 0);
-}
-
-void Shader::use(TriangleMesh* mesh, Mat4x4 matrix) {
-	use(mesh, matrix, this);
-}
+*/

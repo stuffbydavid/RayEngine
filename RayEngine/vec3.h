@@ -6,17 +6,20 @@
 // 3D vector
 struct Vec3 {
 
-	embree::Vec3fa eVec;
+	embree::Vec3f eVec;
 
 	// Constructors
 	Vec3() {
-		eVec = embree::Vec3fa();
+		eVec = embree::Vec3f();
+	}
+	Vec3(float x) {
+		eVec = embree::Vec3f(x, x, x);
 	}
 	Vec3(float x, float y, float z) {
-		eVec = embree::Vec3fa(x, y, z);
+		eVec = embree::Vec3f(x, y, z);
 	}
 	Vec3(float x[3]) {
-		eVec = embree::Vec3fa(x[0], x[1], x[2]);
+		eVec = embree::Vec3f(x[0], x[1], x[2]);
 	}
 	__forceinline Vec3(const Vec3& other) {
 		eVec = other.eVec;
@@ -26,7 +29,7 @@ struct Vec3 {
 		return *this;
 	}
 
-	Vec3(embree::Vec3fa v) {
+	Vec3(embree::Vec3f v) {
 		eVec = v;
 	}
 

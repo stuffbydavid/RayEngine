@@ -1,12 +1,24 @@
 #pragma once
 
 #include "common.h"
+#include "material.h"
 #include "geometry.h"
-#include "triangle_primitive.h"
+
+struct TrianglePrimitive {
+
+	uint indices[3];
+
+	// Constructors
+	TrianglePrimitive() {}
+	TrianglePrimitive(uint i0, uint i1, uint i2) {
+		indices[0] = i0;
+		indices[1] = i1;
+		indices[2] = i2;
+	}
+
+};
 
 struct TriangleMesh : Geometry {
-
-	int id;
 
 	vector<Vec3> posData;
 	vector<Vec3> normalData;
@@ -14,26 +26,15 @@ struct TriangleMesh : Geometry {
 	vector<TrianglePrimitive> primitives;
 	GLuint vbo, ibo;
 
-	GeometryType getGeometryType() {
-		return GeometryType::TriangleMesh;
-	}
+	// Returns an interpolated normal
+	Vec3 getNormal(int primID, float u, float v);
 
+	// Returns an interpolated texture coordinate
+	Vec2 getTexCoord(int primID, float u, float v);
 
-	Vec3 getNormal(int primID, float u, float v) {
-		TrianglePrimitive& prim = primitives[primID];
+	// Embree
+	void initEmbree(RTCScene scene);
 
-		return
-			(1.f - u - v) * normalData[prim.indices[0]] +
-			u * normalData[prim.indices[1]] +
-			v * normalData[prim.indices[2]];
-	}
-
-	Vec2 getTexCoord(int primID, float u, float v) {
-		TrianglePrimitive& prim = primitives[primID];
-
-		return 
-			(1.f - u - v) * texCoordData[prim.indices[0]] +
-			u * texCoordData[prim.indices[1]] +
-			v * texCoordData[prim.indices[2]];
-	}
+	// OptiX
+	void initOptix(optix::Context context);
 };

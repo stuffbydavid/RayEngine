@@ -70,18 +70,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Libs\optix-3.8.0\include;C:\Libs\glew-1.13.0\include;C:\Libs\imagemagick-6.9.3-Q16\include;C:\Libs\glfw-3.1.2.bin.WIN32\include;C:\Libs\embree-2.9.0.win32.windows\include;C:\Libs\embree-2.9.0\common;C:\Libs\freetype\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Libs\optix-3.8.0\lib;C:\Libs\glew-1.13.0\lib\Release\Win32;C:\Libs\imagemagick-6.9.3-Q16\lib;C:\Libs\embree-2.9.0.win32.windows\lib;C:\Libs\glfw-3.1.2.bin.WIN32\lib-vc2013;C:\Libs\freetype\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Libs\glfw-3.1.2.bin.WIN64\include;C:\Libs\embree-2.8.0.x64.windows\include;C:\Libs\embree-2.8.0\common;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Libs\embree-2.8.0.x64.windows\lib;C:\Libs\glfw-3.1.2.bin.WIN64\lib-vc2013;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Libs\optix-3.8.0\include;C:\Libs\glew-1.13.0\include;C:\Libs\imagemagick-6.9.3-Q16\include;C:\Libs\glfw-3.1.2.bin.WIN64\include;C:\Libs\embree-2.9.0.x64.windows\include;C:\Libs\embree-2.9.0\common;C:\Libs\freetype\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Libs\optix-3.8.0\lib64;C:\Libs\glew-1.13.0\lib\Release\x64;C:\Libs\imagemagick-6.9.3-Q16\lib;C:\Libs\embree-2.9.0.x64.windows\lib;C:\Libs\glfw-3.1.2.bin.WIN64\lib-vc2013;C:\Libs\freetype\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Libs\optix-3.8.0\include;C:\Libs\glew-1.13.0\include;C:\Libs\imagemagick-6.9.3-Q16\include;C:\Libs\glfw-3.1.2.bin.WIN32\include;C:\Libs\embree-2.9.0.win32.windows\include;C:\Libs\embree-2.9.0\common;C:\Libs\freetype\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Libs\optix-3.8.0\lib;C:\Libs\glew-1.13.0\lib\Release\Win32;C:\Libs\imagemagick-6.9.3-Q16\lib;C:\Libs\embree-2.9.0.win32.windows\lib;C:\Libs\glfw-3.1.2.bin.WIN32\lib-vc2013;C:\Libs\freetype\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(CUDA_INC_PATH);C:\Libs\optix-3.8.0\include;C:\Libs\glew-1.13.0\include;C:\Libs\imagemagick-6.9.3-Q16\include;C:\Libs\glfw-3.1.2.bin.WIN64\include;C:\Libs\embree-2.9.0.x64.windows\include;C:\Libs\embree-2.9.0\common;C:\Libs\freetype\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>C:\Libs\optix-3.8.0\include;C:\Libs\glew-1.13.0\include;C:\Libs\imagemagick-6.9.3-Q16\include;C:\Libs\glfw-3.1.2.bin.WIN64\include;C:\Libs\embree-2.9.0.x64.windows\include;C:\Libs\embree-2.9.0\common;C:\Libs\freetype\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <LibraryPath>C:\Libs\optix-3.8.0\lib64;C:\Libs\glew-1.13.0\lib\Release\x64;C:\Libs\imagemagick-6.9.3-Q16\lib;C:\Libs\embree-2.9.0.x64.windows\lib;C:\Libs\glfw-3.1.2.bin.WIN64\lib-vc2013;C:\Libs\freetype\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(ProjectName)\</OutDir>
   </PropertyGroup>
@@ -92,11 +96,16 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <CudaCompile>
+      <CompileOut>$(ProjectDir)ptx\%(Filename)%(Extension).ptx</CompileOut>
+      <NvccCompilation>ptx</NvccCompilation>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -106,11 +115,17 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OpenMPSupport>true</OpenMPSupport>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <CudaCompile>
+      <CompileOut>$(ProjectDir)ptx\%(Filename)%(Extension).ptx</CompileOut>
+      <NvccCompilation>ptx</NvccCompilation>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -121,6 +136,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,6 +144,10 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <CudaCompile>
+      <CompileOut>$(ProjectDir)ptx\%(Filename)%(Extension).ptx</CompileOut>
+      <NvccCompilation>ptx</NvccCompilation>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -160,30 +180,31 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="embree_handler.cpp" />
-    <ClCompile Include="embree_optix_renderer.cpp" />
-    <ClCompile Include="embree_renderer.cpp" />
+    <ClCompile Include="render_hybrid.cpp" />
+    <ClCompile Include="render_embree.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="graphic.cpp" />
+    <ClCompile Include="input.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="object.cpp" />
-    <ClCompile Include="opengl_renderer.cpp" />
+    <ClCompile Include="render_opengl.cpp" />
     <ClCompile Include="optix_handler.cpp" />
     <ClCompile Include="rayengine.cpp" />
     <ClInclude Include="rayengine.h" />
-    <ClCompile Include="renderer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="render_optix.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shader.cpp" />
-    <ClCompile Include="shading.cpp" />
     <ClCompile Include="tiny_obj_loader.cc" />
+    <ClCompile Include="triangle_mesh.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="common.h" />
-    <ClInclude Include="embree_handler.h" />
     <ClInclude Include="font.h" />
     <ClInclude Include="geometry.h" />
     <ClInclude Include="graphic.h" />
@@ -192,17 +213,26 @@
     <ClInclude Include="mat4x4.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="object.h" />
-    <ClInclude Include="optix_handler.h" />
-    <ClInclude Include="renderer.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shader.h" />
-    <ClInclude Include="shading.h" />
     <ClInclude Include="tiny_obj_loader.h" />
     <ClInclude Include="triangle_mesh.h" />
-    <ClInclude Include="triangle_primitive.h" />
     <ClInclude Include="vec2.h" />
     <ClInclude Include="vec3.h" />
     <ClInclude Include="window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ogl.fshader">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
+    </None>
+    <None Include="ogl.vshader">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="camera_program.cu" />
+    <CudaCompile Include="miss_program.cu" />
+    <CudaCompile Include="triangle_mesh_program.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
