@@ -1,7 +1,7 @@
 #include "rayengine.h"
 
 // Main entry of the program.
-// Scenes are constructed from outside the RayEngine class.
+// Scenes are constructed from outside the RayEngine object.
 int main(int argc, char **argv) {
 
 	RayEngine rayEngine;

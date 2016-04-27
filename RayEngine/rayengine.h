@@ -23,7 +23,7 @@ struct RayEngine {
 			  int windowHeight = 600,
 			  RenderMode renderMode = RM_RAYTRACING,
 			  RayTracingTarget rayTracingTarget = RTT_GPU,
-			  float hybridPartition = 0.5);
+			  float hybridPartition = 0.2);
 
 	~RayEngine();
 
@@ -35,11 +35,32 @@ struct RayEngine {
 
 private:
 
+	void update();
+	void resize();
+	void resizeEmbree();
+	void resizeOptix();
+	void renderOpenGL();
+	void renderEmbree();
+	void renderEmbreeTexture();
+	void renderOptix();
+	void renderOptixTexture();
+	void renderHybrid();
+	void input();
+
+	// Variables
+	vector<Scene*> scenes;
+	Window window;
+	Shader *shdrOGL, *shdrTex;
+
+	RenderMode renderMode;
+	RayTracingTarget rayTracingTarget;
+	float hybridPartition;
+
 	// Embree
 	struct {
 		RTCDevice device;
-		GLuint texture;
 		Color* buffer;
+		GLuint texture;
 	} EmbreeData;
 	void initEmbree();
 
@@ -51,22 +72,5 @@ private:
 		GLuint texture;
 	} OptixData;
 	void initOptix();
-
-	vector<Scene*> scenes;
-	Window window;
-	RenderMode renderMode;
-	RayTracingTarget rayTracingTarget;
-	float hybridPartition;
-	Shader* shdrOGL;
-
-	void update();
-	void resize();
-	void resizeEmbree();
-	void resizeOptix();
-	void renderOpenGL();
-	void renderEmbree();
-	void renderOptix();
-	void renderHybrid();
-	void input();
 
 };

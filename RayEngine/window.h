@@ -16,5 +16,6 @@ struct Window {
 
 	GLFWwindow* handle;
 	function<void(void)> resizeFunc;
+	Mat4x4 ortho;
 
 };

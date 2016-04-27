@@ -52,17 +52,52 @@ void windowKeyCallback(GLFWwindow* handle, int key, int scancode, int action, in
 
 void windowSizeCallback(GLFWwindow* handle, int width, int height) {
 
+	w->ortho = Mat4x4::ortho(0, width, 0, height, 0, 1);
+	w->width = width;
+	w->height = height;
 	w->resizeFunc();
 
 }
 
 void Window::init(int width, int height) {
 
+	// Initialize window
+
+	w = this;
 	glfwInit();
+	handle = glfwCreateWindow(width, height, "", NULL, NULL);
+	glfwMakeContextCurrent(handle);
+	this->width = width;
+	this->height = height;
+
+	// Init GLEW
+
+	glewExperimental = true;
+	glewInit();
+
+	cout << "GLEW version: " << glewGetString(GLEW_VERSION) << endl;
+	cout << "OpenGL version: " << glGetString(GL_VERSION) << endl;
+	cout << "OpenGL SL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+	cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << endl;
+	cout << endl;
+
+	// Culling
+
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+
+	// Transparent blending
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// Texture settings
+
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	// Initialize input
 
-	w = this;
 	for (uint k = 0; k < GLFW_KEY_LAST; k++) {
 		keyDown[k] = false;
 		keyPressed[k] = false;
@@ -73,34 +108,6 @@ void Window::init(int width, int height) {
 		mousePressed[m] = false;
 		mouseReleased[m] = false;
 	}
-
-	// Initialize window
-
-	handle = glfwCreateWindow(width, height, "", NULL, NULL);
-	glfwMakeContextCurrent(handle);
-
-	// Init GLEW
-	glewExperimental = true;
-	if (glewInit() != GLEW_OK)
-		cout << "ERROR";
-
-	cout << "GLEW version: " << glewGetString(GLEW_VERSION) << endl;
-	cout << "OpenGL version: " << glGetString(GL_VERSION) << endl;
-	cout << "OpenGL SL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
-	cout << "OpenGL vendor: " << glGetString(GL_VENDOR) << endl;
-	cout << endl;
-
-	// Culling
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-
-	// Transparent blending
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	// Texture settings
-	glEnable(GL_TEXTURE_2D);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	
 }
 
@@ -108,6 +115,8 @@ void Window::open(function<void(void)> updateFunc, function<void(void)> resizeFu
 
 	int lastTime = -1, frame = 0;
 	fps = 0;
+
+	// Set callbacks
 
 	this->resizeFunc = resizeFunc;
 	glfwSetMouseButtonCallback(handle, windowMouseButtonCallback);
@@ -117,8 +126,6 @@ void Window::open(function<void(void)> updateFunc, function<void(void)> resizeFu
 	windowSizeCallback(handle, width, height);
 
 	while (!glfwWindowShouldClose(handle)) {
-
-		glfwGetWindowSize(handle, &width, &height);
 
 		// Call update function
 
@@ -143,7 +150,6 @@ void Window::open(function<void(void)> updateFunc, function<void(void)> resizeFu
 			fps = frame;
 			frame = 0;
 		}
-
 		lastTime = (int)glfwGetTime();
 
 		glfwSwapBuffers(handle);

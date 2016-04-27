@@ -14,6 +14,9 @@ struct Vec2 {
 	Vec2(float x, float y) {
 		eVec = embree::Vec2f(x, y);
 	}
+	Vec2(int x, int y) {
+		eVec = embree::Vec2f(x, y);
+	}
 	Vec2(float x[2]) {
 		eVec = embree::Vec2f(x[0], x[1]);
 	}

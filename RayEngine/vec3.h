@@ -18,6 +18,9 @@ struct Vec3 {
 	Vec3(float x, float y, float z) {
 		eVec = embree::Vec3f(x, y, z);
 	}
+	Vec3(int x, int y, int z) {
+		eVec = embree::Vec3f(x, y, z);
+	}
 	Vec3(float x[3]) {
 		eVec = embree::Vec3f(x[0], x[1], x[2]);
 	}

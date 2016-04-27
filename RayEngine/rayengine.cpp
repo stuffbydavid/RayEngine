@@ -10,7 +10,8 @@ RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, R
 	Magick::InitializeMagick(NULL);
 
 	// Shaders
-	shdrOGL = new Shader("OpenGL", Shader::setupOGL, "ogl.vshader", "ogl.fshader");
+	shdrOGL = new Shader("OpenGL", nullptr, "ogl.vshader", "ogl.fshader");
+	shdrTex = new Shader("Texture", nullptr, "tex.vshader", "tex.fshader");
 
 }
 
@@ -30,17 +31,7 @@ void RayEngine::launch() {
 void RayEngine::update() {
 
 	input();
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, 1, 0, 1, -1, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glViewport(0, 0, window.width, window.height);
-
-	glClearColor(0.1, 0.1, 0.1, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
 	string mode = "";
 
 	if (renderMode == RM_OPENGL) {
@@ -48,9 +39,11 @@ void RayEngine::update() {
 		mode = "OpenGL";
 	} else if (rayTracingTarget == RTT_CPU) {
 		renderEmbree();
+		renderEmbreeTexture();
 		mode = "Embree";
 	} else if (rayTracingTarget == RTT_GPU) {
 		renderOptix();
+		renderOptixTexture();
 		mode = "OptiX";
 	} else if (rayTracingTarget == RTT_HYBRID) {
 		renderHybrid();

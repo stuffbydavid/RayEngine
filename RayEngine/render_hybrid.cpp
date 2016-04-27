@@ -2,22 +2,18 @@
 
 void RayEngine::renderHybrid() {
 
-	renderOptix();
-	renderEmbree();
+	omp_set_nested(1);
 
-	/*omp_set_nested(1);
-	//omp_set_num_threads(4);
-
-    #pragma omp parallel 
+    #pragma omp parallel num_threads(2)
 	{
+		if (omp_get_thread_num() == 0)
+			renderOptix();
+		else {
+			renderEmbree();
+		}
+	}
 
-        #pragma omp master
-		renderOptix();
-
-        #pragma omp single
-		renderEmbree();
-
-        //#pragma omp barrier //??
-	}*/
+	renderEmbreeTexture();
+	renderOptixTexture();
 
 }

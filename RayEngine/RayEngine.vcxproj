@@ -185,7 +185,6 @@
     <ClCompile Include="render_hybrid.cpp" />
     <ClCompile Include="render_embree.cpp" />
     <ClCompile Include="font.cpp" />
-    <ClCompile Include="graphic.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="object.cpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="common.h" />
     <ClInclude Include="font.h" />
     <ClInclude Include="geometry.h" />
-    <ClInclude Include="graphic.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="mat4x3.h" />
     <ClInclude Include="mat4x4.h" />
@@ -229,6 +227,8 @@
     <None Include="ogl.vshader">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
     </None>
+    <None Include="tex.fshader" />
+    <None Include="tex.vshader" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="camera_program.cu" />

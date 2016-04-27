@@ -4,6 +4,7 @@
 
 void RayEngine::initEmbree() {
 
+	// Init library
 	EmbreeData.device = rtcNewDevice(NULL);
 	EmbreeData.buffer = nullptr;
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
@@ -25,7 +26,7 @@ void RayEngine::initEmbree() {
 void Scene::initEmbree(RTCDevice device) {
 
 	EmbreeData.scene = rtcDeviceNewScene(device,
-										 RTC_SCENE_DYNAMIC | RTC_SCENE_COMPACT,
+										 RTC_SCENE_DYNAMIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY,
 										 RTC_INTERSECT1 | RTC_INTERSECT4 | RTC_INTERSECT8);
 
 	//TODO: Check other instance modes?
@@ -42,7 +43,7 @@ void Object::initEmbree(RTCDevice device) {
 
 	// Init embree for mesh and all the children
 	EmbreeData.scene = rtcDeviceNewScene(device,
-										 RTC_SCENE_STATIC | RTC_SCENE_COMPACT,
+										 RTC_SCENE_STATIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY,
 										 RTC_INTERSECT1 | RTC_INTERSECT4 | RTC_INTERSECT8);
 	
 	for (uint i = 0; i < geometries.size(); i++)
@@ -55,8 +56,8 @@ void Object::initEmbree(RTCDevice device) {
 void TriangleMesh::initEmbree(RTCScene scene) {
 
 	EmbreeData.geomID = rtcNewTriangleMesh(scene, RTC_GEOMETRY_STATIC, indexData.size(), posData.size());
-	rtcSetBuffer(scene, EmbreeData.geomID, RTC_INDEX_BUFFER, &indexData[0], 0, sizeof(TrianglePrimitive));
 	rtcSetBuffer(scene, EmbreeData.geomID, RTC_VERTEX_BUFFER, &posData[0], 0, sizeof(Vec3));
+	rtcSetBuffer(scene, EmbreeData.geomID, RTC_INDEX_BUFFER, &indexData[0], 0, sizeof(TrianglePrimitive));
 
 }
 

@@ -1,7 +1,5 @@
 #include "shader.h"
 
-void Shader::setupOGL(GLuint program, void* caller) {}
-
 Shader::Shader(string name, function<void(GLuint, void*)> setup, string vertexFilename, string fragmentFilename, string geometryFilename) {
 
 	string vsString, fsString, gsString, line;
@@ -12,7 +10,7 @@ Shader::Shader(string name, function<void(GLuint, void*)> setup, string vertexFi
 	program = glCreateProgram();
 	this->name = name;
 	this->setup = setup;
-	//glGenBuffers(1, &vbo);
+	glGenBuffers(1, &vbo);
 
 	// Vertex shader
 	file.open(vertexFilename);
@@ -140,54 +138,66 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 	glUseProgram(0);
 
 }
-/*
-void Shader::use(Graphic* graphic, Mat4x4 matrix, void* caller) {
+
+void Shader::use2D(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture, Color color) {
 
 	// Start up shader
 	glUseProgram(program);
 	GLint aPos = glGetAttribLocation(program, "aPos");
 	GLint aTexCoord = glGetAttribLocation(program, "aTexCoord");
-	GLint aColor = glGetAttribLocation(program, "aColor");
 	GLint uMat = glGetUniformLocation(program, "uMat");
 	GLint uTex = glGetUniformLocation(program, "uTex");
+	GLint uColor = glGetUniformLocation(program, "uColor");
 
 	// Select current resources
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	// Bind buffers
-	uint vertices = graphic->posData.size();
+	Vec3 posData[6] = {
+		{ x, y, 0 },
+		{ x, y + height, 0 },
+		{ x + width, y, 0 },
+		{ x + width, y, 0 },
+		{ x, y + height, 0 },
+		{ x + width, y + height, 0 },
+	};
+	Vec2 texCoordData[6] = {
+		{ 0, 0 },
+		{ 0, 1 },
+		{ 1, 0 },
+		{ 1, 0 },
+		{ 0, 1 },
+		{ 1, 1 }
+	};
+	uint vertices = 6;
 	uint sizePositions = vertices * sizeof(Vec3);
 	uint sizeTexCoords = vertices * sizeof(Vec2);
-	uint sizeColors = vertices * sizeof(Color);
-	glBufferData(GL_ARRAY_BUFFER, sizePositions + sizeTexCoords + sizeColors, NULL, GL_DYNAMIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizePositions, &graphic->posData[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, sizePositions, sizeTexCoords, &graphic->texCoordData[0]);
-	glBufferSubData(GL_ARRAY_BUFFER, sizePositions + sizeTexCoords, sizeColors, &graphic->colorData[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizePositions + sizeTexCoords, NULL, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizePositions, posData);
+	glBufferSubData(GL_ARRAY_BUFFER, sizePositions, sizeTexCoords, texCoordData);
 
 	// Pass buffers
 	glEnableVertexAttribArray(aPos);
 	glEnableVertexAttribArray(aTexCoord);
-	glEnableVertexAttribArray(aColor);
 	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glVertexAttribPointer(aTexCoord, 2, GL_FLOAT, GL_FALSE, 0, (void*)sizePositions);
-	glVertexAttribPointer(aColor, 4, GL_FLOAT, GL_FALSE, 0, (void*)(sizePositions + sizeTexCoords));
 
 	// Send in matrix
 	glUniformMatrix4fv(uMat, 1, GL_FALSE, matrix.e);
 
+	// Send in color
+	glUniform4fv(uColor, 1, (float*)&color.eCol);
+
 	// Send in texture
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, graphic->texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(uTex, 0);
 
-	// Set up shader specific uniforms
-	if (setup)
-		setup(program, caller);
-
 	// Draw all triangles
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
 	glDrawArrays(GL_TRIANGLES, 0, vertices);
 
+	// Reset
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glUseProgram(0);
+
 }
-*/

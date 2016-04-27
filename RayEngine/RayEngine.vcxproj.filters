@@ -29,9 +29,6 @@
     <ClCompile Include="shader.cpp">
       <Filter>RayEngine\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="graphic.cpp">
-      <Filter>RayEngine\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="font.cpp">
       <Filter>RayEngine\OpenGL</Filter>
     </ClCompile>
@@ -109,9 +106,6 @@
     <ClInclude Include="shader.h">
       <Filter>RayEngine\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="graphic.h">
-      <Filter>RayEngine\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="font.h">
       <Filter>RayEngine\OpenGL</Filter>
     </ClInclude>
@@ -156,6 +150,12 @@
       <Filter>RayEngine\OpenGL\Shaders</Filter>
     </None>
     <None Include="ogl.fshader">
+      <Filter>RayEngine\OpenGL\Shaders</Filter>
+    </None>
+    <None Include="tex.vshader">
+      <Filter>RayEngine\OpenGL\Shaders</Filter>
+    </None>
+    <None Include="tex.fshader">
       <Filter>RayEngine\OpenGL\Shaders</Filter>
     </None>
   </ItemGroup>

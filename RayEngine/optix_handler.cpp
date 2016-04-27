@@ -136,4 +136,14 @@ void TriangleMesh::initOptix(optix::Context context) {
 
 void RayEngine::resizeOptix() {
 
+	// Resize buffer object
+	OptixData.buffer->setSize(window.width, window.height);
+
+	// Resize VBO
+	OptixData.buffer->unregisterGLBuffer();
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, OptixData.vbo);
+	glBufferData(GL_PIXEL_UNPACK_BUFFER, sizeof(float) * 4 * window.width * window.height, 0, GL_STREAM_DRAW);
+	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+	OptixData.buffer->registerGLBuffer();
+
 }

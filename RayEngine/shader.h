@@ -1,6 +1,5 @@
 #pragma once
 #include "common.h"
-#include "graphic.h"
 #include "triangle_mesh.h"
 
 // Loads and renders using a vertex/fragment/geometry shader.
@@ -13,7 +12,7 @@ struct Shader {
 	void use(TriangleMesh* mesh, Mat4x4 matrix, void* caller = nullptr);
 
 	// Renders a 2D graphic.
-	//void use(Graphic* graphic, Mat4x4 matrix, void* caller = nullptr);
+	void use2D(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture = 0, Color color = { 1.f, 1.f, 1.f, 1.f });
 
 	static void setupOGL(GLuint program, void* caller);
 
