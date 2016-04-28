@@ -93,7 +93,7 @@
 	.reg .b64 	%SP;
 	.reg .b64 	%SPL;
 	.reg .pred 	%p<2>;
-	.reg .f32 	%f<49>;
+	.reg .f32 	%f<41>;
 	.reg .s32 	%r<12>;
 	.reg .s64 	%rd<31>;
 
@@ -123,8 +123,8 @@ BB0_2:
 	// inline asm
 	call (%rd23), _rt_buffer_get_64, (%rd24, %r10, %r11, %rd25, %rd26, %rd28, %rd28);
 	// inline asm
-	mov.f32 	%f48, 0f00000000;
-	st.v4.f32 	[%rd23], {%f48, %f48, %f48, %f48};
+	mov.f32 	%f40, 0f00000000;
+	st.v4.f32 	[%rd23], {%f40, %f40, %f40, %f40};
 	bra.uni 	BB0_3;
 
 BB0_1:
@@ -160,22 +160,14 @@ BB0_1:
 	fma.rn.f32 	%f30, %f17, %f21, %f27;
 	mov.u64 	%rd19, zaxis;
 	ldu.global.f32 	%f31, [zaxis];
-	add.f32 	%f32, %f28, %f31;
+	add.f32 	%f8, %f28, %f31;
 	add.s64 	%rd20, %rd19, 4;
-	ldu.global.f32 	%f33, [%rd20];
-	add.f32 	%f34, %f29, %f33;
+	ldu.global.f32 	%f32, [%rd20];
+	add.f32 	%f9, %f29, %f32;
 	add.s64 	%rd21, %rd19, 8;
-	ldu.global.f32 	%f35, [%rd21];
-	add.f32 	%f36, %f30, %f35;
-	mul.f32 	%f37, %f34, %f34;
-	fma.rn.f32 	%f38, %f32, %f32, %f37;
-	fma.rn.f32 	%f39, %f36, %f36, %f38;
-	sqrt.rn.f32 	%f40, %f39;
-	rcp.rn.f32 	%f41, %f40;
-	mul.f32 	%f8, %f32, %f41;
-	mul.f32 	%f9, %f34, %f41;
-	mul.f32 	%f10, %f36, %f41;
-	ld.global.v2.f32 	{%f42, %f43}, [eye];
+	ldu.global.f32 	%f33, [%rd21];
+	add.f32 	%f10, %f30, %f33;
+	ld.global.v2.f32 	{%f34, %f35}, [eye];
 	ld.global.f32 	%f7, [eye+8];
 	ldu.global.u32 	%r3, [sceneObj];
 	mov.u32 	%r4, 0;
@@ -183,7 +175,7 @@ BB0_1:
 	mov.f32 	%f12, 0f6C4ECB8F;
 	mov.u32 	%r5, 12;
 	// inline asm
-	call _rt_trace_64, (%r3, %f42, %f43, %f7, %f8, %f9, %f10, %r4, %f11, %f12, %rd3, %r5);
+	call _rt_trace_64, (%r3, %f34, %f35, %f7, %f8, %f9, %f10, %r4, %f11, %f12, %rd3, %r5);
 	// inline asm
 	ld.global.u32 	%rd6, [launchIndex];
 	ld.global.u32 	%rd7, [launchIndex+4];
@@ -195,11 +187,11 @@ BB0_1:
 	// inline asm
 	call (%rd4), _rt_buffer_get_64, (%rd5, %r6, %r7, %rd6, %rd7, %rd9, %rd9);
 	// inline asm
-	ld.local.f32 	%f44, [%rd10+8];
-	ld.local.f32 	%f45, [%rd10+4];
-	ld.local.f32 	%f46, [%rd10];
-	mov.f32 	%f47, 0f3F800000;
-	st.v4.f32 	[%rd4], {%f46, %f45, %f44, %f47};
+	ld.local.f32 	%f36, [%rd10+8];
+	ld.local.f32 	%f37, [%rd10+4];
+	ld.local.f32 	%f38, [%rd10];
+	mov.f32 	%f39, 0f3F800000;
+	st.v4.f32 	[%rd4], {%f38, %f37, %f36, %f39};
 
 BB0_3:
 	ret;

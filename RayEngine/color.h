@@ -11,18 +11,17 @@ struct Color {
 	Color() {
 		eCol = embree::Color4();
 	}
-
-	Color(float r_, float g_, float b_, float a_) {
-		eCol = embree::Color4(r_, g_, b_, a_);
+	Color(float r, float g, float b, float a = 1.f) {
+		eCol = embree::Color4(r, g, b, a);
 	}
-	Color(embree::Color4 color_) {
-		eCol = color_;
+	Color(embree::Color4 color) {
+		eCol = color;
 	}
-	Color(embree::Color color_) {
-		eCol = embree::Color4(color_);
+	Color(embree::Color color) {
+		eCol = embree::Color4(color);
 	}
 	Color(float arr[3]) {
-		eCol = embree::Color4(arr[0], arr[1], arr[2], 1);
+		eCol = embree::Color4(arr[0], arr[1], arr[2], 1.f);
 	}
 
 	// Getters
@@ -40,17 +39,17 @@ struct Color {
 	}
 
 	// Setters
-	__forceinline void r(float r_) {
-		eCol.r = r_;
+	__forceinline void r(float r) {
+		eCol.r = r;
 	}
-	__forceinline void g(float g_) {
-		eCol.g = g_;
+	__forceinline void g(float g) {
+		eCol.g = g;
 	}
-	__forceinline void b(float b_) {
-		eCol.b = b_;
+	__forceinline void b(float b) {
+		eCol.b = b;
 	}
-	__forceinline void a(float a_) {
-		eCol.a = a_;
+	__forceinline void a(float a) {
+		eCol.a = a;
 	}
 
 };

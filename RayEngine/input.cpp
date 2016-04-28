@@ -3,7 +3,6 @@
 void RayEngine::input() {
 
 	static bool moveCamera = false;
-	Camera& selectedCamera = scenes[0]->camera;
 
 	// Start/Stop moving
 
@@ -38,6 +37,14 @@ void RayEngine::input() {
 		rayTracingTarget = RTT_HYBRID;
 	}
 
+	// Hybrid partition
+
+	if (window.keyDown[GLFW_KEY_LEFT])
+		hybridPartition = max(hybridPartition - 0.01f, 0.f);
+
+	if (window.keyDown[GLFW_KEY_RIGHT])
+		hybridPartition = min(hybridPartition + 0.01f, 1.f);
+
 	// Move the camera
 
 	if (moveCamera) {
@@ -49,13 +56,13 @@ void RayEngine::input() {
 
 		// Rotate X and Z axis around Y axis for yaw
 
-		selectedCamera.xaxis = Mat4x3::rotate(selectedCamera.xaxis, selectedCamera.yaxis, -window.mouseMove.x() * lookFactor);
-		selectedCamera.zaxis = Mat4x3::rotate(selectedCamera.zaxis, selectedCamera.yaxis, -window.mouseMove.x() * lookFactor);
+		curCamera->xaxis = Mat4x3::rotate(curCamera->xaxis, curCamera->yaxis, -window.mouseMove.x() * lookFactor);
+		curCamera->zaxis = Mat4x3::rotate(curCamera->zaxis, curCamera->yaxis, -window.mouseMove.x() * lookFactor);
 
 		// Rotate Y and Z axis around X axis for pitch
 
-		selectedCamera.yaxis = Mat4x3::rotate(selectedCamera.yaxis, selectedCamera.xaxis, -window.mouseMove.y() * lookFactor);
-		selectedCamera.zaxis = Mat4x3::rotate(selectedCamera.zaxis, selectedCamera.xaxis, -window.mouseMove.y() * lookFactor);
+		curCamera->yaxis = Mat4x3::rotate(curCamera->yaxis, curCamera->xaxis, -window.mouseMove.y() * lookFactor);
+		curCamera->zaxis = Mat4x3::rotate(curCamera->zaxis, curCamera->xaxis, -window.mouseMove.y() * lookFactor);
 
 		// Go faster
 
@@ -70,35 +77,37 @@ void RayEngine::input() {
 		// Move along the axises
 
 		if (window.keyDown[GLFW_KEY_W])
-			selectedCamera.position += selectedCamera.zaxis * moveFactor;
+			curCamera->position += curCamera->zaxis * moveFactor;
 
 		if (window.keyDown[GLFW_KEY_S])
-			selectedCamera.position -= selectedCamera.zaxis * moveFactor;
+			curCamera->position -= curCamera->zaxis * moveFactor;
 
 		if (window.keyDown[GLFW_KEY_D])
-			selectedCamera.position += selectedCamera.xaxis * moveFactor;
+			curCamera->position += curCamera->xaxis * moveFactor;
 
 		if (window.keyDown[GLFW_KEY_A])
-			selectedCamera.position -= selectedCamera.xaxis * moveFactor;
+			curCamera->position -= curCamera->xaxis * moveFactor;
 
 		// Roll (rotate X and Y axis around Z axis)
 
 		if (window.keyDown[GLFW_KEY_Q]) {
-			selectedCamera.xaxis = Mat4x3::rotate(selectedCamera.xaxis, selectedCamera.zaxis, -rotateFactor);
-			selectedCamera.yaxis = Mat4x3::rotate(selectedCamera.yaxis, selectedCamera.zaxis, -rotateFactor);
+			curCamera->xaxis = Mat4x3::rotate(curCamera->xaxis, curCamera->zaxis, -rotateFactor);
+			curCamera->yaxis = Mat4x3::rotate(curCamera->yaxis, curCamera->zaxis, -rotateFactor);
 		}
 
 		if (window.keyDown[GLFW_KEY_E]) {
-			selectedCamera.xaxis = Mat4x3::rotate(selectedCamera.xaxis, selectedCamera.zaxis, rotateFactor);
-			selectedCamera.yaxis = Mat4x3::rotate(selectedCamera.yaxis, selectedCamera.zaxis, rotateFactor);
+			curCamera->xaxis = Mat4x3::rotate(curCamera->xaxis, curCamera->zaxis, rotateFactor);
+			curCamera->yaxis = Mat4x3::rotate(curCamera->yaxis, curCamera->zaxis, rotateFactor);
 		}
 
 		// FOV
 
 		if (window.keyDown[GLFW_KEY_T])
-			selectedCamera.fov++;
+			curCamera->setFov(curCamera->fov + 1);
 
 		if (window.keyDown[GLFW_KEY_G])
-			selectedCamera.fov--;
+			curCamera->setFov(curCamera->fov - 1);
+
 	}
+
 }

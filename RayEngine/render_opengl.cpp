@@ -2,13 +2,13 @@
 
 void RayEngine::renderOpenGL() {
 
-	glClearColor(0.1, 0.1, 0.1, 1);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	Mat4x4 proj = scenes[0]->camera.getMatrix((float)window.width / window.height);
+	Mat4x4 proj = curCamera->getMatrix(window.ratio);
 
-	for (uint i = 0; i < scenes[0]->objects.size(); i++)
-		scenes[0]->objects[i]->renderOpenGL(shdrOGL, proj);
+	for (uint i = 0; i < curScene->objects.size(); i++)
+		curScene->objects[i]->renderOpenGL(shdrOGL, proj);
 
 }
 

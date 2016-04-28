@@ -19,11 +19,14 @@ struct Scene {
 	Color ambient, background;
 
 	//map<int, Object*> objectsMap; // TODO: Put in EmbreeHandler?
+
+	// Embree
 	struct {
 		RTCScene scene;
 	} EmbreeData;
 	void initEmbree(RTCDevice device);
 
+	// OptiX
 	struct {
 		optix::Group group;
 	} OptixData;

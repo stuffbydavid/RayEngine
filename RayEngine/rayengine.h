@@ -22,8 +22,8 @@ struct RayEngine {
 	RayEngine(int windowWidth = 900,
 			  int windowHeight = 600,
 			  RenderMode renderMode = RM_RAYTRACING,
-			  RayTracingTarget rayTracingTarget = RTT_GPU,
-			  float hybridPartition = 0.2);
+			  RayTracingTarget rayTracingTarget = RTT_CPU,
+			  float hybridPartition = 0.5);
 
 	~RayEngine();
 
@@ -49,8 +49,11 @@ private:
 
 	// Variables
 	vector<Scene*> scenes;
+	Scene* curScene;
+	Camera* curCamera;
 	Window window;
-	Shader *shdrOGL, *shdrTex;
+	Shader* shdrOGL;
+	Shader* shdrTex;
 
 	RenderMode renderMode;
 	RayTracingTarget rayTracingTarget;

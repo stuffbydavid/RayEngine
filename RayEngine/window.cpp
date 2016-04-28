@@ -52,9 +52,11 @@ void windowKeyCallback(GLFWwindow* handle, int key, int scancode, int action, in
 
 void windowSizeCallback(GLFWwindow* handle, int width, int height) {
 
+	glViewport(0, 0, width, height);
 	w->ortho = Mat4x4::ortho(0, width, 0, height, 0, 1);
 	w->width = width;
 	w->height = height;
+	w->ratio = (float)width / height;
 	w->resizeFunc();
 
 }
@@ -63,12 +65,12 @@ void Window::init(int width, int height) {
 
 	// Initialize window
 
-	w = this;
 	glfwInit();
 	handle = glfwCreateWindow(width, height, "", NULL, NULL);
 	glfwMakeContextCurrent(handle);
 	this->width = width;
 	this->height = height;
+	w = this;
 
 	// Init GLEW
 
@@ -151,6 +153,8 @@ void Window::open(function<void(void)> updateFunc, function<void(void)> resizeFu
 			frame = 0;
 		}
 		lastTime = (int)glfwGetTime();
+
+		// Swap buffers
 
 		glfwSwapBuffers(handle);
 		glfwPollEvents();

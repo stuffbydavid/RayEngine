@@ -2,12 +2,10 @@
 
 void RayEngine::renderOptix() {
 
-	float ratio = (float)window.width / window.height;
-	float tfov = embree::tan(embree::deg2rad(scenes[0]->camera.fov / 2.f));
-	Vec3 rpos = scenes[0]->camera.position;
-	Vec3 rxaxis = scenes[0]->camera.xaxis * ratio * tfov;
-	Vec3 ryaxis = scenes[0]->camera.yaxis * tfov;
-	Vec3 rzaxis = scenes[0]->camera.zaxis;
+	Vec3 rpos = curCamera->position;
+	Vec3 rxaxis = curCamera->xaxis * window.ratio * curCamera->tFov;
+	Vec3 ryaxis = curCamera->yaxis * curCamera->tFov;
+	Vec3 rzaxis = curCamera->zaxis;
 
 	OptixData.context["partition"]->setFloat(rayTracingTarget == RTT_HYBRID ? hybridPartition : 0.f);
 	OptixData.context["eye"]->setFloat(rpos.x(), rpos.y(), rpos.z());

@@ -19,7 +19,7 @@ RT_PROGRAM void camera() {
 
 	float2 d = (make_float2(launchIndex) / make_float2(launchDim)) * 2.f - 1.f;
 	float3 rayOrg = eye;
-	float3 rayDir = normalize(d.x * xaxis + d.y * yaxis + zaxis);
+	float3 rayDir = d.x * xaxis + d.y * yaxis + zaxis;
 
 	optix::Ray ray = make_Ray(rayOrg, rayDir, 0, 0.01f, RT_DEFAULT_MAX);
 

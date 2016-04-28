@@ -63,8 +63,9 @@ void RayEngine::resize() {
 
 Scene* RayEngine::createScene(string name) {
 
-	Scene* scene = new Scene(name);
-	scenes.push_back(scene);
-	return scene;
+	curScene = new Scene(name);
+	curCamera = &curScene->camera;
+	scenes.push_back(curScene);
+	return curScene;
 
 }

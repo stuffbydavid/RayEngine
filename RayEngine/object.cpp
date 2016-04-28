@@ -26,10 +26,10 @@ Object* Object::load(string name, string file, Material* defaultMaterial) {
 		return nullptr;
 	}
 	if (fileShapes.empty()) {
-		cerr << "No objects found" << endl;
+		cerr << "No shapes found" << endl;
 		return nullptr;
 	}
-	cout << "Objects found: " << fileShapes.size() << endl;
+	cout << "Shapes found: " << fileShapes.size() << endl;
 
 	// Convert to our material type
 	vector<Material*> materials(fileMaterials.size());
@@ -80,7 +80,7 @@ Object* Object::load(string name, string file, Material* defaultMaterial) {
 
 		TriangleMesh* triangleMesh = new TriangleMesh();
 		obj->geometries.push_back(triangleMesh);
-
+		
 		cout << "  " << fileShapes[i].name << endl;
 
 		// Vertices

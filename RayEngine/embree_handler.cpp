@@ -2,6 +2,11 @@
 #include "triangle_mesh.h"
 #include "object.h"
 
+#define SFLAGS_SCENE RTC_SCENE_DYNAMIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY
+#define AFLAGS_SCENE RTC_INTERSECT8
+#define SFLAGS_OBJECT RTC_SCENE_STATIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY
+#define AFLAGS_OBJECT RTC_INTERSECT8
+
 void RayEngine::initEmbree() {
 
 	// Init library
@@ -25,9 +30,7 @@ void RayEngine::initEmbree() {
 
 void Scene::initEmbree(RTCDevice device) {
 
-	EmbreeData.scene = rtcDeviceNewScene(device,
-										 RTC_SCENE_DYNAMIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY,
-										 RTC_INTERSECT1 | RTC_INTERSECT4 | RTC_INTERSECT8);
+	EmbreeData.scene = rtcDeviceNewScene(device, SFLAGS_SCENE, AFLAGS_SCENE);
 
 	//TODO: Check other instance modes?
 	for (uint i = 0; i < objects.size(); i++) {
@@ -41,11 +44,9 @@ void Scene::initEmbree(RTCDevice device) {
 
 void Object::initEmbree(RTCDevice device) {
 
-	// Init embree for mesh and all the children
-	EmbreeData.scene = rtcDeviceNewScene(device,
-										 RTC_SCENE_STATIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY,
-										 RTC_INTERSECT1 | RTC_INTERSECT4 | RTC_INTERSECT8);
-	
+	EmbreeData.scene = rtcDeviceNewScene(device, SFLAGS_OBJECT, AFLAGS_OBJECT);
+
+	// Init embree for meshes
 	for (uint i = 0; i < geometries.size(); i++)
 		geometries[i]->initEmbree(EmbreeData.scene);
 

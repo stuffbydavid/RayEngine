@@ -11,11 +11,12 @@ struct Mat4x4 {
 
 	// Constructors
 	Mat4x4() {
-		e[0] = 1; e[4] = 0; e[8] = 0; e[12] = 0;
-		e[1] = 0; e[5] = 1; e[9] = 0; e[13] = 0;
-		e[2] = 0; e[6] = 0; e[10] = 1; e[14] = 0;
-		e[3] = 0; e[7] = 0; e[11] = 0; e[15] = 1;
+		e[0] = 1.f; e[4] = 0.f; e[8] = 0.f; e[12] = 0.f;
+		e[1] = 0.f; e[5] = 1.f; e[9] = 0.f; e[13] = 0.f;
+		e[2] = 0.f; e[6] = 0.f; e[10] = 1.f; e[14] = 0.f;
+		e[3] = 0.f; e[7] = 0.f; e[11] = 0.f; e[15] = 1.f;
 	}
+
 	Mat4x4(float x1, float y1, float z1, float w1,
 		float x2, float y2, float z2, float w2,
 		float x3, float y3, float z3, float w3,
@@ -25,15 +26,18 @@ struct Mat4x4 {
 		e[2] = x3; e[6] = y3; e[10] = z3; e[14] = w3;
 		e[3] = x4; e[7] = y4; e[11] = z4; e[15] = w4;
 	}
+
 	__forceinline Mat4x4(const Mat4x4& other) {
 		for (int i = 0; i < 16; i++)
 			e[i] = other.e[i];
 	}
+
 	__forceinline Mat4x4& operator=(const Mat4x4& other) {
 		for (int i = 0; i < 16; i++)
 			e[i] = other.e[i];
 		return *this;
 	}
+
 	Mat4x4(const Mat4x3& other) {
 		embree::LinearSpace3f ls = other.eMat.l;
 		embree::Vec3f as = other.eMat.p;
@@ -56,11 +60,11 @@ struct Mat4x4 {
 	}
 
 	// Builds a perspective matrix
-	static __forceinline Mat4x4 perspective(float fov, float ratio, float znear, float zfar) {
-		float f = 1.f / embree::tan(embree::deg2rad(fov) / 2.f);
+	static __forceinline Mat4x4 perspective(float tFov, float ratio, float znear, float zfar) {
+		float iFov = 1.f / tFov;
 		return Mat4x4(
-			f / ratio, 0.f, 0.f, 0.f,
-			0.f, f, 0.f, 0.f,
+			iFov / ratio, 0.f, 0.f, 0.f,
+			0.f, iFov, 0.f, 0.f,
 			0.f, 0.f, (zfar + znear) / (znear - zfar), (2.f * zfar * znear) / (znear - zfar),
 			0.f, 0.f, -1.f, 0.f
 		);
@@ -100,6 +104,7 @@ __forceinline Mat4x4 operator*(const Mat4x4& a, const Mat4x4& b) {
 	}
 	return product;
 }
+
 __forceinline void operator*=(Mat4x4& a, const Mat4x4& b) {
 	a = a * b;
 }
