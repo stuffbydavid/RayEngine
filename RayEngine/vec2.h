@@ -48,6 +48,21 @@ struct Vec2 {
 		eVec.y = y_;
 	}
 
+
+	// Functions
+	static __forceinline float length(const Vec2& a) {
+		return embree::length(a.eVec);
+	}
+	static __forceinline Vec2 normalize(const Vec2& a) {
+		return embree::normalize(a.eVec);
+	}
+	static __forceinline float distance(const Vec2& a, const Vec2& b) {
+		return embree::distance(a.eVec, b.eVec);
+	}
+	static __forceinline float dot(const Vec2& a, const Vec2& b) {
+		return embree::dot(a.eVec, b.eVec);
+	}
+
 };
 
 // Unary operators
@@ -87,18 +102,4 @@ __forceinline bool operator==(const Vec2& a, const Vec2& b) {
 }
 __forceinline bool operator!=(const Vec2& a, const Vec2& b) {
 	return embree::operator!=(a.eVec, b.eVec);
-}
-
-// Functions
-__forceinline float length(const Vec2& a) {
-	return embree::length(a.eVec);
-}
-__forceinline Vec2 normalize(const Vec2& a) {
-	return embree::normalize(a.eVec);
-}
-__forceinline float distance(const Vec2& a, const Vec2& b) {
-	return embree::distance(a.eVec, b.eVec);
-}
-__forceinline float dot(const Vec2& a, const Vec2& b) {
-	return embree::dot(a.eVec, b.eVec);
 }

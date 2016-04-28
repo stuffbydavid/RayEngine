@@ -21,7 +21,7 @@ struct RayEngine {
 
 	RayEngine(int windowWidth = 900,
 			  int windowHeight = 600,
-			  RenderMode renderMode = RM_RAYTRACING,
+			  RenderMode renderMode = RM_OPENGL,
 			  RayTracingTarget rayTracingTarget = RTT_CPU,
 			  float hybridPartition = 0.5);
 
@@ -35,7 +35,7 @@ struct RayEngine {
 
 private:
 
-	void update();
+	void loop();
 	void resize();
 	void resizeEmbree();
 	void resizeOptix();

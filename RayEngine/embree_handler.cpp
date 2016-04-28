@@ -9,6 +9,15 @@
 
 void RayEngine::initEmbree() {
 
+	cout << "Starting Embree..." << endl;
+
+	// Generate texture
+	glGenTextures(1, &EmbreeData.texture);
+	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 	// Init library
 	EmbreeData.device = rtcNewDevice(NULL);
 	EmbreeData.buffer = nullptr;
@@ -19,13 +28,6 @@ void RayEngine::initEmbree() {
 	for (uint i = 0; i < scenes.size(); i++)
 		scenes[i]->initEmbree(EmbreeData.device);
 
-	// Generate texture
-	glGenTextures(1, &EmbreeData.texture);
-	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
 }
 
 void Scene::initEmbree(RTCDevice device) {
@@ -35,7 +37,9 @@ void Scene::initEmbree(RTCDevice device) {
 	//TODO: Check other instance modes?
 	for (uint i = 0; i < objects.size(); i++) {
 		objects[i]->initEmbree(device);
-		objects[i]->EmbreeData.instID = rtcNewInstance2(EmbreeData.scene, objects[i]->EmbreeData.scene);
+		uint instID = rtcNewInstance2(EmbreeData.scene, objects[i]->EmbreeData.scene);
+		rtcSetTransform2(EmbreeData.scene, instID, RTC_MATRIX_COLUMN_MAJOR_ALIGNED16, Mat4x4(objects[i]->matrix).e);
+		EmbreeData.instIDmap[instID] = objects[i];
 	}
 
 	rtcCommit(EmbreeData.scene);
@@ -47,18 +51,21 @@ void Object::initEmbree(RTCDevice device) {
 	EmbreeData.scene = rtcDeviceNewScene(device, SFLAGS_OBJECT, AFLAGS_OBJECT);
 
 	// Init embree for meshes
-	for (uint i = 0; i < geometries.size(); i++)
-		geometries[i]->initEmbree(EmbreeData.scene);
+	for (uint i = 0; i < geometries.size(); i++) {
+		uint geomID = geometries[i]->initEmbree(EmbreeData.scene);
+		EmbreeData.geomIDmap[geomID] = geometries[i];
+	}
 
 	rtcCommit(EmbreeData.scene);
 
 }
 
-void TriangleMesh::initEmbree(RTCScene scene) {
+uint TriangleMesh::initEmbree(RTCScene scene) {
 
-	EmbreeData.geomID = rtcNewTriangleMesh(scene, RTC_GEOMETRY_STATIC, indexData.size(), posData.size());
-	rtcSetBuffer(scene, EmbreeData.geomID, RTC_VERTEX_BUFFER, &posData[0], 0, sizeof(Vec3));
-	rtcSetBuffer(scene, EmbreeData.geomID, RTC_INDEX_BUFFER, &indexData[0], 0, sizeof(TrianglePrimitive));
+	uint geomID = rtcNewTriangleMesh(scene, RTC_GEOMETRY_STATIC, indexData.size(), posData.size());
+	rtcSetBuffer(scene, geomID, RTC_VERTEX_BUFFER, &posData[0], 0, sizeof(Vec3));
+	rtcSetBuffer(scene, geomID, RTC_INDEX_BUFFER, &indexData[0], 0, sizeof(TrianglePrimitive));
+	return geomID;
 
 }
 

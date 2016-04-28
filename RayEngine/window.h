@@ -2,11 +2,11 @@
 
 #include "common.h"
 
-// Window class for handling input and the buffer.
+// Window class for handling input and the program loop.
 struct Window {
 
 	void init(int width, int height);
-	void open(function<void(void)> updateFunc, function<void(void)> resizeFunc);
+	void open(function<void(void)> loopFunc, function<void(void)> resizeFunc);
 	void setTitle(string title);
 
 	int width, height, fps;

@@ -15,6 +15,6 @@ void RayEngine::renderOpenGL() {
 void Object::renderOpenGL(Shader* shader, Mat4x4 proj) {
 
 	for (uint i = 0; i < geometries.size(); i++)
-		shader->use((TriangleMesh*)geometries[i], proj, this);
+		shader->use((TriangleMesh*)geometries[i], proj * matrix, this);
 
 }

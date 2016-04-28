@@ -1,5 +1,14 @@
 #include "rayengine.h"
 
+
+void setupOGL(GLuint program, void* caller) {
+
+	GLint uMatWorld = glGetUniformLocation(program, "uMatWorld");
+	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, Mat4x4(((Object*)caller)->matrix).e);
+
+}
+
+
 RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, RayTracingTarget rayTracingTarget, float hybridPartition) :
     renderMode(renderMode),
 	rayTracingTarget(rayTracingTarget),
@@ -10,7 +19,7 @@ RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, R
 	Magick::InitializeMagick(NULL);
 
 	// Shaders
-	shdrOGL = new Shader("OpenGL", nullptr, "ogl.vshader", "ogl.fshader");
+	shdrOGL = new Shader("OpenGL", setupOGL, "ogl.vshader", "ogl.fshader");
 	shdrTex = new Shader("Texture", nullptr, "tex.vshader", "tex.fshader");
 
 }
@@ -24,11 +33,11 @@ void RayEngine::launch() {
 	initEmbree();
 	initOptix();
 
-	window.open(bind(&RayEngine::update, this), bind(&RayEngine::resize, this));
+	window.open(bind(&RayEngine::loop, this), bind(&RayEngine::resize, this));
 
 }
 
-void RayEngine::update() {
+void RayEngine::loop() {
 
 	input();
 	

@@ -18,9 +18,8 @@ void RayEngine::input() {
 
 	// Render mode
 
-	if (window.keyPressed[GLFW_KEY_F1]) {
+	if (window.keyPressed[GLFW_KEY_F1])
 		renderMode = RM_OPENGL;
-	}
 
 	if (window.keyPressed[GLFW_KEY_F2]) {
 		renderMode = RM_RAYTRACING;
@@ -49,20 +48,19 @@ void RayEngine::input() {
 
 	if (moveCamera) {
 
-		// TODO: This should depend on framerate
 		float lookFactor = 0.2f;
 		float moveFactor = 0.2f;
 		float rotateFactor = 0.2f;
 
 		// Rotate X and Z axis around Y axis for yaw
 
-		curCamera->xaxis = Mat4x3::rotate(curCamera->xaxis, curCamera->yaxis, -window.mouseMove.x() * lookFactor);
-		curCamera->zaxis = Mat4x3::rotate(curCamera->zaxis, curCamera->yaxis, -window.mouseMove.x() * lookFactor);
+		curCamera->xaxis = Vec3::rotate(curCamera->xaxis, curCamera->yaxis, -window.mouseMove.x() * lookFactor);
+		curCamera->zaxis = Vec3::rotate(curCamera->zaxis, curCamera->yaxis, -window.mouseMove.x() * lookFactor);
 
 		// Rotate Y and Z axis around X axis for pitch
 
-		curCamera->yaxis = Mat4x3::rotate(curCamera->yaxis, curCamera->xaxis, -window.mouseMove.y() * lookFactor);
-		curCamera->zaxis = Mat4x3::rotate(curCamera->zaxis, curCamera->xaxis, -window.mouseMove.y() * lookFactor);
+		curCamera->yaxis = Vec3::rotate(curCamera->yaxis, curCamera->xaxis, -window.mouseMove.y() * lookFactor);
+		curCamera->zaxis = Vec3::rotate(curCamera->zaxis, curCamera->xaxis, -window.mouseMove.y() * lookFactor);
 
 		// Go faster
 
@@ -91,22 +89,22 @@ void RayEngine::input() {
 		// Roll (rotate X and Y axis around Z axis)
 
 		if (window.keyDown[GLFW_KEY_Q]) {
-			curCamera->xaxis = Mat4x3::rotate(curCamera->xaxis, curCamera->zaxis, -rotateFactor);
-			curCamera->yaxis = Mat4x3::rotate(curCamera->yaxis, curCamera->zaxis, -rotateFactor);
+			curCamera->xaxis = Vec3::rotate(curCamera->xaxis, curCamera->zaxis, -rotateFactor);
+			curCamera->yaxis = Vec3::rotate(curCamera->yaxis, curCamera->zaxis, -rotateFactor);
 		}
 
 		if (window.keyDown[GLFW_KEY_E]) {
-			curCamera->xaxis = Mat4x3::rotate(curCamera->xaxis, curCamera->zaxis, rotateFactor);
-			curCamera->yaxis = Mat4x3::rotate(curCamera->yaxis, curCamera->zaxis, rotateFactor);
+			curCamera->xaxis = Vec3::rotate(curCamera->xaxis, curCamera->zaxis, rotateFactor);
+			curCamera->yaxis = Vec3::rotate(curCamera->yaxis, curCamera->zaxis, rotateFactor);
 		}
 
 		// FOV
 
 		if (window.keyDown[GLFW_KEY_T])
-			curCamera->setFov(curCamera->fov + 1);
+			curCamera->setFov(curCamera->fov + 1.f);
 
 		if (window.keyDown[GLFW_KEY_G])
-			curCamera->setFov(curCamera->fov - 1);
+			curCamera->setFov(curCamera->fov - 1.f);
 
 	}
 

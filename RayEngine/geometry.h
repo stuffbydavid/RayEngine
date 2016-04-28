@@ -6,12 +6,13 @@
 struct Geometry {
 
 	// Embree
-	struct {
-		uint geomID;
-	} EmbreeData;
-	virtual void initEmbree(RTCScene scene) = 0;
+	virtual uint initEmbree(RTCScene scene) = 0;
 
 	// OptiX
+	struct {
+		optix::Geometry geometry;
+		optix::GeometryInstance geometryInstance;
+	} OptixData;
 	virtual void initOptix(optix::Context context) = 0;
 
 };

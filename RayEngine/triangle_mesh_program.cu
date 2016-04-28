@@ -1,6 +1,7 @@
 #include "common.cuh"
 
 rtBuffer<float3, 1> posData;
+rtBuffer<float3, 1> normalData;
 rtBuffer<uint3, 1> indexData;
 
 rtDeclareVariable(float3, normal, attribute normal, );
@@ -19,7 +20,13 @@ RT_PROGRAM void intersect(int primId) {
 	if (intersect_triangle(ray, p0, p1, p2, n, t, u, v)) {
 
 		if (rtPotentialIntersection(t)) {
-			normal = normalize(n);
+
+			// Normal
+			float3 n0 = normalData[prim.x];
+			float3 n1 = normalData[prim.y];
+			float3 n2 = normalData[prim.z];
+			normal = normalize(rtTransformVector(RT_OBJECT_TO_WORLD, n0 * (1.f - u - v) + n1 * u + n2 * v));
+
 			rtReportIntersection(0);
 		}
 	}

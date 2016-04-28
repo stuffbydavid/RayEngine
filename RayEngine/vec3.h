@@ -2,6 +2,7 @@
 
 #include "math/vec3.h"
 #include "math/vec3fa.h"
+#include "math/affinespace.h"
 
 // 3D vector
 struct Vec3 {
@@ -48,14 +49,14 @@ struct Vec3 {
 	}
 
 	// Setters
-	__forceinline void x(float x_) {
-		eVec.x = x_;
+	__forceinline void x(float x) {
+		eVec.x = x;
 	}
-	__forceinline void y(float y_) {
-		eVec.y = y_;
+	__forceinline void y(float y) {
+		eVec.y = y;
 	}
-	__forceinline void z(float z_) {
-		eVec.z = z_;
+	__forceinline void z(float z) {
+		eVec.z = z;
 	}
 
 	// Functions
@@ -76,6 +77,9 @@ struct Vec3 {
 	}
 	static __forceinline Vec3 reflect(const Vec3& incidence, const Vec3& normal) {
 		return embree::reflect(incidence.eVec, normal.eVec);
+	}
+	static __forceinline Vec3 rotate(const Vec3& vec, const Vec3& around, float angle) {
+		return embree::xfmVector(embree::AffineSpace3fa::rotate(around.eVec, embree::deg2rad(angle)), vec.eVec);
 	}
 
 };

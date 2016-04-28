@@ -1,17 +1,25 @@
 #include "object.h"
 #include "tiny_obj_loader.h"
 
-Object::Object(string name) :
-  name(name)
-{
-	
-}
+Object::Object() {}
 
 Object::~Object() {
 	//delete geometry;
 }
 
-Object* Object::load(string name, string file, Material* defaultMaterial) {
+void Object::translate(Vec3 vector) {
+	matrix = Mat4x3::translate(vector) * matrix;
+}
+
+void Object::rotate(Vec3 vector, float angle) {
+	matrix = Mat4x3::rotate(vector, angle) * matrix;
+}
+
+void Object::scale(Vec3 vector) {
+	matrix = Mat4x3::scale(vector) * matrix;
+}
+
+Object* Object::load(string file, Material* defaultMaterial) {
 
 	vector<tinyobj::shape_t> fileShapes;
 	vector<tinyobj::material_t> fileMaterials;
@@ -74,7 +82,7 @@ Object* Object::load(string name, string file, Material* defaultMaterial) {
 		materials.push_back(defaultMaterial);
 
 	// Create a root
-	Object* obj = new Object(name);
+	Object* obj = new Object();
 
 	for (uint i = 0; i < fileShapes.size(); i++) {
 
@@ -176,6 +184,8 @@ Object* Object::load(string name, string file, Material* defaultMaterial) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, triangles * sizeof(TrianglePrimitive), &triangleMesh->indexData[0], GL_STATIC_DRAW);
 
 	}
+
+	cout << endl;
 
 	return obj;
 

@@ -9,23 +9,32 @@
 struct Object {
 
 	// Constructor
-	Object(string name = "");
+	Object();
 	~Object();
 
 	// Loads object(s) from a file.
-	static Object* load(string name, string file, Material* defaultMaterial = nullptr);
+	static Object* load(string file, Material* defaultMaterial = nullptr);
 	
 	// Renders using an OpenGL shader.
 	void renderOpenGL(Shader* shader, Mat4x4 proj);
 
+	// Translates the object by a vector.
+	void translate(Vec3 vector);
+
+	// Rotates the object by a vector and angle.
+	void rotate(Vec3 vector, float angle);
+
+	// Scales the object by a vector.
+	void scale(Vec3 vector);
+
 	// Variables
-	string name;
 	vector<Geometry*> geometries;
+	Mat4x3 matrix;
 
 	// Embree
 	struct {
 		RTCScene scene;
-		uint instID;
+		map<uint, Geometry*> geomIDmap;
 	} EmbreeData;
 	void initEmbree(RTCDevice device);
 
@@ -37,5 +46,3 @@ struct Object {
 	void initOptix(optix::Context context);
 
 };
-
-typedef map<uint, Object*> ObjectMap;

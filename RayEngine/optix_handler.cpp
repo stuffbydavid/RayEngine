@@ -9,6 +9,8 @@ void printException(optix::Exception e) {
 
 void RayEngine::initOptix() {
 
+	cout << "Starting OptiX..." << endl;
+
 	try {
 
 		/// Generate buffer
@@ -84,10 +86,9 @@ void Object::initOptix(optix::Context context) {
 		}
 
 		// Make transform
-		Mat4x4 def;
 		OptixData.transform = context->createTransform();
 		OptixData.transform->setChild(OptixData.geometryGroup);
-		OptixData.transform->setMatrix(true, def.e, NULL);
+		OptixData.transform->setMatrix(true, Mat4x4(matrix).e, NULL);
 
 	} catch (optix::Exception e) {
 		printException(e);
@@ -107,6 +108,11 @@ void TriangleMesh::initOptix(optix::Context context) {
 		OptixData.posBuffer->setFormat(RT_FORMAT_FLOAT3);
 		OptixData.posBuffer->setSize(posData.size());
 
+		// Bind vertex VBO
+		OptixData.normalBuffer = context->createBufferFromGLBO(RT_BUFFER_INPUT, vboNormal);
+		OptixData.normalBuffer->setFormat(RT_FORMAT_FLOAT3);
+		OptixData.normalBuffer->setSize(normalData.size());
+
 		// Bind index IBO
 		OptixData.indexBuffer = context->createBufferFromGLBO(RT_BUFFER_INPUT, ibo);
 		OptixData.indexBuffer->setFormat(RT_FORMAT_UNSIGNED_INT);
@@ -118,6 +124,7 @@ void TriangleMesh::initOptix(optix::Context context) {
 		OptixData.geometry->setBoundingBoxProgram(boundsProgram);
 		OptixData.geometry->setPrimitiveCount(indexData.size());
 		OptixData.geometry["posData"]->setBuffer(OptixData.posBuffer);
+		OptixData.geometry["normalData"]->setBuffer(OptixData.normalBuffer);
 		OptixData.geometry["indexData"]->setBuffer(OptixData.indexBuffer);
 
 		// Make instance

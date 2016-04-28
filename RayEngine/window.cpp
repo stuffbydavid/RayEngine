@@ -52,6 +52,11 @@ void windowKeyCallback(GLFWwindow* handle, int key, int scancode, int action, in
 
 void windowSizeCallback(GLFWwindow* handle, int width, int height) {
 
+	// The window was resized!
+
+	width = max(1, width);
+	height = max(1, height);
+
 	glViewport(0, 0, width, height);
 	w->ortho = Mat4x4::ortho(0, width, 0, height, 0, 1);
 	w->width = width;
@@ -113,7 +118,9 @@ void Window::init(int width, int height) {
 	
 }
 
-void Window::open(function<void(void)> updateFunc, function<void(void)> resizeFunc) {
+void Window::open(function<void(void)> loopFunc, function<void(void)> resizeFunc) {
+
+	cout << "Opening window..." << endl;
 
 	int lastTime = -1, frame = 0;
 	fps = 0;
@@ -129,9 +136,9 @@ void Window::open(function<void(void)> updateFunc, function<void(void)> resizeFu
 
 	while (!glfwWindowShouldClose(handle)) {
 
-		// Call update function
+		// Call loop function
 
-		updateFunc();
+		loopFunc();
 
 		// Reset input
 

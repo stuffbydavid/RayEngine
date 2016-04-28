@@ -47,8 +47,8 @@ void RayEngine::renderEmbree() {
 			} else
 				valid[j] = RAY_VALID;
 
-			int x = ((i * 8 + j) % wid);
-			int y = ((i * 8 + j) / wid);
+			int x = (i * 8 + j) % wid;
+			int y = (i * 8 + j) / wid;
 
 			float dx = ((float)x / window.width) * 2.f - 1.f;
 			float dy = ((float)y / window.height) * 2.f - 1.f;
@@ -75,15 +75,22 @@ void RayEngine::renderEmbree() {
 			if (valid[j] == RAY_INVALID)
 				continue;
 
-			int x = ((i * 8 + j) % wid);
-			int y = ((i * 8 + j) / wid);
+			int x = (i * 8 + j) % wid;
+			int y = (i * 8 + j) / wid;
 
-			if (packet.geomID[j] != RTC_INVALID_GEOMETRY_ID) {
-				Vec3 n = Vec3::normalize(-Vec3(packet.Ngx[j], packet.Ngy[j], packet.Ngz[j])) * 0.5 + Vec3(0.5);
-				EmbreeData.buffer[y * window.width + x] = { n.x(), n.y(), n.z() };
-			} else
+			if (packet.geomID[j] == RTC_INVALID_GEOMETRY_ID) {
 				EmbreeData.buffer[y * window.width + x] = { 0.f, 0.f, 0.f };
+				continue;
+			}
 
+			Object* hitObj = curScene->EmbreeData.instIDmap[packet.instID[j]];
+
+			TriangleMesh* hitMesh = (TriangleMesh*)hitObj->EmbreeData.geomIDmap[packet.geomID[j]];
+			Vec3 hitNorm = Vec3::normalize(hitObj->matrix * hitMesh->getNormal(packet.primID[j], packet.u[j], packet.v[j]));
+
+			Vec3 n = hitNorm * 0.5f + 0.5f;
+			EmbreeData.buffer[y * window.width + x] = { n.x(), n.y(), n.z() };
+		
 		}
 
 	}

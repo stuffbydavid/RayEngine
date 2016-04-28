@@ -10,7 +10,10 @@ struct Scene {
 	Scene(string name);
 
 	// Loads object(s) from a file and adds it to the scene.
-	Object* loadObject(string name, string file, Material* defaultMaterial = nullptr);
+	Object* loadObject(string file, Material* defaultMaterial = nullptr);
+
+	// Adds a new customizable object
+	Object* addObject(Geometry* geometry = nullptr);
 
 	string name;
 	Camera camera;
@@ -18,11 +21,10 @@ struct Scene {
 	vector<Light*> lights;
 	Color ambient, background;
 
-	//map<int, Object*> objectsMap; // TODO: Put in EmbreeHandler?
-
 	// Embree
 	struct {
 		RTCScene scene;
+		map<uint, Object*> instIDmap;
 	} EmbreeData;
 	void initEmbree(RTCDevice device);
 

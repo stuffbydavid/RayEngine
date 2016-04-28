@@ -2,6 +2,9 @@
 #include "math/affinespace.h"
 #include "vec3.h"
 
+// TODO: Is this needed?
+
+
 // 4x3 Matrix
 // Used for object transformations
 struct Mat4x3 {
@@ -10,7 +13,7 @@ struct Mat4x3 {
 
 	// Constructors
 	Mat4x3() {
-		eMat = embree::AffineSpace3fa();
+		eMat = embree::AffineSpace3fa(embree::one);
 	}
 	Mat4x3(float x1, float y1, float z1, float w1,
 			float x2, float y2, float z2, float w2,
@@ -35,11 +38,11 @@ struct Mat4x3 {
 	static __forceinline Mat4x3 translate(const Vec3& vec) {
 		return embree::AffineSpace3fa::translate(vec.eVec);
 	}
+	static __forceinline Mat4x3 rotate(const Vec3& around, float angle) {
+		return embree::AffineSpace3fa::rotate(around.eVec, embree::deg2rad(angle));
+	}
 	static __forceinline Mat4x3 scale(const Vec3& s) {
 		return embree::AffineSpace3fa::scale(s.eVec);
-	}
-	static __forceinline Vec3 rotate(const Vec3& vec, const Vec3& around, float angle) {
-		return embree::xfmVector(embree::AffineSpace3fa::rotate(around.eVec, embree::deg2rad(angle)), vec.eVec);
 	}
 	static __forceinline Mat4x3 lookat(const Vec3& from, const Vec3& to, const Vec3& up) {
 		return embree::AffineSpace3fa::lookat(from.eVec, to.eVec, up.eVec);
@@ -57,7 +60,7 @@ __forceinline Mat4x3 operator*(const float& a, const Mat4x3& b) {
 	return embree::operator*(a, b.eMat);
 }
 __forceinline Vec3 operator*(const Mat4x3& a, const Vec3& b) {
-	return embree::xfmPoint(a.eMat, b.eVec);
+	return embree::xfmVector(a.eMat, b.eVec);
 }
 __forceinline void operator*=(Vec3& a, const Mat4x3& b) {
 	a = b * a;

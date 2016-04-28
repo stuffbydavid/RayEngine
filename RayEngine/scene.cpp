@@ -2,9 +2,19 @@
 
 Scene::Scene(string name) : name(name) {}
 
-Object* Scene::loadObject(string name, string file, Material* defaultMaterial) {
+Object* Scene::addObject(Geometry* geometry) {
 
-	Object* obj = Object::load(name, file, defaultMaterial);
+	Object* obj = new Object();
+	if (geometry)
+		obj->geometries.push_back(geometry);
+	objects.push_back(obj);
+	return obj;
+
+}
+
+Object* Scene::loadObject(string file, Material* defaultMaterial) {
+
+	Object* obj = Object::load(file, defaultMaterial);
 	objects.push_back(obj);
 	return obj;
 

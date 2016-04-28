@@ -162,12 +162,12 @@ void Shader::use2D(Mat4x4 matrix, int x, int y, int width, int height, GLuint te
 		{ x + width, y + height, 0 },
 	};
 	Vec2 texCoordData[6] = {
-		{ 0.f, 0.f },
-		{ 0.f, 1.f },
-		{ 1.f, 0.f },
-		{ 1.f, 0.f },
-		{ 0.f, 1.f },
-		{ 1.f, 1.f }
+		{ 0, 0 },
+		{ 0, 1 },
+		{ 1, 0 },
+		{ 1, 0 },
+		{ 0, 1 },
+		{ 1, 1 }
 	};
 	uint vertices = 6;
 	uint sizePositions = vertices * sizeof(Vec3);
