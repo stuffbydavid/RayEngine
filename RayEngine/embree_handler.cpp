@@ -2,11 +2,6 @@
 #include "triangle_mesh.h"
 #include "object.h"
 
-#define SFLAGS_SCENE RTC_SCENE_DYNAMIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY
-#define AFLAGS_SCENE RTC_INTERSECT8
-#define SFLAGS_OBJECT RTC_SCENE_STATIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY
-#define AFLAGS_OBJECT RTC_INTERSECT8
-
 void RayEngine::initEmbree() {
 
 	cout << "Starting Embree..." << endl;
@@ -32,7 +27,7 @@ void RayEngine::initEmbree() {
 
 void Scene::initEmbree(RTCDevice device) {
 
-	EmbreeData.scene = rtcDeviceNewScene(device, SFLAGS_SCENE, AFLAGS_SCENE);
+	EmbreeData.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_SCENE, EMBREE_AFLAGS_SCENE);
 
 	//TODO: Check other instance modes?
 	for (uint i = 0; i < objects.size(); i++) {
@@ -48,7 +43,7 @@ void Scene::initEmbree(RTCDevice device) {
 
 void Object::initEmbree(RTCDevice device) {
 
-	EmbreeData.scene = rtcDeviceNewScene(device, SFLAGS_OBJECT, AFLAGS_OBJECT);
+	EmbreeData.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_OBJECT, EMBREE_AFLAGS_OBJECT);
 
 	// Init embree for meshes
 	for (uint i = 0; i < geometries.size(); i++) {
@@ -71,9 +66,25 @@ uint TriangleMesh::initEmbree(RTCScene scene) {
 
 void RayEngine::resizeEmbree() {
 
+	// Free old buffer
 	if (EmbreeData.buffer)
 		delete EmbreeData.buffer;
 
-	EmbreeData.buffer = new Color[window.width * window.height];
+	// Set dimensions
+	if (rayTracingTarget == RTT_HYBRID) {
+		EmbreeData.offset = 0;
+		EmbreeData.width = ceil(window.width * hybridPartition);
+	} else {
+		EmbreeData.offset = 0;
+		EmbreeData.width = window.width;
+	}
+
+	// Resize buffer
+	EmbreeData.buffer = new Color[EmbreeData.width * window.height];
+
+	// Resize texture
+	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, EmbreeData.width, window.height, 0, GL_RGBA, GL_FLOAT, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 }

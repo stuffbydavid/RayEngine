@@ -10,9 +10,11 @@ void setupOGL(GLuint program, void* caller) {
 
 
 RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, RayTracingTarget rayTracingTarget, float hybridPartition) :
-    renderMode(renderMode),
+	renderMode(renderMode),
 	rayTracingTarget(rayTracingTarget),
-	hybridPartition(hybridPartition)
+	hybridPartition(hybridPartition),
+	showEmbreeRender(true),
+	showOptixRender(true)
 {
 
 	window.init(windowWidth, windowHeight);

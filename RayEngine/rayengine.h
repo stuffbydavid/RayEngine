@@ -19,11 +19,11 @@ struct RayEngine {
 		RTT_HYBRID // Use both Embree and OptiX for CPU and GPU ray tracing
 	};
 
-	RayEngine(int windowWidth = 900,
-			  int windowHeight = 600,
-			  RenderMode renderMode = RM_OPENGL,
-			  RayTracingTarget rayTracingTarget = RTT_CPU,
-			  float hybridPartition = 0.5);
+	RayEngine(int windowWidth = WINDOW_WIDTH,
+			  int windowHeight = WINDOW_HEIGHT,
+			  RenderMode renderMode = RENDER_MODE,
+			  RayTracingTarget rayTracingTarget = RAY_TRACING_TARGET,
+			  float hybridPartition = HYBRID_PARTITION);
 
 	~RayEngine();
 
@@ -58,12 +58,14 @@ private:
 	RenderMode renderMode;
 	RayTracingTarget rayTracingTarget;
 	float hybridPartition;
+	bool showEmbreeRender, showOptixRender;
 
 	// Embree
 	struct {
 		RTCDevice device;
 		Color* buffer;
 		GLuint texture;
+		int offset, width;
 	} EmbreeData;
 	void initEmbree();
 
@@ -73,6 +75,7 @@ private:
 		optix::Buffer buffer;
 		GLuint vbo;
 		GLuint texture;
+		int offset, width;
 	} OptixData;
 	void initOptix();
 

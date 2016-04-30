@@ -6,5 +6,5 @@ uniform sampler2D uTex;
 uniform vec4 uColor;
 
 void main(void) {
-	fColor = texture2D(uTex, vTexCoord) * uColor;
+	fColor = uColor * texture2D(uTex, vTexCoord);
 }

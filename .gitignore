@@ -1,6 +1,7 @@
 *.sdf
 *.opensdf
 x64/
+Release/
 
 
 # Windows image file caches

@@ -12,10 +12,7 @@ void RayEngine::initOptix() {
 	cout << "Starting OptiX..." << endl;
 
 	try {
-
-		/// Generate buffer
-		glGenBuffers(1, &OptixData.vbo);
-
+		
 		// Generate texture
 		glGenTextures(1, &OptixData.texture);
 		glBindTexture(GL_TEXTURE_2D, OptixData.texture);
@@ -29,10 +26,17 @@ void RayEngine::initOptix() {
 		OptixData.context->setEntryPointCount(1);
 
 		// Make output buffer
-		OptixData.buffer = OptixData.context->createBufferFromGLBO(RT_BUFFER_OUTPUT, OptixData.vbo);
+
+#if OPTIX_USE_OPENGL
+		/// Generate buffer
+		glGenBuffers(1, &OptixData.vbo);
+
+		OptixData.buffer = OptixData.context->createBufferFromGLBO(RT_BUFFER_OUTPUT, OptixData.vbo[0]);
 		OptixData.buffer->setFormat(RT_FORMAT_FLOAT4);
-		OptixData.buffer->setSize(window.width, window.height);
-		OptixData.context["outputBuffer"]->set(OptixData.buffer);
+		OptixData.buffer ->setSize(window.width, window.height);
+#else
+		OptixData.buffer = OptixData.context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT4, window.width, window.height);
+#endif
 
 		// Make ray generation program
 		OptixData.context->setRayGenerationProgram(0, OptixData.context->createProgramFromPTXFile("ptx/camera_program.cu.ptx", "camera"));
@@ -44,8 +48,9 @@ void RayEngine::initOptix() {
 		for (uint i = 0; i < scenes.size(); i++)
 			scenes[i]->initOptix(OptixData.context);
 
-		OptixData.context["bgColor"]->setFloat(0.3f, 0.3f, 0.3f);
+		OptixData.context["bgColor"]->setFloat(0.9f, 0.3f, 0.3f);
 		OptixData.context["sceneObj"]->set(scenes[0]->OptixData.group);
+		OptixData.context["outputBuffer"]->set(OptixData.buffer);
 
 		// Compile
 		OptixData.context->validate();
@@ -60,7 +65,7 @@ void RayEngine::initOptix() {
 void Scene::initOptix(optix::Context context) {
 
 	OptixData.group = context->createGroup();
-	OptixData.group->setAcceleration(context->createAcceleration("Trbvh", "Bvh")); // TODO: change during runtime?
+	OptixData.group->setAcceleration(context->createAcceleration("Sbvh", "Bvh")); // TODO: change during runtime?
 
 	for (uint i = 0; i < objects.size(); i++) {
 		objects[i]->initOptix(context);
@@ -103,6 +108,7 @@ void TriangleMesh::initOptix(optix::Context context) {
 		static optix::Program intersectProgram = context->createProgramFromPTXFile("ptx/triangle_mesh_program.cu.ptx", "intersect");
 		static optix::Program boundsProgram = context->createProgramFromPTXFile("ptx/triangle_mesh_program.cu.ptx", "bounds");
 
+#if OPTIX_USE_OPENGL
 		// Bind vertex VBO
 		OptixData.posBuffer = context->createBufferFromGLBO(RT_BUFFER_INPUT, vboPos);
 		OptixData.posBuffer->setFormat(RT_FORMAT_FLOAT3);
@@ -117,6 +123,22 @@ void TriangleMesh::initOptix(optix::Context context) {
 		OptixData.indexBuffer = context->createBufferFromGLBO(RT_BUFFER_INPUT, ibo);
 		OptixData.indexBuffer->setFormat(RT_FORMAT_UNSIGNED_INT);
 		OptixData.indexBuffer->setSize(indexData.size());
+#else
+		// Copy position buffer
+		OptixData.posBuffer = context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_FLOAT3, posData.size());
+		memcpy(OptixData.posBuffer->map(), &posData[0], posData.size() * sizeof(Vec3));
+		OptixData.posBuffer->unmap();
+
+		// Copy normal buffer
+		OptixData.normalBuffer = context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_FLOAT3, normalData.size());
+		memcpy(OptixData.normalBuffer->map(), &normalData[0], normalData.size() * sizeof(Vec3));
+		OptixData.normalBuffer->unmap();
+
+		// Copy index buffer
+		OptixData.indexBuffer = context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_UNSIGNED_INT3, indexData.size());
+		memcpy(OptixData.indexBuffer->map(), &indexData[0], indexData.size() * sizeof(TrianglePrimitive));
+		OptixData.indexBuffer->unmap();
+#endif
 
 		// Make geometry
 		OptixData.geometry = context->createGeometry();
@@ -143,14 +165,25 @@ void TriangleMesh::initOptix(optix::Context context) {
 
 void RayEngine::resizeOptix() {
 
+	// Set dimensions
+	if (rayTracingTarget == RTT_HYBRID) {
+		OptixData.offset = EmbreeData.width;
+		OptixData.width = window.width - OptixData.offset;
+	} else {
+		OptixData.offset = 0;
+		OptixData.width = window.width;
+	}
+
 	// Resize buffer object
-	OptixData.buffer->setSize(window.width, window.height);
+	OptixData.buffer->setSize(OptixData.width, window.height);
 
 	// Resize VBO
+#if OPTIX_USE_OPENGL
 	OptixData.buffer->unregisterGLBuffer();
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, OptixData.vbo);
-	glBufferData(GL_PIXEL_UNPACK_BUFFER, sizeof(float) * 4 * window.width * window.height, 0, GL_STREAM_DRAW);
+	glBufferData(GL_PIXEL_UNPACK_BUFFER, sizeof(float) * 4 * OptixData.width * window.height, 0, GL_STREAM_DRAW);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 	OptixData.buffer->registerGLBuffer();
+#endif
 
 }

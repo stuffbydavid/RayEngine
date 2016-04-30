@@ -213,6 +213,7 @@
     <ClInclude Include="material.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="scene.h" />
+    <ClInclude Include="settings.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="tiny_obj_loader.h" />
     <ClInclude Include="triangle_mesh.h" />

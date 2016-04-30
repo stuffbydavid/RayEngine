@@ -112,6 +112,9 @@
     <ClInclude Include="common.cuh">
       <Filter>RayEngine\OptiX\CUDA</Filter>
     </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>RayEngine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RayEngine">

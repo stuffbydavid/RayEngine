@@ -165,7 +165,8 @@ Object* Object::load(string file, Material* defaultMaterial) {
 		for (uint n = 0; n < vertices; n++)
 			triangleMesh->normalData[n] = Vec3::normalize(triangleMesh->normalData[n]);
 
-		// Set up vbo (Vertex buffer object) and ibo (Index buffer object)
+		// Set up VBOs (Vertex buffer objects) and IBO (Index buffer object)
+		// OptiX doesn't accept a single buffer for position+normal+texture, so we need three VBOs.
 		glGenBuffers(1, &triangleMesh->vboPos);
 		glGenBuffers(1, &triangleMesh->vboNormal);
 		glGenBuffers(1, &triangleMesh->vboTexCoord);

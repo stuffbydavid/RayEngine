@@ -138,6 +138,8 @@ void Window::open(function<void(void)> loopFunc, function<void(void)> resizeFunc
 
 		// Call loop function
 
+		glClearColor(0.f, 0.f, 0.f, 1.f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		loopFunc();
 
 		// Reset input

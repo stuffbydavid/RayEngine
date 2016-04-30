@@ -12,9 +12,10 @@ struct Scene {
 	// Loads object(s) from a file and adds it to the scene.
 	Object* loadObject(string file, Material* defaultMaterial = nullptr);
 
-	// Adds a new customizable object
+	// Adds a new customizable object.
 	Object* addObject(Geometry* geometry = nullptr);
 
+	// Variables
 	string name;
 	Camera camera;
 	vector<Object*> objects;

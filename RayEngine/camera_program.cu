@@ -1,6 +1,7 @@
 #include "common.cuh"
 
-rtDeclareVariable(float, partition, , );
+rtDeclareVariable(float, offset, , );
+rtDeclareVariable(float, windowWidth, , );
 rtDeclareVariable(float3, eye, , );
 rtDeclareVariable(float3, xaxis, , );
 rtDeclareVariable(float3, yaxis, , );
@@ -12,12 +13,8 @@ rtDeclareVariable(uint2, launchIndex, rtLaunchIndex, );
 rtDeclareVariable(uint2, launchDim, rtLaunchDim, );
 
 RT_PROGRAM void camera() {
-	if (launchIndex.x < launchDim.x * partition) {
-		outputBuffer[launchIndex] = make_float4(0.f);
-		return;
-	}
 
-	float2 d = (make_float2(launchIndex) / make_float2(launchDim)) * 2.f - 1.f;
+	float2 d = (make_float2(offset + launchIndex.x, launchIndex.y) / make_float2(windowWidth, launchDim.y)) * 2.f - 1.f;
 	float3 rayOrg = eye;
 	float3 rayDir = d.x * xaxis + d.y * yaxis + zaxis;
 

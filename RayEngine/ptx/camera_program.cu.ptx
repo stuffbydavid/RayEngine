@@ -11,7 +11,8 @@
 .address_size 64
 
 	// .globl	_Z6camerav
-.global .align 4 .f32 partition;
+.global .align 4 .f32 offset;
+.global .align 4 .f32 windowWidth;
 .global .align 8 .b8 eye[12];
 .global .align 4 .b8 xaxis[12];
 .global .align 4 .b8 yaxis[12];
@@ -44,7 +45,8 @@
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_xE;
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_yE;
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_zE;
-.global .align 4 .b8 _ZN21rti_internal_typeinfo9partitionE[8] = {82, 97, 121, 0, 4, 0, 0, 0};
+.global .align 4 .b8 _ZN21rti_internal_typeinfo6offsetE[8] = {82, 97, 121, 0, 4, 0, 0, 0};
+.global .align 4 .b8 _ZN21rti_internal_typeinfo11windowWidthE[8] = {82, 97, 121, 0, 4, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo3eyeE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo5xaxisE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo5yaxisE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
@@ -52,7 +54,8 @@
 .global .align 4 .b8 _ZN21rti_internal_typeinfo8sceneObjE[8] = {82, 97, 121, 0, 4, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo11launchIndexE[8] = {82, 97, 121, 0, 8, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo9launchDimE[8] = {82, 97, 121, 0, 8, 0, 0, 0};
-.global .align 1 .b8 _ZN21rti_internal_typename9partitionE[6] = {102, 108, 111, 97, 116, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename6offsetE[6] = {102, 108, 111, 97, 116, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename11windowWidthE[6] = {102, 108, 111, 97, 116, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename3eyeE[7] = {102, 108, 111, 97, 116, 51, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename5xaxisE[7] = {102, 108, 111, 97, 116, 51, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename5yaxisE[7] = {102, 108, 111, 97, 116, 51, 0};
@@ -60,7 +63,8 @@
 .global .align 1 .b8 _ZN21rti_internal_typename8sceneObjE[9] = {114, 116, 79, 98, 106, 101, 99, 116, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename11launchIndexE[6] = {117, 105, 110, 116, 50, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename9launchDimE[6] = {117, 105, 110, 116, 50, 0};
-.global .align 4 .u32 _ZN21rti_internal_typeenum9partitionE = 4919;
+.global .align 4 .u32 _ZN21rti_internal_typeenum6offsetE = 4919;
+.global .align 4 .u32 _ZN21rti_internal_typeenum11windowWidthE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum3eyeE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum5xaxisE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum5yaxisE = 4919;
@@ -68,7 +72,8 @@
 .global .align 4 .u32 _ZN21rti_internal_typeenum8sceneObjE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum11launchIndexE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum9launchDimE = 4919;
-.global .align 1 .b8 _ZN21rti_internal_semantic9partitionE[1];
+.global .align 1 .b8 _ZN21rti_internal_semantic6offsetE[1];
+.global .align 1 .b8 _ZN21rti_internal_semantic11windowWidthE[1];
 .global .align 1 .b8 _ZN21rti_internal_semantic3eyeE[1];
 .global .align 1 .b8 _ZN21rti_internal_semantic5xaxisE[1];
 .global .align 1 .b8 _ZN21rti_internal_semantic5yaxisE[1];
@@ -76,7 +81,8 @@
 .global .align 1 .b8 _ZN21rti_internal_semantic8sceneObjE[1];
 .global .align 1 .b8 _ZN21rti_internal_semantic11launchIndexE[14] = {114, 116, 76, 97, 117, 110, 99, 104, 73, 110, 100, 101, 120, 0};
 .global .align 1 .b8 _ZN21rti_internal_semantic9launchDimE[12] = {114, 116, 76, 97, 117, 110, 99, 104, 68, 105, 109, 0};
-.global .align 1 .b8 _ZN23rti_internal_annotation9partitionE[1];
+.global .align 1 .b8 _ZN23rti_internal_annotation6offsetE[1];
+.global .align 1 .b8 _ZN23rti_internal_annotation11windowWidthE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation3eyeE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation5xaxisE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation5yaxisE[1];
@@ -92,108 +98,81 @@
 	.local .align 8 .b8 	__local_depot0[16];
 	.reg .b64 	%SP;
 	.reg .b64 	%SPL;
-	.reg .pred 	%p<2>;
-	.reg .f32 	%f<41>;
-	.reg .s32 	%r<12>;
-	.reg .s64 	%rd<31>;
+	.reg .f32 	%f<40>;
+	.reg .s32 	%r<11>;
+	.reg .s64 	%rd<22>;
 
 
-	mov.u64 	%rd30, __local_depot0;
-	cvta.local.u64 	%SP, %rd30;
-	ldu.global.u64 	%rd1, [launchIndex];
-	cvt.u32.u64	%r1, %rd1;
-	cvt.rn.f32.u32	%f1, %r1;
-	ldu.global.u64 	%rd2, [launchDim];
-	cvt.u32.u64	%r2, %rd2;
-	cvt.rn.f32.u32	%f2, %r2;
-	ldu.global.f32 	%f3, [partition];
-	mul.f32 	%f4, %f2, %f3;
-	setp.lt.f32	%p1, %f1, %f4;
-	@%p1 bra 	BB0_2;
-	bra.uni 	BB0_1;
-
-BB0_2:
-	ld.global.u32 	%rd25, [launchIndex];
-	ld.global.u32 	%rd26, [launchIndex+4];
-	mov.u64 	%rd29, outputBuffer;
-	cvta.global.u64 	%rd24, %rd29;
-	mov.u32 	%r10, 2;
-	mov.u32 	%r11, 16;
-	mov.u64 	%rd28, 0;
-	// inline asm
-	call (%rd23), _rt_buffer_get_64, (%rd24, %r10, %r11, %rd25, %rd26, %rd28, %rd28);
-	// inline asm
-	mov.f32 	%f40, 0f00000000;
-	st.v4.f32 	[%rd23], {%f40, %f40, %f40, %f40};
-	bra.uni 	BB0_3;
-
-BB0_1:
-	add.u64 	%rd3, %SP, 0;
-	cvta.to.local.u64 	%rd10, %rd3;
-	shr.u64 	%rd11, %rd2, 32;
-	cvt.u32.u64	%r8, %rd11;
-	shr.u64 	%rd12, %rd1, 32;
-	cvt.u32.u64	%r9, %rd12;
-	cvt.rn.f32.u32	%f13, %r9;
-	cvt.rn.f32.u32	%f14, %r8;
-	div.rn.f32 	%f15, %f13, %f14;
-	div.rn.f32 	%f16, %f1, %f2;
-	fma.rn.f32 	%f17, %f16, 0f40000000, 0fBF800000;
-	fma.rn.f32 	%f18, %f15, 0f40000000, 0fBF800000;
-	ldu.global.f32 	%f19, [xaxis];
-	mov.u64 	%rd13, xaxis;
-	add.s64 	%rd14, %rd13, 4;
-	ldu.global.f32 	%f20, [%rd14];
-	add.s64 	%rd15, %rd13, 8;
-	ldu.global.f32 	%f21, [%rd15];
-	mov.u64 	%rd16, yaxis;
-	ldu.global.f32 	%f22, [yaxis];
-	mul.f32 	%f23, %f18, %f22;
-	add.s64 	%rd17, %rd16, 4;
-	ldu.global.f32 	%f24, [%rd17];
+	mov.u64 	%rd21, __local_depot0;
+	cvta.local.u64 	%SP, %rd21;
+	add.u64 	%rd1, %SP, 0;
+	cvta.to.local.u64 	%rd8, %rd1;
+	ldu.global.f32 	%f9, [offset];
+	ldu.global.v2.u32 	{%r6, %r7}, [launchIndex];
+	cvt.rn.f32.u32	%f10, %r6;
+	add.f32 	%f11, %f9, %f10;
+	cvt.rn.f32.u32	%f12, %r7;
+	ldu.global.f32 	%f13, [windowWidth];
+	mov.u64 	%rd9, launchDim;
+	add.s64 	%rd10, %rd9, 4;
+	ldu.global.u32 	%r10, [%rd10];
+	cvt.rn.f32.u32	%f14, %r10;
+	div.rn.f32 	%f15, %f11, %f13;
+	div.rn.f32 	%f16, %f12, %f14;
+	fma.rn.f32 	%f17, %f15, 0f40000000, 0fBF800000;
+	fma.rn.f32 	%f18, %f16, 0f40000000, 0fBF800000;
+	ld.global.v2.f32 	{%f19, %f20}, [eye];
+	ld.global.f32 	%f3, [eye+8];
+	ldu.global.f32 	%f21, [xaxis];
+	mov.u64 	%rd11, xaxis;
+	add.s64 	%rd12, %rd11, 4;
+	ldu.global.f32 	%f22, [%rd12];
+	add.s64 	%rd13, %rd11, 8;
+	ldu.global.f32 	%f23, [%rd13];
+	mov.u64 	%rd14, yaxis;
+	ldu.global.f32 	%f24, [yaxis];
 	mul.f32 	%f25, %f18, %f24;
-	add.s64 	%rd18, %rd16, 8;
-	ldu.global.f32 	%f26, [%rd18];
+	add.s64 	%rd15, %rd14, 4;
+	ldu.global.f32 	%f26, [%rd15];
 	mul.f32 	%f27, %f18, %f26;
-	fma.rn.f32 	%f28, %f17, %f19, %f23;
-	fma.rn.f32 	%f29, %f17, %f20, %f25;
-	fma.rn.f32 	%f30, %f17, %f21, %f27;
-	mov.u64 	%rd19, zaxis;
-	ldu.global.f32 	%f31, [zaxis];
-	add.f32 	%f8, %f28, %f31;
-	add.s64 	%rd20, %rd19, 4;
-	ldu.global.f32 	%f32, [%rd20];
-	add.f32 	%f9, %f29, %f32;
-	add.s64 	%rd21, %rd19, 8;
-	ldu.global.f32 	%f33, [%rd21];
-	add.f32 	%f10, %f30, %f33;
-	ld.global.v2.f32 	{%f34, %f35}, [eye];
-	ld.global.f32 	%f7, [eye+8];
-	ldu.global.u32 	%r3, [sceneObj];
-	mov.u32 	%r4, 0;
-	mov.f32 	%f11, 0f3C23D70A;
-	mov.f32 	%f12, 0f6C4ECB8F;
-	mov.u32 	%r5, 12;
+	add.s64 	%rd16, %rd14, 8;
+	ldu.global.f32 	%f28, [%rd16];
+	mul.f32 	%f29, %f18, %f28;
+	fma.rn.f32 	%f30, %f17, %f21, %f25;
+	fma.rn.f32 	%f31, %f17, %f22, %f27;
+	fma.rn.f32 	%f32, %f17, %f23, %f29;
+	mov.u64 	%rd17, zaxis;
+	ldu.global.f32 	%f33, [zaxis];
+	add.f32 	%f4, %f30, %f33;
+	add.s64 	%rd18, %rd17, 4;
+	ldu.global.f32 	%f34, [%rd18];
+	add.f32 	%f5, %f31, %f34;
+	add.s64 	%rd19, %rd17, 8;
+	ldu.global.f32 	%f35, [%rd19];
+	add.f32 	%f6, %f32, %f35;
+	ldu.global.u32 	%r1, [sceneObj];
+	mov.u32 	%r2, 0;
+	mov.f32 	%f7, 0f3C23D70A;
+	mov.f32 	%f8, 0f6C4ECB8F;
+	mov.u32 	%r3, 12;
 	// inline asm
-	call _rt_trace_64, (%r3, %f34, %f35, %f7, %f8, %f9, %f10, %r4, %f11, %f12, %rd3, %r5);
+	call _rt_trace_64, (%r1, %f19, %f20, %f3, %f4, %f5, %f6, %r2, %f7, %f8, %rd1, %r3);
 	// inline asm
-	ld.global.u32 	%rd6, [launchIndex];
-	ld.global.u32 	%rd7, [launchIndex+4];
-	mov.u64 	%rd22, outputBuffer;
-	cvta.global.u64 	%rd5, %rd22;
-	mov.u32 	%r6, 2;
-	mov.u32 	%r7, 16;
-	mov.u64 	%rd9, 0;
+	ld.global.u32 	%rd4, [launchIndex];
+	ld.global.u32 	%rd5, [launchIndex+4];
+	mov.u64 	%rd20, outputBuffer;
+	cvta.global.u64 	%rd3, %rd20;
+	mov.u32 	%r4, 2;
+	mov.u32 	%r5, 16;
+	mov.u64 	%rd7, 0;
 	// inline asm
-	call (%rd4), _rt_buffer_get_64, (%rd5, %r6, %r7, %rd6, %rd7, %rd9, %rd9);
+	call (%rd2), _rt_buffer_get_64, (%rd3, %r4, %r5, %rd4, %rd5, %rd7, %rd7);
 	// inline asm
-	ld.local.f32 	%f36, [%rd10+8];
-	ld.local.f32 	%f37, [%rd10+4];
-	ld.local.f32 	%f38, [%rd10];
+	ld.local.f32 	%f36, [%rd8+8];
+	ld.local.f32 	%f37, [%rd8+4];
+	ld.local.f32 	%f38, [%rd8];
 	mov.f32 	%f39, 0f3F800000;
-	st.v4.f32 	[%rd4], {%f38, %f37, %f36, %f39};
-
-BB0_3:
+	st.v4.f32 	[%rd2], {%f38, %f37, %f36, %f39};
 	ret;
 }
 

@@ -5,12 +5,16 @@ float frand() {
 }
 
 // Main entry of the program.
-// Scenes are constructed from outside the RayEngine object.
+// Scenes are constructed using the RayEngine object.
 int main(int argc, char **argv) {
 
 	RayEngine rayEngine;
 
 	Scene* myScene = rayEngine.createScene("myScene");
+	myScene->camera.position = { 90.9064f, 148.59f, 202.493f };
+	myScene->camera.xaxis = { 0.805529f, -0.00260918f, -0.592553f };
+	myScene->camera.yaxis = { -0.393318f, 0.745581f, -0.537971f };
+	myScene->camera.zaxis = { -0.443199f, -0.666411f, -0.599562f };
 
 	// Add some objects...
 	myScene->loadObject("obj/floor.obj");

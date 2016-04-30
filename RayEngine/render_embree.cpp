@@ -11,11 +11,11 @@ struct {
 
 void RayEngine::renderEmbree() {
 
-	int wid, hei;
-	wid = ceil(window.width * (rayTracingTarget == RTT_HYBRID ? hybridPartition : 1.f));
-	hei = window.height;
+#if EMBREE_PRINT_TIME
+	float start = glfwGetTime();
+#endif
 	
-	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 
 	Vec3 rpos = curCamera->position;
 	Vec3 rxaxis = curCamera->xaxis * window.ratio * curCamera->tFov;
@@ -30,9 +30,10 @@ void RayEngine::renderEmbree() {
 	//   for reflective pixels, do reflection (using same code as step 1), add to pixel
 
 	// Diffuse pass
-	int numDiffusePixels = wid * hei;
+	int numDiffusePixels = EmbreeData.width * window.height;
 	int numDiffusePackets = ceil((float)numDiffusePixels / 8);
 
+	// Try 16x16 packets
     #pragma omp parallel for schedule(dynamic)
 	for (int i = 0; i < numDiffusePackets; i++) {
 
@@ -47,10 +48,10 @@ void RayEngine::renderEmbree() {
 			} else
 				valid[j] = RAY_VALID;
 
-			int x = (i * 8 + j) % wid;
-			int y = (i * 8 + j) / wid;
+			int x = (i * 8 + j) % EmbreeData.width;
+			int y = (i * 8 + j) / EmbreeData.width;
 
-			float dx = ((float)x / window.width) * 2.f - 1.f;
+			float dx = ((float)(EmbreeData.offset + x) / window.width) * 2.f - 1.f;
 			float dy = ((float)y / window.height) * 2.f - 1.f;
 			Vec3 dir = dx * rxaxis + dy * ryaxis + rzaxis;
 
@@ -75,11 +76,11 @@ void RayEngine::renderEmbree() {
 			if (valid[j] == RAY_INVALID)
 				continue;
 
-			int x = (i * 8 + j) % wid;
-			int y = (i * 8 + j) / wid;
+			int x = (i * 8 + j) % EmbreeData.width;
+			int y = (i * 8 + j) / EmbreeData.width;
 
 			if (packet.geomID[j] == RTC_INVALID_GEOMETRY_ID) {
-				EmbreeData.buffer[y * window.width + x] = { 0.f, 0.f, 0.f };
+				EmbreeData.buffer[y * EmbreeData.width + x] = { 0.3f, 0.3f, 0.9f };
 				continue;
 			}
 
@@ -89,20 +90,33 @@ void RayEngine::renderEmbree() {
 			Vec3 hitNorm = Vec3::normalize(hitObj->matrix * hitMesh->getNormal(packet.primID[j], packet.u[j], packet.v[j]));
 
 			Vec3 n = hitNorm * 0.5f + 0.5f;
-			EmbreeData.buffer[y * window.width + x] = { n.x(), n.y(), n.z() };
+			EmbreeData.buffer[y * EmbreeData.width + x] = { n.x(), n.y(), n.z() };
 		
 		}
 
 	}
+
+#if EMBREE_PRINT_TIME
+	float end = glfwGetTime();
+	printf("Embree render:  %.6fs\n", end - start);
+#endif
 	
 }
 
 void RayEngine::renderEmbreeTexture() {
 
+	if (!showEmbreeRender)
+		return;
+
+	float start = glfwGetTime();
+
 	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window.width, window.height, 0, GL_RGBA, GL_FLOAT, EmbreeData.buffer);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, EmbreeData.width, window.height, GL_RGBA, GL_FLOAT, EmbreeData.buffer);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	shdrTex->use2D(window.ortho, 0, 0, window.width, window.height, EmbreeData.texture);
+	shdrTex->use2D(window.ortho, EmbreeData.offset, 0, EmbreeData.width, window.height, EmbreeData.texture);
+	//glDrawPixels(window.width, window.height, GL_RGBA, GL_FLOAT, EmbreeData.buffer[!renderBuffer]);
+	float end = glfwGetTime();
+	printf("Embree texture: %.6fs\n", end - start);
 
 }
