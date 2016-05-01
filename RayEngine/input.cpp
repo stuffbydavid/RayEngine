@@ -22,19 +22,19 @@ void RayEngine::input() {
 		renderMode = RM_OPENGL;
 
 	if (window.keyPressed[GLFW_KEY_F2]) {
-		renderMode = RM_RAYTRACING;
+		renderMode = RM_RAY_TRACING;
 		rayTracingTarget = RTT_CPU;
 		resize();
 	}
 
 	if (window.keyPressed[GLFW_KEY_F3]) {
-		renderMode = RM_RAYTRACING;
+		renderMode = RM_RAY_TRACING;
 		rayTracingTarget = RTT_GPU;
 		resize();
 	}
 
 	if (window.keyPressed[GLFW_KEY_F4]) {
-		renderMode = RM_RAYTRACING;
+		renderMode = RM_RAY_TRACING;
 		rayTracingTarget = RTT_HYBRID;
 		resize();
 	}

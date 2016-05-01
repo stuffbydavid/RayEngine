@@ -4,15 +4,18 @@ void RayEngine::renderHybrid() {
 
 	omp_set_nested(true);
 	
-	// Embree slows down in hybrid mode, OptiX statys the same
+#if HYBRID_THREADED
     #pragma omp parallel num_threads(2)
 	{
-		if (omp_get_thread_num() == 0) {
+		if (omp_get_thread_num() == 0)
 			renderOptix();
-		} else {
+		else
 			renderEmbree();
-		}
 	}
+#else
+	renderEmbree();
+	renderOptix();
+#endif
 
 	renderEmbreeTexture();
 	renderOptixTexture();

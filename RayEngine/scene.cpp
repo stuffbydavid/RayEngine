@@ -12,9 +12,9 @@ Object* Scene::addObject(Geometry* geometry) {
 
 }
 
-Object* Scene::loadObject(string file, Material* defaultMaterial) {
+Object* Scene::loadObject(string file) {
 
-	Object* obj = Object::load(file, defaultMaterial);
+	Object* obj = Object::load(file);
 	objects.push_back(obj);
 	return obj;
 

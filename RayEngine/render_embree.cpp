@@ -15,7 +15,7 @@ void RayEngine::renderEmbree() {
 	float start = glfwGetTime();
 #endif
 	
-	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 
 	Vec3 rpos = curCamera->position;
 	Vec3 rxaxis = curCamera->xaxis * window.ratio * curCamera->tFov;
@@ -87,10 +87,11 @@ void RayEngine::renderEmbree() {
 			Object* hitObj = curScene->EmbreeData.instIDmap[packet.instID[j]];
 
 			TriangleMesh* hitMesh = (TriangleMesh*)hitObj->EmbreeData.geomIDmap[packet.geomID[j]];
+			Material* hitMaterial = hitMesh->material;
 			Vec3 hitNorm = Vec3::normalize(hitObj->matrix * hitMesh->getNormal(packet.primID[j], packet.u[j], packet.v[j]));
+			Vec2 coord = hitMesh->getTexCoord(packet.primID[j], packet.u[j], packet.v[j]);
 
-			Vec3 n = hitNorm * 0.5f + 0.5f;
-			EmbreeData.buffer[y * EmbreeData.width + x] = { n.x(), n.y(), n.z() };
+			EmbreeData.buffer[y * EmbreeData.width + x] = hitMaterial->image->getPixel(coord);
 		
 		}
 
@@ -108,15 +109,20 @@ void RayEngine::renderEmbreeTexture() {
 	if (!showEmbreeRender)
 		return;
 
+#if EMBREE_PRINT_TIME
 	float start = glfwGetTime();
+#endif
 
 	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, EmbreeData.width, window.height, GL_RGBA, GL_FLOAT, EmbreeData.buffer);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	shdrTex->use2D(window.ortho, EmbreeData.offset, 0, EmbreeData.width, window.height, EmbreeData.texture);
-	//glDrawPixels(window.width, window.height, GL_RGBA, GL_FLOAT, EmbreeData.buffer[!renderBuffer]);
+	shdrTexture->use2D(window.ortho, EmbreeData.offset, 0, EmbreeData.width, window.height, EmbreeData.texture);
+	//glDrawPixels(EmbreeData.width, window.height, GL_RGBA, GL_FLOAT, EmbreeData.buffer);
+
+#if EMBREE_PRINT_TIME
 	float end = glfwGetTime();
 	printf("Embree texture: %.6fs\n", end - start);
+#endif
 
 }

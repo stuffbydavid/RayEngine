@@ -1,9 +1,12 @@
 #pragma once
 
 #include "common.h"
+#include "material.h"
 
 // Stores a mesh or custom geometry
 struct Geometry {
+
+	Material* material;
 
 	// Embree
 	virtual uint initEmbree(RTCScene scene) = 0;

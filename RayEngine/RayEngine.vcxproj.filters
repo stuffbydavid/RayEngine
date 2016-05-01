@@ -41,9 +41,6 @@
     <ClCompile Include="triangle_mesh.cpp">
       <Filter>RayEngine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="render_hybrid.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
     <ClCompile Include="render_embree.cpp">
       <Filter>RayEngine\Render</Filter>
     </ClCompile>
@@ -52,6 +49,12 @@
     </ClCompile>
     <ClCompile Include="render_optix.cpp">
       <Filter>RayEngine\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="render_hybrid.cpp">
+      <Filter>RayEngine\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="image.cpp">
+      <Filter>RayEngine\Data</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +118,9 @@
     <ClInclude Include="settings.h">
       <Filter>RayEngine</Filter>
     </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>RayEngine\Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RayEngine">
@@ -132,9 +138,6 @@
     <Filter Include="RayEngine\Data">
       <UniqueIdentifier>{0983e3db-5867-485b-baf5-9927c2a71d15}</UniqueIdentifier>
     </Filter>
-    <Filter Include="RayEngine\Render">
-      <UniqueIdentifier>{0fe8e255-14e8-4d29-afc8-7786f04c9307}</UniqueIdentifier>
-    </Filter>
     <Filter Include="RayEngine\Scene">
       <UniqueIdentifier>{a108bd94-9742-4aa9-a251-1a4801e40493}</UniqueIdentifier>
     </Filter>
@@ -147,18 +150,21 @@
     <Filter Include="RayEngine\Scene\TinyObjLoader">
       <UniqueIdentifier>{6be24712-5a84-460f-be8f-dff61e3d7897}</UniqueIdentifier>
     </Filter>
+    <Filter Include="RayEngine\Render">
+      <UniqueIdentifier>{5918ede9-182e-412a-a055-6ebfb76a9707}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ogl.vshader">
+    <None Include="normals.fshader">
       <Filter>RayEngine\OpenGL\Shaders</Filter>
     </None>
-    <None Include="ogl.fshader">
+    <None Include="normals.vshader">
       <Filter>RayEngine\OpenGL\Shaders</Filter>
     </None>
-    <None Include="tex.vshader">
+    <None Include="texture.fshader">
       <Filter>RayEngine\OpenGL\Shaders</Filter>
     </None>
-    <None Include="tex.fshader">
+    <None Include="texture.vshader">
       <Filter>RayEngine\OpenGL\Shaders</Filter>
     </None>
   </ItemGroup>

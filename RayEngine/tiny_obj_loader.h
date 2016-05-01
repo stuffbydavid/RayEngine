@@ -979,7 +979,7 @@ bool LoadObj(std::vector<shape_t> &shapes,       // [output]
 #endif
 
       // Create face group per material.
-#if 0
+#if 1
       bool ret =
           exportFaceGroupToShape(shape, vertexCache, v, vn, vt, faceGroup, tags,
                                  material, name, true, triangulate);

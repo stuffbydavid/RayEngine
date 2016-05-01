@@ -101,14 +101,14 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboPos);
 	glEnableVertexAttribArray(aPos);
 	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboNormal);
+	
+	/*glBindBuffer(GL_ARRAY_BUFFER, mesh->vboNormal);
 	glEnableVertexAttribArray(aNormal);
-	glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboTexCoord);
 	glEnableVertexAttribArray(aTexCoord);
-	glVertexAttribPointer(aTexCoord, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(aTexCoord, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
 
@@ -116,11 +116,8 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 	glUniformMatrix4fv(uMat, 1, GL_FALSE, matrix.e);
 
 	// Send in texture
-	/*glActiveTexture(GL_TEXTURE0);
-	if (mesh->material)
-		glBindTexture(GL_TEXTURE_2D, mesh->material->texture->texture);
-	else
-		glBindTexture(GL_TEXTURE_2D, 0);*/
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh->material->image->texture);
 	glUniform1i(uTex, 0);
 
 	// Set up shader specific uniforms
@@ -135,6 +132,7 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 	glDisable(GL_CULL_FACE);
 
 	// Disable shader
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glUseProgram(0);
 
 }
@@ -148,7 +146,7 @@ void Shader::use2D(Mat4x4 matrix, int x, int y, int width, int height, GLuint te
 	GLint uMat = glGetUniformLocation(program, "uMat");
 	GLint uTex = glGetUniformLocation(program, "uTex");
 	GLint uColor = glGetUniformLocation(program, "uColor");
-
+	
 	// Select current resources
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
@@ -175,7 +173,7 @@ void Shader::use2D(Mat4x4 matrix, int x, int y, int width, int height, GLuint te
 	glBufferData(GL_ARRAY_BUFFER, sizePositions + sizeTexCoords, NULL, GL_DYNAMIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizePositions, posData);
 	glBufferSubData(GL_ARRAY_BUFFER, sizePositions, sizeTexCoords, texCoordData);
-
+	
 	// Pass buffers
 	glEnableVertexAttribArray(aPos);
 	glEnableVertexAttribArray(aTexCoord);

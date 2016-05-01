@@ -13,8 +13,10 @@
 	// .globl	_Z9intersecti
 .global .align 1 .b8 posData[1];
 .global .align 1 .b8 normalData[1];
+.global .align 1 .b8 texCoordData[1];
 .global .align 1 .b8 indexData[1];
 .global .align 8 .b8 normal[12];
+.global .align 8 .b8 texCoord[8];
 .global .align 4 .b8 ray[36];
 .global .align 8 .u64 _ZN21rti_internal_register20reg_bitness_detectorE;
 .global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail0E;
@@ -41,14 +43,19 @@
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_yE;
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_zE;
 .global .align 4 .b8 _ZN21rti_internal_typeinfo6normalE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
+.global .align 4 .b8 _ZN21rti_internal_typeinfo8texCoordE[8] = {82, 97, 121, 0, 8, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo3rayE[8] = {82, 97, 121, 0, 36, 0, 0, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename6normalE[7] = {102, 108, 111, 97, 116, 51, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename8texCoordE[7] = {102, 108, 111, 97, 116, 50, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename3rayE[4] = {82, 97, 121, 0};
 .global .align 4 .u32 _ZN21rti_internal_typeenum6normalE = 4919;
+.global .align 4 .u32 _ZN21rti_internal_typeenum8texCoordE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum3rayE = 4919;
 .global .align 1 .b8 _ZN21rti_internal_semantic6normalE[17] = {97, 116, 116, 114, 105, 98, 117, 116, 101, 32, 110, 111, 114, 109, 97, 108, 0};
+.global .align 1 .b8 _ZN21rti_internal_semantic8texCoordE[19] = {97, 116, 116, 114, 105, 98, 117, 116, 101, 32, 116, 101, 120, 67, 111, 111, 114, 100, 0};
 .global .align 1 .b8 _ZN21rti_internal_semantic3rayE[13] = {114, 116, 67, 117, 114, 114, 101, 110, 116, 82, 97, 121, 0};
 .global .align 1 .b8 _ZN23rti_internal_annotation6normalE[1];
+.global .align 1 .b8 _ZN23rti_internal_annotation8texCoordE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation3rayE[1];
 
 .visible .entry _Z9intersecti(
@@ -56,9 +63,9 @@
 )
 {
 	.reg .pred 	%p<11>;
-	.reg .f32 	%f<97>;
-	.reg .s32 	%r<19>;
-	.reg .s64 	%rd<49>;
+	.reg .f32 	%f<115>;
+	.reg .s32 	%r<25>;
+	.reg .s64 	%rd<68>;
 
 
 	ld.param.s32 	%rd6, [_Z9intersecti_param_0];
@@ -164,8 +171,8 @@ BB0_1:
 	setp.eq.s32	%p10, %r9, 0;
 	@%p10 bra 	BB0_3;
 
-	mov.u64 	%rd48, normalData;
-	cvta.global.u64 	%rd31, %rd48;
+	mov.u64 	%rd66, normalData;
+	cvta.global.u64 	%rd31, %rd66;
 	// inline asm
 	call (%rd30), _rt_buffer_get_64, (%rd31, %r7, %r8, %rd12, %rd27, %rd27, %rd27);
 	// inline asm
@@ -211,9 +218,31 @@ BB0_1:
 	mul.f32 	%f96, %f63, %f93;
 	st.global.v2.f32 	[normal], {%f96, %f95};
 	st.global.f32 	[normal+8], %f94;
-	mov.u32 	%r18, 0;
+	mov.u64 	%rd67, texCoordData;
+	cvta.global.u64 	%rd49, %rd67;
+	mov.u32 	%r22, 8;
 	// inline asm
-	call (%r17), _rt_report_intersection, (%r18);
+	call (%rd48), _rt_buffer_get_64, (%rd49, %r7, %r22, %rd12, %rd27, %rd27, %rd27);
+	// inline asm
+	ld.v2.f32 	{%f97, %f98}, [%rd48];
+	// inline asm
+	call (%rd54), _rt_buffer_get_64, (%rd49, %r7, %r22, %rd18, %rd27, %rd27, %rd27);
+	// inline asm
+	ld.v2.f32 	{%f101, %f102}, [%rd54];
+	// inline asm
+	call (%rd60), _rt_buffer_get_64, (%rd49, %r7, %r22, %rd24, %rd27, %rd27, %rd27);
+	// inline asm
+	mul.f32 	%f105, %f1, %f101;
+	mul.f32 	%f106, %f1, %f102;
+	fma.rn.f32 	%f107, %f79, %f97, %f105;
+	fma.rn.f32 	%f108, %f79, %f98, %f106;
+	ld.v2.f32 	{%f109, %f110}, [%rd60];
+	fma.rn.f32 	%f113, %f2, %f110, %f108;
+	fma.rn.f32 	%f114, %f2, %f109, %f107;
+	st.global.v2.f32 	[texCoord], {%f114, %f113};
+	mov.u32 	%r24, 0;
+	// inline asm
+	call (%r23), _rt_report_intersection, (%r24);
 	// inline asm
 
 BB0_3:

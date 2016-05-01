@@ -1,13 +1,19 @@
 #include "rayengine.h"
 
 
-void setupOGL(GLuint program, void* caller) {
+void setupNormals(GLuint program, void* caller) {
 
 	GLint uMatWorld = glGetUniformLocation(program, "uMatWorld");
 	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, Mat4x4(((Object*)caller)->matrix).e);
 
 }
 
+void setupTexture(GLuint program, void* caller) {
+
+	GLint uColor = glGetUniformLocation(program, "uColor");
+	glUniform4f(uColor, 1.f, 1.f, 1.f, 1.f);
+
+}
 
 RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, RayTracingTarget rayTracingTarget, float hybridPartition) :
 	renderMode(renderMode),
@@ -21,13 +27,13 @@ RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, R
 	Magick::InitializeMagick(NULL);
 
 	// Shaders
-	shdrOGL = new Shader("OpenGL", setupOGL, "ogl.vshader", "ogl.fshader");
-	shdrTex = new Shader("Texture", nullptr, "tex.vshader", "tex.fshader");
+	shdrNormals = new Shader("Normals", setupNormals, "normals.vshader", "normals.fshader");
+	shdrTexture = new Shader("Texture", setupTexture, "texture.vshader", "texture.fshader");
 
 }
 
 RayEngine::~RayEngine() {
-
+	// TODO
 }
 
 void RayEngine::launch() {

@@ -182,6 +182,7 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="embree_handler.cpp" />
+    <ClCompile Include="image.cpp" />
     <ClCompile Include="render_hybrid.cpp" />
     <ClCompile Include="render_embree.cpp" />
     <ClCompile Include="font.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="optix_handler.cpp" />
     <ClCompile Include="rayengine.cpp" />
     <ClInclude Include="common.cuh" />
+    <ClInclude Include="image.h" />
     <ClInclude Include="rayengine.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="render_optix.cpp" />
@@ -222,14 +224,14 @@
     <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ogl.fshader">
+    <None Include="normals.fshader">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
     </None>
-    <None Include="ogl.vshader">
+    <None Include="normals.vshader">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
     </None>
-    <None Include="tex.fshader" />
-    <None Include="tex.vshader" />
+    <None Include="texture.fshader" />
+    <None Include="texture.vshader" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="camera_program.cu" />

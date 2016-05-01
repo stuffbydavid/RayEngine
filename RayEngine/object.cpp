@@ -19,7 +19,9 @@ void Object::scale(Vec3 vector) {
 	matrix = Mat4x3::scale(vector) * matrix;
 }
 
-Object* Object::load(string file, Material* defaultMaterial) {
+Object* Object::load(string file) {
+
+	static Image defaultTexture({ 1.f, 1.f, 1.f });
 
 	vector<tinyobj::shape_t> fileShapes;
 	vector<tinyobj::material_t> fileMaterials;
@@ -37,53 +39,39 @@ Object* Object::load(string file, Material* defaultMaterial) {
 		cerr << "No shapes found" << endl;
 		return nullptr;
 	}
-	cout << "Shapes found: " << fileShapes.size() << endl;
 
 	// Convert to our material type
 	vector<Material*> materials(fileMaterials.size());
 	if (fileMaterials.size() > 0) {
 		for (int i = 0; i < materials.size(); i++) {
 
-			Material* mat = new Material(fileMaterials[i].name);
+			Material* mat = new Material();
 
-			mat->id = i;
 			mat->ambient = Color(fileMaterials[i].ambient);
 			mat->diffuse = Color(fileMaterials[i].diffuse);
 			mat->specular = Color(fileMaterials[i].specular);
 			mat->shininess = fileMaterials[i].shininess; // TODO: Don't use this for reflection
-			mat->textureFile = fileMaterials[i].diffuse_texname;
 
-			if (mat->textureFile != "") {
-				mat->textureFile = path + mat->textureFile;
-				mat->image.read(mat->textureFile);
-				mat->imageData = mat->image.getPixels(0, 0, mat->image.columns(), mat->image.rows());
-				mat->imageWidth = mat->image.columns();
-				mat->imageHeight = mat->image.rows();
-			}
+			if (fileMaterials[i].diffuse_texname != "")
+				mat->image = new Image(path + fileMaterials[i].diffuse_texname, GL_NEAREST);
+			else
+				mat->image = &defaultTexture;
 
 			materials[i] = mat;
 
 		}
-	} else if (!defaultMaterial) {
+	} else {
 
-		// Generate new basic material
 		Material* mat = new Material();
-
-		mat->id = 0;
-		mat->ambient = Color(0.f, 0.f, 0.f, 1.f);
-		mat->diffuse = Color(1.f, 1.f, 1.f, 1.f);
-		mat->specular = Color(0.f, 0.f, 0.f, 1.f);
-		mat->shininess = 0.f;
-		mat->textureFile = "";
-
+		mat->image = &defaultTexture;
 		materials.push_back(mat);
 
-	} else
-		materials.push_back(defaultMaterial);
+	}
 
 	// Create a root
 	Object* obj = new Object();
 
+	cout << "Shapes found: " << fileShapes.size() << endl;
 	for (uint i = 0; i < fileShapes.size(); i++) {
 
 		TriangleMesh* triangleMesh = new TriangleMesh();
@@ -124,17 +112,13 @@ Object* Object::load(string file, Material* defaultMaterial) {
 				(uint)fileShapes[i].mesh.indices[3 * t + 1],
 				(uint)fileShapes[i].mesh.indices[3 * t + 2]
 			};
-
-			int material_id = fileShapes[i].mesh.material_ids[t];
-			if (material_id < 0)
-				material_id = 0;
-			for (uint m = 0; m < materials.size(); m++) {
-				if (materials[m]->id == material_id) {
-					//triangleMesh->indexData[t].material = materials[m]; // TODO
-					break;
-				}
-			}
 		}
+
+		// Fetch geometry material from first triangle
+		int material_id = fileShapes[i].mesh.material_ids[0];
+		if (material_id < 0)
+			material_id = 0;
+		triangleMesh->material = materials[material_id];
 
 		cout << "    Vertices: " << vertices << endl;
 		cout << "    Triangles: " << triangles << endl;

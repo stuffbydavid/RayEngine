@@ -1,20 +1,20 @@
 #pragma once
 
 #include "common.h"
+#include "image.h"
 
 struct Material {
 
-	Material(string name = "");
+	Material();
 
-	string name;
-
-	int id;
 	Color ambient, diffuse, specular;
 	float shininess;
-	string textureFile;
-	Magick::Image image;
-	Magick::PixelPacket *imageData;
-	int imageWidth, imageHeight;
+	Image* image;
+
+	struct {
+		optix::Material material;
+		optix::TextureSampler sampler;
+	} OptixData;
 
 	/*int id;
 

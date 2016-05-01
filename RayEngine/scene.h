@@ -10,7 +10,7 @@ struct Scene {
 	Scene(string name);
 
 	// Loads object(s) from a file and adds it to the scene.
-	Object* loadObject(string file, Material* defaultMaterial = nullptr);
+	Object* loadObject(string file);
 
 	// Adds a new customizable object.
 	Object* addObject(Geometry* geometry = nullptr);

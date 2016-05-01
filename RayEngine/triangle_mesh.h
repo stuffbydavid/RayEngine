@@ -41,7 +41,7 @@ struct TriangleMesh : Geometry {
 	struct {
 		optix::Geometry geometry;
 		optix::GeometryInstance geometryInstance;
-		optix::Buffer posBuffer, normalBuffer, indexBuffer;
+		optix::Buffer posBuffer, normalBuffer, texCoordBuffer, indexBuffer;
 	} OptixData;
 	void initOptix(optix::Context context);
 

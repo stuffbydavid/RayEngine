@@ -66,10 +66,6 @@ uint TriangleMesh::initEmbree(RTCScene scene) {
 
 void RayEngine::resizeEmbree() {
 
-	// Free old buffer
-	if (EmbreeData.buffer)
-		delete EmbreeData.buffer;
-
 	// Set dimensions
 	if (rayTracingTarget == RTT_HYBRID) {
 		EmbreeData.offset = 0;
@@ -80,6 +76,8 @@ void RayEngine::resizeEmbree() {
 	}
 
 	// Resize buffer
+	if (EmbreeData.buffer)
+		delete EmbreeData.buffer;
 	EmbreeData.buffer = new Color[EmbreeData.width * window.height];
 
 	// Resize texture

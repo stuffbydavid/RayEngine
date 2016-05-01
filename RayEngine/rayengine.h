@@ -8,7 +8,7 @@ struct RayEngine {
 
 	// Render modes
 	enum RenderMode {
-		RM_RAYTRACING, // Render using the ray tracing algorithm
+		RM_RAY_TRACING, // Render using the ray tracing algorithm
 		RM_OPENGL // Render using OpenGL shaders
 	};
 
@@ -52,8 +52,8 @@ private:
 	Scene* curScene;
 	Camera* curCamera;
 	Window window;
-	Shader* shdrOGL;
-	Shader* shdrTex;
+	Shader* shdrNormals;
+	Shader* shdrTexture;
 
 	RenderMode renderMode;
 	RayTracingTarget rayTracingTarget;

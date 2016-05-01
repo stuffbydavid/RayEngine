@@ -8,7 +8,7 @@ void RayEngine::renderOpenGL() {
 	Mat4x4 proj = curCamera->getMatrix(window.ratio);
 
 	for (uint i = 0; i < curScene->objects.size(); i++)
-		curScene->objects[i]->renderOpenGL(shdrOGL, proj);
+		curScene->objects[i]->renderOpenGL(OPENGL_SHADER, proj);
 
 }
 

@@ -13,7 +13,7 @@ struct Object {
 	~Object();
 
 	// Loads object(s) from a file.
-	static Object* load(string file, Material* defaultMaterial = nullptr);
+	static Object* load(string file);
 	
 	// Renders using an OpenGL shader.
 	void renderOpenGL(Shader* shader, Mat4x4 proj);
