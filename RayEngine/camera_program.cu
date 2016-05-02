@@ -20,8 +20,8 @@ RT_PROGRAM void camera() {
 
 	optix::Ray ray = make_Ray(rayOrg, rayDir, 0, 0.01f, RT_DEFAULT_MAX);
 
-	RayData rd;
-	rtTrace(sceneObj, ray, rd);
+	RayColorData data;
+	rtTrace(sceneObj, ray, data);
 
-	renderBuffer[launchIndex] = rd.result;
+	renderBuffer[launchIndex] = data.result;
 }

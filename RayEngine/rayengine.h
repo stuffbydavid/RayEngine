@@ -29,7 +29,7 @@ struct RayEngine {
 	~RayEngine();
 
 	// Adds a new, empty scene.
-	Scene* createScene(string name);
+	Scene* createScene(string name, Color ambient = { 0.f }, Color background = { 0.f });
 
 	// Launches the program and starts rendering.
 	void launch();

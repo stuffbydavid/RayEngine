@@ -5,8 +5,12 @@
 
 using namespace optix;
 
-struct RayData {
+struct RayColorData {
 	float4 result;
+};
+
+struct RayShadowData {
+	float attenuation;
 };
 
 struct Light {

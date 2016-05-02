@@ -1,9 +1,9 @@
 #include "common.cuh"
 
-rtDeclareVariable(float4, backgroundColor, , );
+rtDeclareVariable(float4, background, , );
 
-rtDeclareVariable(RayData, rayData, rtPayload, );
+rtDeclareVariable(RayColorData, rayColorData, rtPayload, );
 
 RT_PROGRAM void miss() {
-	rayData.result = backgroundColor;
+	rayColorData.result = background;
 }

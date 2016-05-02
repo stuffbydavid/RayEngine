@@ -107,15 +107,17 @@ void RayEngine::renderEmbree() {
 				float distance = Vec3::length(light.position - hitPos);
 				float attenuation = max(1.f - distance / light.range, 0.f);
 
-				// Diffuse factor
-				float diffuse = max(Vec3::dot(hitNormal, incidence), 0.f) * attenuation;
-				totalDiffuse += diffuse * light.color;
+				if (attenuation > 0.0) {
+					// Diffuse factor
+					float diffuse = max(Vec3::dot(hitNormal, incidence), 0.f) * attenuation;
+					totalDiffuse += diffuse * light.color;
 
-				// Specular factor
-				if (hitMaterial->shininess > 0.0) {
-					Vec3 reflection = 2.f * Vec3::dot(incidence, hitNormal) * hitNormal - incidence;
-					float specular = pow(max(Vec3::dot(reflection, toEye), 0.f), 1.f / hitMaterial->shininess) * attenuation;
-					totalSpecular += specular * light.color;
+					// Specular factor
+					if (hitMaterial->shininess > 0.0) {
+						Vec3 reflection = 2.f * Vec3::dot(incidence, hitNormal) * hitNormal - incidence;
+						float specular = pow(max(Vec3::dot(reflection, toEye), 0.f), 1.f / hitMaterial->shininess) * attenuation;
+						totalSpecular += specular * light.color;
+					}
 				}
 			}
 

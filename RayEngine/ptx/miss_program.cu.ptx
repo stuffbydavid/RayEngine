@@ -11,8 +11,8 @@
 .address_size 64
 
 	// .globl	_Z4missv
-.global .align 16 .b8 backgroundColor[16];
-.global .align 16 .b8 rayData[16];
+.global .align 16 .b8 background[16];
+.global .align 16 .b8 rayColorData[16];
 .global .align 8 .u64 _ZN21rti_internal_register20reg_bitness_detectorE;
 .global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail0E;
 .global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail1E;
@@ -37,16 +37,16 @@
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_xE;
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_yE;
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_zE;
-.global .align 4 .b8 _ZN21rti_internal_typeinfo15backgroundColorE[8] = {82, 97, 121, 0, 16, 0, 0, 0};
-.global .align 4 .b8 _ZN21rti_internal_typeinfo7rayDataE[8] = {82, 97, 121, 0, 16, 0, 0, 0};
-.global .align 1 .b8 _ZN21rti_internal_typename15backgroundColorE[7] = {102, 108, 111, 97, 116, 52, 0};
-.global .align 1 .b8 _ZN21rti_internal_typename7rayDataE[8] = {82, 97, 121, 68, 97, 116, 97, 0};
-.global .align 4 .u32 _ZN21rti_internal_typeenum15backgroundColorE = 4919;
-.global .align 4 .u32 _ZN21rti_internal_typeenum7rayDataE = 4919;
-.global .align 1 .b8 _ZN21rti_internal_semantic15backgroundColorE[1];
-.global .align 1 .b8 _ZN21rti_internal_semantic7rayDataE[10] = {114, 116, 80, 97, 121, 108, 111, 97, 100, 0};
-.global .align 1 .b8 _ZN23rti_internal_annotation15backgroundColorE[1];
-.global .align 1 .b8 _ZN23rti_internal_annotation7rayDataE[1];
+.global .align 4 .b8 _ZN21rti_internal_typeinfo10backgroundE[8] = {82, 97, 121, 0, 16, 0, 0, 0};
+.global .align 4 .b8 _ZN21rti_internal_typeinfo12rayColorDataE[8] = {82, 97, 121, 0, 16, 0, 0, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename10backgroundE[7] = {102, 108, 111, 97, 116, 52, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename12rayColorDataE[13] = {82, 97, 121, 67, 111, 108, 111, 114, 68, 97, 116, 97, 0};
+.global .align 4 .u32 _ZN21rti_internal_typeenum10backgroundE = 4919;
+.global .align 4 .u32 _ZN21rti_internal_typeenum12rayColorDataE = 4919;
+.global .align 1 .b8 _ZN21rti_internal_semantic10backgroundE[1];
+.global .align 1 .b8 _ZN21rti_internal_semantic12rayColorDataE[10] = {114, 116, 80, 97, 121, 108, 111, 97, 100, 0};
+.global .align 1 .b8 _ZN23rti_internal_annotation10backgroundE[1];
+.global .align 1 .b8 _ZN23rti_internal_annotation12rayColorDataE[1];
 
 .visible .entry _Z4missv(
 
@@ -55,8 +55,8 @@
 	.reg .f32 	%f<9>;
 
 
-	ld.global.v4.f32 	{%f1, %f2, %f3, %f4}, [backgroundColor];
-	st.global.v4.f32 	[rayData], {%f1, %f2, %f3, %f4};
+	ld.global.v4.f32 	{%f1, %f2, %f3, %f4}, [background];
+	st.global.v4.f32 	[rayColorData], {%f1, %f2, %f3, %f4};
 	ret;
 }
 

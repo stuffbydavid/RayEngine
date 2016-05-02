@@ -1,9 +1,9 @@
 #include "Scene.h"
 
-Scene::Scene(string name, Color ambient, Color backgroundColor) :
+Scene::Scene(string name, Color ambient, Color background) :
     name(name),
 	ambient(ambient),
-	backgroundColor(backgroundColor)
+	background(background)
 {}
 
 Object* Scene::loadObject(string file) {

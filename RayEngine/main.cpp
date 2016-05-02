@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
 	//myScene->loadObject("SLS", "C:/Users/david/Documents/Visual Studio 2013/Projects/SimpleEmbree/Meshes/SLS/sls_amg.obj");
 
 	// Let there be light!
-	myScene->addLight({ 100.f, 100.f, 100.f }, { 1.f, 1.f, 1.f }, 300.f);
+	myScene->addLight({ 100.f, 100.f, 100.f }, { 1.f, 1.f, 1.f }, 3000.f);
 	
 	rayEngine.launch();
 

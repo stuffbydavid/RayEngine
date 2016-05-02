@@ -1,6 +1,6 @@
 #include "rayengine.h"
 
-optix::Program materialProgram;
+optix::Program materialClosestHitProgram, materialAnyHitProgram;
 
 void printException(optix::Exception e) {
 
@@ -24,7 +24,7 @@ void RayEngine::initOptix() {
 
 		// Make context
 		OptixData.context = optix::Context::create();
-		OptixData.context->setRayTypeCount(1);
+		OptixData.context->setRayTypeCount(2);
 		OptixData.context->setEntryPointCount(1);
 
 		// Make output buffer
@@ -49,15 +49,16 @@ void RayEngine::initOptix() {
 		// Make miss program
 		OptixData.context->setMissProgram(0, OptixData.context->createProgramFromPTXFile("ptx/miss_program.cu.ptx", "miss"));
 
-		// Make material program
-		materialProgram = OptixData.context->createProgramFromPTXFile("ptx/material_program.cu.ptx", "closestHit");
+		// Make material programs
+		materialClosestHitProgram = OptixData.context->createProgramFromPTXFile("ptx/material_program.cu.ptx", "closestHit");
+		materialAnyHitProgram = OptixData.context->createProgramFromPTXFile("ptx/material_program.cu.ptx", "anyHit");
 
 		// Init scenes
 		for (uint i = 0; i < scenes.size(); i++)
 			scenes[i]->initOptix(OptixData.context);
 
 		OptixData.context["ambient"]->setFloat(curScene->ambient.r(), curScene->ambient.g(), curScene->ambient.b(), curScene->ambient.a());
-		OptixData.context["backgroundColor"]->setFloat(0.9f, 0.3f, 0.3f, 1.f);
+		OptixData.context["background"]->setFloat(0.9f, 0.3f, 0.3f, 1.f);
 		OptixData.context["sceneObj"]->set(scenes[0]->OptixData.group);
 		OptixData.context["lights"]->set(OptixData.lights);
 		OptixData.context["renderBuffer"]->set(OptixData.renderBuffer);
@@ -192,7 +193,8 @@ void TriangleMesh::initOptix(optix::Context context) {
 			material->OptixData.sampler->setFilteringModes(RT_FILTER_NEAREST, RT_FILTER_NEAREST, RT_FILTER_NONE);
 
 			material->OptixData.material = context->createMaterial();
-			material->OptixData.material->setClosestHitProgram(0, materialProgram);
+			material->OptixData.material->setClosestHitProgram(0, materialClosestHitProgram);
+			material->OptixData.material->setAnyHitProgram(1, materialAnyHitProgram);
 			material->OptixData.material["sampler"]->setTextureSampler(material->OptixData.sampler);
 
 			material->OptixData.material["diffuse"]->setFloat(material->diffuse.r(), material->diffuse.g(), material->diffuse.b(), material->diffuse.a());
