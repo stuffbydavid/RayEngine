@@ -1,12 +1,12 @@
 #include "common.cuh"
 
+rtBuffer<float4, 2> renderBuffer;
 rtDeclareVariable(float, offset, , );
 rtDeclareVariable(float, windowWidth, , );
 rtDeclareVariable(float3, eye, , );
 rtDeclareVariable(float3, xaxis, , );
 rtDeclareVariable(float3, yaxis, , );
 rtDeclareVariable(float3, zaxis, , );
-rtBuffer<float4, 2> outputBuffer;
 rtDeclareVariable(rtObject, sceneObj, , );
 
 rtDeclareVariable(uint2, launchIndex, rtLaunchIndex, );
@@ -23,5 +23,5 @@ RT_PROGRAM void camera() {
 	RayData rd;
 	rtTrace(sceneObj, ray, rd);
 
-	outputBuffer[launchIndex] = make_float4(rd.result, 1.f);
+	renderBuffer[launchIndex] = rd.result;
 }

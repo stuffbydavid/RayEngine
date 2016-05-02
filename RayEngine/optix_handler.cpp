@@ -30,12 +30,18 @@ void RayEngine::initOptix() {
 		// Make output buffer
 #if OPTIX_USE_OUTPUT_VBO
 		glGenBuffers(1, &OptixData.vbo);
-		OptixData.buffer = OptixData.context->createBufferFromGLBO(RT_BUFFER_OUTPUT, OptixData.vbo);
-		OptixData.buffer->setFormat(RT_FORMAT_FLOAT4);
-		OptixData.buffer->setSize(window.width, window.height);
+		OptixData.renderBuffer = OptixData.context->createBufferFromGLBO(RT_BUFFER_OUTPUT, OptixData.vbo);
+		OptixData.renderBuffer->setFormat(RT_FORMAT_FLOAT4);
+		OptixData.renderBuffer->setSize(window.width, window.height);
 #else
 		OptixData.buffer = OptixData.context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT4, window.width, window.height);
 #endif
+
+		// Make light buffer
+		OptixData.lights = OptixData.context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_USER, curScene->lights.size());
+		OptixData.lights->setElementSize(sizeof(Light));
+		memcpy(OptixData.lights->map(), &curScene->lights[0], curScene->lights.size() * sizeof(Light));
+		OptixData.lights->unmap();
 
 		// Make ray generation program
 		OptixData.context->setRayGenerationProgram(0, OptixData.context->createProgramFromPTXFile("ptx/camera_program.cu.ptx", "camera"));
@@ -50,9 +56,11 @@ void RayEngine::initOptix() {
 		for (uint i = 0; i < scenes.size(); i++)
 			scenes[i]->initOptix(OptixData.context);
 
-		OptixData.context["bgColor"]->setFloat(0.9f, 0.3f, 0.3f);
+		OptixData.context["ambient"]->setFloat(curScene->ambient.r(), curScene->ambient.g(), curScene->ambient.b(), curScene->ambient.a());
+		OptixData.context["backgroundColor"]->setFloat(0.9f, 0.3f, 0.3f, 1.f);
 		OptixData.context["sceneObj"]->set(scenes[0]->OptixData.group);
-		OptixData.context["outputBuffer"]->set(OptixData.buffer);
+		OptixData.context["lights"]->set(OptixData.lights);
+		OptixData.context["renderBuffer"]->set(OptixData.renderBuffer);
 
 		// Compile
 		OptixData.context->validate();
@@ -187,6 +195,8 @@ void TriangleMesh::initOptix(optix::Context context) {
 			material->OptixData.material->setClosestHitProgram(0, materialProgram);
 			material->OptixData.material["sampler"]->setTextureSampler(material->OptixData.sampler);
 
+			material->OptixData.material["diffuse"]->setFloat(material->diffuse.r(), material->diffuse.g(), material->diffuse.b(), material->diffuse.a());
+			material->OptixData.material["shininess"]->setFloat(material->shininess);
 		}
 
 		OptixData.geometryInstance = context->createGeometryInstance();
@@ -211,15 +221,15 @@ void RayEngine::resizeOptix() {
 	}
 
 	// Resize buffer object
-	OptixData.buffer->setSize(OptixData.width, window.height);
+	OptixData.renderBuffer->setSize(OptixData.width, window.height);
 
 	// Resize VBO
 #if OPTIX_USE_OUTPUT_VBO
-	OptixData.buffer->unregisterGLBuffer();
+	OptixData.renderBuffer->unregisterGLBuffer();
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, OptixData.vbo);
 	glBufferData(GL_PIXEL_UNPACK_BUFFER, sizeof(float) * 4 * OptixData.width * window.height, 0, GL_STREAM_DRAW);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-	OptixData.buffer->registerGLBuffer();
+	OptixData.renderBuffer->registerGLBuffer();
 #endif
 
 	// Resize texture

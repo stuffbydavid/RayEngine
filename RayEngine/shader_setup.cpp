@@ -27,17 +27,17 @@ void RayEngine::setupPhong(GLuint program, Object* object, TriangleMesh* mesh) {
 	uint lightCount = curScene->lights.size();
 
 	GLint uMatWorld = glGetUniformLocation(program, "uMatWorld");
-	GLint uAmbientColor = glGetUniformLocation(program, "uAmbientColor");
+	GLint uambient = glGetUniformLocation(program, "uambient");
 	GLint uShininess = glGetUniformLocation(program, "uShininess");
 	GLint uEyePos = glGetUniformLocation(program, "uEyePos");
 	GLint uLights = glGetUniformLocation(program, "uLights");
 	GLint uLightPos = glGetUniformLocation(program, "uLightPos");
 	GLint uLightColor = glGetUniformLocation(program, "uLightColor");
 	GLint uLightRange = glGetUniformLocation(program, "uLightRange");
-	GLint uDiffuse = glGetUniformLocation(program, "uDiffuse");
+	GLint udiffuse = glGetUniformLocation(program, "udiffuse");
 
 	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, object->matrix.e);
-	glUniformColor(uAmbientColor, curScene->ambientColor);
+	glUniformColor(uambient, curScene->ambient);
 	glUniformVec3(uEyePos, curCamera->position);
 
 	// Create light arrays
@@ -45,9 +45,9 @@ void RayEngine::setupPhong(GLuint program, Object* object, TriangleMesh* mesh) {
 	Color* lightColor = new Color[lightCount];
 	float* lightRange = new float[lightCount];
 	for (uint i = 0; i < lightCount; i++) {
-		lightPos[i] = curScene->lights[i]->position;
-		lightColor[i] = curScene->lights[i]->color;
-		lightRange[i] = curScene->lights[i]->range;
+		lightPos[i] = curScene->lights[i].position;
+		lightColor[i] = curScene->lights[i].color;
+		lightRange[i] = curScene->lights[i].range;
 	}
 
 	glUniform1f(uLights, lightCount);
@@ -55,7 +55,7 @@ void RayEngine::setupPhong(GLuint program, Object* object, TriangleMesh* mesh) {
 	glUniform4fv(uLightColor, lightCount, (float*)lightColor);
 	glUniform1fv(uLightRange, lightCount, lightRange);
 
-	glUniformColor(uDiffuse, mesh->material->diffuse);
+	glUniformColor(udiffuse, mesh->material->diffuse);
 	glUniform1f(uShininess, mesh->material->shininess);
 
 	delete lightPos;

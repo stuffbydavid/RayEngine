@@ -11,13 +11,13 @@
 .address_size 64
 
 	// .globl	_Z6camerav
+.global .align 1 .b8 renderBuffer[1];
 .global .align 4 .f32 offset;
 .global .align 4 .f32 windowWidth;
 .global .align 8 .b8 eye[12];
 .global .align 4 .b8 xaxis[12];
 .global .align 4 .b8 yaxis[12];
 .global .align 4 .b8 zaxis[12];
-.global .align 1 .b8 outputBuffer[1];
 .global .align 8 .b8 sceneObj[4];
 .global .align 8 .b8 launchIndex[8];
 .global .align 8 .b8 launchDim[8];
@@ -95,10 +95,10 @@
 
 )
 {
-	.local .align 8 .b8 	__local_depot0[16];
+	.local .align 16 .b8 	__local_depot0[16];
 	.reg .b64 	%SP;
 	.reg .b64 	%SPL;
-	.reg .f32 	%f<40>;
+	.reg .f32 	%f<44>;
 	.reg .s32 	%r<11>;
 	.reg .s64 	%rd<22>;
 
@@ -154,25 +154,21 @@
 	mov.u32 	%r2, 0;
 	mov.f32 	%f7, 0f3C23D70A;
 	mov.f32 	%f8, 0f6C4ECB8F;
-	mov.u32 	%r3, 12;
+	mov.u32 	%r5, 16;
 	// inline asm
-	call _rt_trace_64, (%r1, %f19, %f20, %f3, %f4, %f5, %f6, %r2, %f7, %f8, %rd1, %r3);
+	call _rt_trace_64, (%r1, %f19, %f20, %f3, %f4, %f5, %f6, %r2, %f7, %f8, %rd1, %r5);
 	// inline asm
 	ld.global.u32 	%rd4, [launchIndex];
 	ld.global.u32 	%rd5, [launchIndex+4];
-	mov.u64 	%rd20, outputBuffer;
+	mov.u64 	%rd20, renderBuffer;
 	cvta.global.u64 	%rd3, %rd20;
 	mov.u32 	%r4, 2;
-	mov.u32 	%r5, 16;
 	mov.u64 	%rd7, 0;
 	// inline asm
 	call (%rd2), _rt_buffer_get_64, (%rd3, %r4, %r5, %rd4, %rd5, %rd7, %rd7);
 	// inline asm
-	ld.local.f32 	%f36, [%rd8+8];
-	ld.local.f32 	%f37, [%rd8+4];
-	ld.local.f32 	%f38, [%rd8];
-	mov.f32 	%f39, 0f3F800000;
-	st.v4.f32 	[%rd2], {%f38, %f37, %f36, %f39};
+	ld.local.v4.f32 	{%f36, %f37, %f38, %f39}, [%rd8];
+	st.v4.f32 	[%rd2], {%f36, %f37, %f38, %f39};
 	ret;
 }
 

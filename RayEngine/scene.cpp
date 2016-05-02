@@ -1,8 +1,8 @@
 #include "Scene.h"
 
-Scene::Scene(string name, Color ambientColor, Color backgroundColor) :
+Scene::Scene(string name, Color ambient, Color backgroundColor) :
     name(name),
-	ambientColor(ambientColor),
+	ambient(ambient),
 	backgroundColor(backgroundColor)
 {}
 
@@ -24,10 +24,8 @@ Object* Scene::addObject(Geometry* geometry) {
 
 }
 
-Light* Scene::addLight(Vec3 position, Color color, float range) {
+void Scene::addLight(Vec3 position, Color color, float range) {
 
-	Light* light = new Light(position, color, range);
-	lights.push_back(light);
-	return light;
+	lights.push_back({ position, color, range });
 
 }

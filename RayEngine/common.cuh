@@ -6,5 +6,11 @@
 using namespace optix;
 
 struct RayData {
-	float3 result;
+	float4 result;
+};
+
+struct Light {
+	float3 position;
+	float4 color;
+	float range;
 };

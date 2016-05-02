@@ -7,6 +7,7 @@ rtBuffer<uint3, 1> indexData;
 
 rtDeclareVariable(float3, normal, attribute normal, );
 rtDeclareVariable(float2, texCoord, attribute texCoord, );
+
 rtDeclareVariable(Ray, ray, rtCurrentRay, );
 
 RT_PROGRAM void intersect(int primId) {

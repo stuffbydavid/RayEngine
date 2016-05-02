@@ -100,28 +100,28 @@ void RayEngine::renderEmbree() {
 			totalDiffuse = totalSpecular = { 0.f };
 
 			// Go through the lights
-			for (Light* light : curScene->lights) {
-				Vec3 incidence = Vec3::normalize(light->position - hitPos);
+			for (Light light : curScene->lights) {
+				Vec3 incidence = Vec3::normalize(light.position - hitPos);
 
 				// Calculate attenuation (falloff)
-				float distance = Vec3::length(light->position - hitPos);
-				float attenuation = max(1.f - distance / light->range, 0.f);
+				float distance = Vec3::length(light.position - hitPos);
+				float attenuation = max(1.f - distance / light.range, 0.f);
 
 				// Diffuse factor
 				float diffuse = max(Vec3::dot(hitNormal, incidence), 0.f) * attenuation;
-				totalDiffuse += diffuse * light->color;
+				totalDiffuse += diffuse * light.color;
 
 				// Specular factor
 				if (hitMaterial->shininess > 0.0) {
 					Vec3 reflection = 2.f * Vec3::dot(incidence, hitNormal) * hitNormal - incidence;
 					float specular = pow(max(Vec3::dot(reflection, toEye), 0.f), 1.f / hitMaterial->shininess) * attenuation;
-					totalSpecular += specular * light->color;
+					totalSpecular += specular * light.color;
 				}
 			}
 
 			// Create color
 			Color texColor = hitMaterial->diffuse * hitMaterial->image->getPixel(hitTexCoord);
-			col = texColor * (curScene->ambientColor + totalDiffuse) + totalSpecular;
+			col = texColor * (curScene->ambient + totalDiffuse) + totalSpecular;
 			col.a(texColor.a());
 
 			EmbreeData.buffer[y * EmbreeData.width + x] = col;

@@ -76,7 +76,7 @@ struct RayEngine {
 	// OptiX
 	struct OptixData  {
 		optix::Context context;
-		optix::Buffer buffer;
+		optix::Buffer renderBuffer, lights;
 		GLuint vbo;
 		GLuint texture;
 		int offset, width;
