@@ -1,6 +1,18 @@
 #include "Scene.h"
 
-Scene::Scene(string name) : name(name) {}
+Scene::Scene(string name, Color ambientColor, Color backgroundColor) :
+    name(name),
+	ambientColor(ambientColor),
+	backgroundColor(backgroundColor)
+{}
+
+Object* Scene::loadObject(string file) {
+
+	Object* obj = Object::load(file);
+	objects.push_back(obj);
+	return obj;
+
+}
 
 Object* Scene::addObject(Geometry* geometry) {
 
@@ -12,10 +24,10 @@ Object* Scene::addObject(Geometry* geometry) {
 
 }
 
-Object* Scene::loadObject(string file) {
+Light* Scene::addLight(Vec3 position, Color color, float range) {
 
-	Object* obj = Object::load(file);
-	objects.push_back(obj);
-	return obj;
+	Light* light = new Light(position, color, range);
+	lights.push_back(light);
+	return light;
 
 }

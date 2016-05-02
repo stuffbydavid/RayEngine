@@ -7,7 +7,7 @@
 
 struct Scene {
 
-	Scene(string name);
+	Scene(string name, Color ambientColor = { 0.25f }, Color backgroundColor = { 0.f });
 
 	// Loads object(s) from a file and adds it to the scene.
 	Object* loadObject(string file);
@@ -15,12 +15,15 @@ struct Scene {
 	// Adds a new customizable object.
 	Object* addObject(Geometry* geometry = nullptr);
 
+	// Adds a new light.
+	Light* addLight(Vec3 position, Color color, float range);
+
 	// Variables
 	string name;
 	Camera camera;
 	vector<Object*> objects;
 	vector<Light*> lights;
-	Color ambient, background;
+	Color ambientColor, backgroundColor;
 
 	// Embree
 	struct {

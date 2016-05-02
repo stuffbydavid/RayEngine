@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 
 	// Add some objects...
 	myScene->loadObject("obj/floor.obj");
-	/*Object* teapot = myScene->loadObject("obj/teapot.obj");
+	Object* teapot = myScene->loadObject("obj/teapot.obj");
 	teapot->scale({ 0.5f, 1.5f, 0.5f });
 	teapot->rotate({ 0, 1, 0 }, 180.f);
 
@@ -28,9 +28,12 @@ int main(int argc, char **argv) {
 		clone->rotate({ 0, 1, 0 }, frand() * 360.f);
 		clone->translate({ x, 0.f, 0.f });
 		clone->rotate({ 0, 1, 0 }, frand() * 360.f);
-	}*/
+	}
 	//myScene->loadObject("Cornell Box", "obj/cornell_box.obj");
 	//myScene->loadObject("SLS", "C:/Users/david/Documents/Visual Studio 2013/Projects/SimpleEmbree/Meshes/SLS/sls_amg.obj");
+
+	// Let there be light!
+	myScene->addLight({ 100.f, 100.f, 100.f }, { 1.f, 1.f, 1.f }, 300.f);
 	
 	rayEngine.launch();
 

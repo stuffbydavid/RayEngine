@@ -1,20 +1,5 @@
 #include "rayengine.h"
 
-
-void setupNormals(GLuint program, void* caller) {
-
-	GLint uMatWorld = glGetUniformLocation(program, "uMatWorld");
-	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, Mat4x4(((Object*)caller)->matrix).e);
-
-}
-
-void setupTexture(GLuint program, void* caller) {
-
-	GLint uColor = glGetUniformLocation(program, "uColor");
-	glUniform4f(uColor, 1.f, 1.f, 1.f, 1.f);
-
-}
-
 RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, RayTracingTarget rayTracingTarget, float hybridPartition) :
 	renderMode(renderMode),
 	rayTracingTarget(rayTracingTarget),
@@ -25,10 +10,11 @@ RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, R
 
 	window.init(windowWidth, windowHeight);
 	Magick::InitializeMagick(NULL);
-
+	
 	// Shaders
-	shdrNormals = new Shader("Normals", setupNormals, "normals.vshader", "normals.fshader");
-	shdrTexture = new Shader("Texture", setupTexture, "texture.vshader", "texture.fshader");
+	shdrNormals = new Shader("Normals", bind(&RayEngine::setupNormals, this, _1, _2), "normals.vshader", "normals.fshader");
+	shdrTexture = new Shader("Texture", bind(&RayEngine::setupTexture, this, _1, _2), "texture.vshader", "texture.fshader");
+	shdrPhong = new Shader("Phong", bind(&RayEngine::setupPhong, this, _1, _2), "phong.vshader", "phong.fshader");
 
 }
 

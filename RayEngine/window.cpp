@@ -118,7 +118,7 @@ void Window::init(int width, int height) {
 	
 }
 
-void Window::open(function<void(void)> loopFunc, function<void(void)> resizeFunc) {
+void Window::open(function<void()> loopFunc, function<void()> resizeFunc) {
 
 	cout << "Opening window..." << endl;
 

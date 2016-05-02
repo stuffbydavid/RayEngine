@@ -11,6 +11,9 @@ struct Color {
 	Color() {
 		eCol = embree::Color4();
 	}
+	Color(float v) {
+		eCol = embree::Color4(v, v, v, 1.f);
+	}
 	Color(float r, float g, float b, float a = 1.f) {
 		eCol = embree::Color4(r, g, b, a);
 	}

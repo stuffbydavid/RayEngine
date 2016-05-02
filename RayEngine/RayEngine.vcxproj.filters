@@ -56,6 +56,12 @@
     <ClCompile Include="image.cpp">
       <Filter>RayEngine\Data</Filter>
     </ClCompile>
+    <ClCompile Include="light.cpp">
+      <Filter>RayEngine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="shader_setup.cpp">
+      <Filter>RayEngine\OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -165,6 +171,12 @@
       <Filter>RayEngine\OpenGL\Shaders</Filter>
     </None>
     <None Include="texture.vshader">
+      <Filter>RayEngine\OpenGL\Shaders</Filter>
+    </None>
+    <None Include="phong.fshader">
+      <Filter>RayEngine\OpenGL\Shaders</Filter>
+    </None>
+    <None Include="phong.vshader">
       <Filter>RayEngine\OpenGL\Shaders</Filter>
     </None>
   </ItemGroup>

@@ -164,8 +164,18 @@ void TriangleMesh::initOptix(optix::Context context) {
 		// Make instance
 		if (!material->OptixData.material) {
 
-			// This is broken
+#if 0
+			// This is broken with the normal attribute in OpenGL shaders
 			material->OptixData.sampler = context->createTextureSamplerFromGLImage(material->image->texture, RT_TARGET_GL_TEXTURE_2D);
+#else
+			optix::Buffer buf = context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_FLOAT4, material->image->width, material->image->height);
+			memcpy(buf->map(), material->image->pixels, material->image->width * material->image->height * sizeof(Color));
+			buf->unmap();
+			material->OptixData.sampler = context->createTextureSampler();
+			material->OptixData.sampler->setArraySize(1);
+			material->OptixData.sampler->setMipLevelCount(1);
+			material->OptixData.sampler->setBuffer(0, 0, buf);
+#endif
 			material->OptixData.sampler->setWrapMode(0, RT_WRAP_REPEAT);
 			material->OptixData.sampler->setWrapMode(1, RT_WRAP_REPEAT);
 			material->OptixData.sampler->setIndexingMode(RT_TEXTURE_INDEX_NORMALIZED_COORDINATES);

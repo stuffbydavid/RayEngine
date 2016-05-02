@@ -6,7 +6,7 @@
 #define RENDER_MODE RM_RAY_TRACING
 #define RAY_TRACING_TARGET RTT_GPU
 
-#define OPENGL_SHADER shdrTexture
+#define OPENGL_SHADER shdrPhong
 
 #define OPTIX_PRINT_TIME 0
 #define OPTIX_USE_GEOMETRY_VBO 1

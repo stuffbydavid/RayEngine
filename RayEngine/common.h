@@ -35,6 +35,7 @@
 #include "settings.h"
 
 using namespace std;
+using namespace placeholders;
 
 typedef unsigned int uint;
 typedef unsigned char uchar;

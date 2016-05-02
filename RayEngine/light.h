@@ -6,9 +6,8 @@ struct Light {
 
 	Vec3 position;
 	Color color;
+	float range;
 
-	Light(Vec3 position, Color color) :
-	  position(position),
-	  color(color) {}
+	Light(Vec3 position, Color color, float range);
 
 };

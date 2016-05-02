@@ -6,7 +6,7 @@
 struct Window {
 
 	void init(int width, int height);
-	void open(function<void(void)> loopFunc, function<void(void)> resizeFunc);
+	void open(function<void()> loopFunc, function<void()> resizeFunc);
 	void setTitle(string title);
 
 	int width, height, fps;
@@ -16,7 +16,7 @@ struct Window {
 	bool mouseDown[GLFW_MOUSE_BUTTON_LAST], mousePressed[GLFW_MOUSE_BUTTON_LAST], mouseReleased[GLFW_MOUSE_BUTTON_LAST];
 
 	GLFWwindow* handle;
-	function<void(void)> resizeFunc;
+	function<void()> resizeFunc;
 	Mat4x4 ortho;
 
 };

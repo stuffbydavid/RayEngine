@@ -33,8 +33,6 @@ struct RayEngine {
 	// Launches the program and starts rendering.
 	void launch();
 
-private:
-
 	void loop();
 	void resize();
 	void resizeEmbree();
@@ -47,6 +45,10 @@ private:
 	void renderHybrid();
 	void input();
 
+	void setupNormals(GLuint program, void* caller);
+	void setupTexture(GLuint program, void* caller);
+	void setupPhong(GLuint program, void* caller);
+
 	// Variables
 	vector<Scene*> scenes;
 	Scene* curScene;
@@ -54,6 +56,7 @@ private:
 	Window window;
 	Shader* shdrNormals;
 	Shader* shdrTexture;
+	Shader* shdrPhong;
 
 	RenderMode renderMode;
 	RayTracingTarget rayTracingTarget;

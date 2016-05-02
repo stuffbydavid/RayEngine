@@ -183,6 +183,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="embree_handler.cpp" />
     <ClCompile Include="image.cpp" />
+    <ClCompile Include="light.cpp" />
     <ClCompile Include="render_hybrid.cpp" />
     <ClCompile Include="render_embree.cpp" />
     <ClCompile Include="font.cpp" />
@@ -199,6 +200,7 @@
     <ClCompile Include="render_optix.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="shader_setup.cpp" />
     <ClCompile Include="tiny_obj_loader.cc" />
     <ClCompile Include="triangle_mesh.cpp" />
     <ClCompile Include="window.cpp" />
@@ -230,6 +232,8 @@
     <None Include="normals.vshader">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
     </None>
+    <None Include="phong.fshader" />
+    <None Include="phong.vshader" />
     <None Include="texture.fshader" />
     <None Include="texture.vshader" />
   </ItemGroup>

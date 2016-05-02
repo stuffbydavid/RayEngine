@@ -95,16 +95,17 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 	GLint aNormal = glGetAttribLocation(program, "aNormal");
 	GLint aTexCoord = glGetAttribLocation(program, "aTexCoord");
 	GLint uMat = glGetUniformLocation(program, "uMat");
-	GLint uTex = glGetUniformLocation(program, "uTex");
+	GLint uSampler = glGetUniformLocation(program, "uSampler");
 
 	// Pass buffers
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboPos);
 	glEnableVertexAttribArray(aPos);
 	glVertexAttribPointer(aPos, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	
-	/*glBindBuffer(GL_ARRAY_BUFFER, mesh->vboNormal);
+	// Breaks OptiX OpenGL textures
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboNormal);
 	glEnableVertexAttribArray(aNormal);
-	glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);*/
+	glVertexAttribPointer(aNormal, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboTexCoord);
 	glEnableVertexAttribArray(aTexCoord);
@@ -118,7 +119,7 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 	// Send in texture
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mesh->material->image->texture);
-	glUniform1i(uTex, 0);
+	glUniform1i(uSampler, 0);
 
 	// Set up shader specific uniforms
 	if (setup)
@@ -132,8 +133,10 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 	glDisable(GL_CULL_FACE);
 
 	// Disable shader
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aNormal);
+	glDisableVertexAttribArray(aTexCoord);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glUseProgram(0);
 
 }
 
@@ -144,7 +147,7 @@ void Shader::use2D(Mat4x4 matrix, int x, int y, int width, int height, GLuint te
 	GLint aPos = glGetAttribLocation(program, "aPos");
 	GLint aTexCoord = glGetAttribLocation(program, "aTexCoord");
 	GLint uMat = glGetUniformLocation(program, "uMat");
-	GLint uTex = glGetUniformLocation(program, "uTex");
+	GLint uSampler = glGetUniformLocation(program, "uSampler");
 	GLint uColor = glGetUniformLocation(program, "uColor");
 	
 	// Select current resources
@@ -189,13 +192,14 @@ void Shader::use2D(Mat4x4 matrix, int x, int y, int width, int height, GLuint te
 	// Send in texture
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glUniform1i(uTex, 0);
+	glUniform1i(uSampler, 0);
 
 	// Draw all triangles
 	glDrawArrays(GL_TRIANGLES, 0, vertices);
 
 	// Reset
+	glDisableVertexAttribArray(aPos);
+	glDisableVertexAttribArray(aTexCoord);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glUseProgram(0);
 
 }
