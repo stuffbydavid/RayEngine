@@ -3,6 +3,7 @@
 #include "common.h"
 #include "window.h"
 #include "scene.h"
+#include "shader.h"
 
 struct RayEngine {
 
@@ -45,9 +46,9 @@ struct RayEngine {
 	void renderHybrid();
 	void input();
 
-	void setupNormals(GLuint program, void* caller);
-	void setupTexture(GLuint program, void* caller);
-	void setupPhong(GLuint program, void* caller);
+	void setupNormals(GLuint program, Object* object, TriangleMesh* mesh);
+	void setupTexture(GLuint program, Object* object, TriangleMesh* mesh);
+	void setupPhong(GLuint program, Object* object, TriangleMesh* mesh);
 
 	// Variables
 	vector<Scene*> scenes;
@@ -64,7 +65,7 @@ struct RayEngine {
 	bool showEmbreeRender, showOptixRender;
 
 	// Embree
-	struct {
+	struct EmbreeData{
 		RTCDevice device;
 		Color* buffer;
 		GLuint texture;
@@ -73,7 +74,7 @@ struct RayEngine {
 	void initEmbree();
 
 	// OptiX
-	struct {
+	struct OptixData  {
 		optix::Context context;
 		optix::Buffer buffer;
 		GLuint vbo;

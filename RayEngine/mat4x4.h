@@ -1,7 +1,5 @@
 #pragma once
 
-#include "mat4x3.h"
-
 // 4x4 Matrix
 // Used for viewing transformations
 struct Mat4x4 {
@@ -38,18 +36,40 @@ struct Mat4x4 {
 		return *this;
 	}
 
-	Mat4x4(const Mat4x3& other) {
-		embree::LinearSpace3f ls = other.eMat.l;
-		embree::Vec3f as = other.eMat.p;
-		e[0] = ls.vx.x; e[4] = ls.vy.x; e[8] = ls.vz.x;  e[12] = as.x;
-		e[1] = ls.vx.y; e[5] = ls.vy.y; e[9] = ls.vz.y;  e[13] = as.y;
-		e[2] = ls.vx.z; e[6] = ls.vy.z; e[10] = ls.vz.z; e[14] = as.z;
-		e[3] = 0.f;     e[7] = 0.f;     e[11] = 0.f;     e[15] = 1.f;
-	}
-
 	// Functions
 
-	// Builds an orthographic matrix
+	// Builds a translation matrix.
+	static __forceinline Mat4x4 translate(const Vec3& vec) {
+		return Mat4x4(
+			1.f, 0.f, 0.f, vec.x(),
+			0.f, 1.f, 0.f, vec.y(),
+			0.f, 0.f, 1.f, vec.z(),
+			0.f, 0.f, 0.f, 1.f
+		);
+	}
+
+	// Builds a rotation matrix.
+	static __forceinline Mat4x4 rotate(const Vec3& around, float angle) {
+		embree::LinearSpace3f ls = embree::LinearSpace3f::rotate(around.eVec, embree::deg2rad(angle));
+		return Mat4x4(
+			ls.vx.x, ls.vy.x, ls.vz.x, 0.f,
+			ls.vx.y, ls.vy.y, ls.vz.y, 0.f,
+			ls.vx.z, ls.vy.z, ls.vz.z, 0.f,
+			0.f, 0.f, 0.f, 1.f
+		);
+	}
+
+	// Builds a scaling matrix.
+	static __forceinline Mat4x4 scale(const Vec3& s) {
+		return Mat4x4(
+			s.x(), 0.f, 0.f, 0.f,
+			0.f, s.y(), 0.f, 0.f,
+			0.f, 0.f, s.z(), 0.f,
+			0.f, 0.f, 0.f, 1.f
+		);
+	}
+
+	// Builds an orthographic matrix.
 	static __forceinline Mat4x4 ortho(float left, float right, float bottom, float top, float znear, float zfar) {
 		return Mat4x4(
 			2.f / (right - left), 0.f, 0.f, -(right + left) / (right - left),
@@ -59,7 +79,7 @@ struct Mat4x4 {
 		);
 	}
 
-	// Builds a perspective matrix
+	// Builds a perspective matrix.
 	static __forceinline Mat4x4 perspective(float tFov, float ratio, float znear, float zfar) {
 		float iFov = 1.f / tFov;
 		return Mat4x4(
@@ -83,7 +103,7 @@ struct Mat4x4 {
 };
 
 // Unary operators
-__forceinline std::ostream& operator<<(std::ostream& cout, const Mat4x4& a) {
+__forceinline std::ostream& operator << (std::ostream& cout, const Mat4x4& a) {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++)
 			cout << a.e[j * 4 + i] << (j < 3 ? "," : "");
@@ -93,7 +113,7 @@ __forceinline std::ostream& operator<<(std::ostream& cout, const Mat4x4& a) {
 }
 
 // Binary operators
-__forceinline Mat4x4 operator*(const Mat4x4& a, const Mat4x4& b) {
+__forceinline Mat4x4 operator * (const Mat4x4& a, const Mat4x4& b) {
 	Mat4x4 product;
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {
@@ -105,6 +125,15 @@ __forceinline Mat4x4 operator*(const Mat4x4& a, const Mat4x4& b) {
 	return product;
 }
 
-__forceinline void operator*=(Mat4x4& a, const Mat4x4& b) {
+
+__forceinline Vec3 operator * (const Mat4x4& a, const Vec3& b) {
+	return Vec3(
+		a.e[0] * b.x() + a.e[4] * b.y() + a.e[8] * b.z() + a.e[12] * 0.f,
+		a.e[1] * b.x() + a.e[5] * b.y() + a.e[9] * b.z() + a.e[13] * 0.f,
+		a.e[2] * b.x() + a.e[6] * b.y() + a.e[10] * b.z() + a.e[14] * 0.f
+	);
+}
+
+__forceinline void operator *= (Mat4x4& a, const Mat4x4& b) {
 	a = a * b;
 }

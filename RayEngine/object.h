@@ -4,7 +4,6 @@
 #include "geometry.h"
 #include "triangle_mesh.h"
 #include "material.h"
-#include "shader.h"
 
 struct Object {
 
@@ -14,9 +13,6 @@ struct Object {
 
 	// Loads object(s) from a file.
 	static Object* load(string file);
-	
-	// Renders using an OpenGL shader.
-	void renderOpenGL(Shader* shader, Mat4x4 proj);
 
 	// Translates the object by a vector.
 	void translate(Vec3 vector);
@@ -29,17 +25,17 @@ struct Object {
 
 	// Variables
 	vector<Geometry*> geometries;
-	Mat4x3 matrix;
+	Mat4x4 matrix;
 
 	// Embree
-	struct {
+	struct EmbreeData {
 		RTCScene scene;
 		map<uint, Geometry*> geomIDmap;
 	} EmbreeData;
 	void initEmbree(RTCDevice device);
 
 	// OptiX
-	struct {
+	struct OptixData{
 		optix::Transform transform;
 		optix::GeometryGroup geometryGroup;
 	} OptixData;

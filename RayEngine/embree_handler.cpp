@@ -33,7 +33,7 @@ void Scene::initEmbree(RTCDevice device) {
 	for (uint i = 0; i < objects.size(); i++) {
 		objects[i]->initEmbree(device);
 		uint instID = rtcNewInstance2(EmbreeData.scene, objects[i]->EmbreeData.scene);
-		rtcSetTransform2(EmbreeData.scene, instID, RTC_MATRIX_COLUMN_MAJOR_ALIGNED16, Mat4x4(objects[i]->matrix).e);
+		rtcSetTransform2(EmbreeData.scene, instID, RTC_MATRIX_COLUMN_MAJOR_ALIGNED16, objects[i]->matrix.e);
 		EmbreeData.instIDmap[instID] = objects[i];
 	}
 

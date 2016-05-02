@@ -1,3 +1,5 @@
 newmtl floor
-Kd 1.0 1.0 1.0
+Kd 1.0 0.5 0.5
+Ks 1.0 1.0 1.0
+Ns 0.01
 map_Kd grid.jpg

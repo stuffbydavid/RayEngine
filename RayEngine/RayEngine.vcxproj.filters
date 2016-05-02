@@ -94,9 +94,6 @@
     <ClInclude Include="light.h">
       <Filter>RayEngine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="mat4x3.h">
-      <Filter>RayEngine\Data</Filter>
-    </ClInclude>
     <ClInclude Include="mat4x4.h">
       <Filter>RayEngine\Data</Filter>
     </ClInclude>

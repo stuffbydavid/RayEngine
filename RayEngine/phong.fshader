@@ -13,6 +13,7 @@ uniform vec3 uLightPos[MAXLIGHTS];
 uniform vec4 uLightColor[MAXLIGHTS];
 uniform float uLightRange[MAXLIGHTS];
 uniform float uShininess;
+uniform vec4 uDiffuse;
 
 void main(void) {
 	vec3 totalDiffuse = vec3(0.0), totalSpecular = vec3(0.0);
@@ -39,7 +40,7 @@ void main(void) {
 	}
 
 	// Create color
-	vec4 texColor = texture2D(uSampler, vTexCoord);
+	vec4 texColor = uDiffuse * texture2D(uSampler, vTexCoord);
 	fColor.rgb = texColor.rgb * (uAmbientColor.rgb + totalDiffuse) + totalSpecular;
 	fColor.a = texColor.a; // Alpha stays
 }

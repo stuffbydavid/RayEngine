@@ -1,22 +1,23 @@
 #pragma once
 
 #include "common.h"
-#include "triangle_mesh.h"
+#include "object.h"
 
 // Loads and renders using a vertex/fragment/geometry shader.
 struct Shader {
 
 	// Load shaders from text files.
-	Shader(string name, function<void(GLuint, void*)> setup, string vertexFilename, string fragmentFilename, string geometryFilename = "");
+	Shader(string name, function<void(GLuint , Object*, TriangleMesh*)> setup, string vertexFilename, string fragmentFilename, string geometryFilename = "");
 
 	// Render a 3D mesh.
-	void use(TriangleMesh* mesh, Mat4x4 matrix, void* caller = nullptr);
+	void use(Mat4x4 matrix, Object* object, TriangleMesh* mesh);
 
 	// Renders a 2D graphic.
-	void use2D(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture = 0, Color color = { 1.f, 1.f, 1.f, 1.f });
+	void use(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture = 0, Color color = { 1.f });
 
 	// Variables
 	string name;
 	GLuint program, vbo;
-	function<void(GLuint, void*)> setup;
+	function<void(GLuint, Object*, TriangleMesh*)> setup;
+
 };

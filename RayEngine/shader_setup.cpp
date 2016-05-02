@@ -8,34 +8,35 @@ void glUniformColor(GLint location, Color color) {
 	glUniform4f(location, color.r(), color.g(), color.b(), color.a());
 }
 
-void RayEngine::setupNormals(GLuint program, void* caller) {
+void RayEngine::setupNormals(GLuint program, Object* object, TriangleMesh* mesh) {
 
 	GLint uMatWorld = glGetUniformLocation(program, "uMatWorld");
-	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, Mat4x4(((Object*)caller)->matrix).e);
+	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, object->matrix.e);
 
 }
 
-void RayEngine::setupTexture(GLuint program, void* caller) {
+void RayEngine::setupTexture(GLuint program, Object* object, TriangleMesh* mesh) {
 
 	GLint uColor = glGetUniformLocation(program, "uColor");
 	glUniformColor(program, { 1.f, 1.f, 1.f });
 
 }
 
-void RayEngine::setupPhong(GLuint program, void* caller) {
+void RayEngine::setupPhong(GLuint program, Object* object, TriangleMesh* mesh) {
 
 	uint lightCount = curScene->lights.size();
 
 	GLint uMatWorld = glGetUniformLocation(program, "uMatWorld");
 	GLint uAmbientColor = glGetUniformLocation(program, "uAmbientColor");
+	GLint uShininess = glGetUniformLocation(program, "uShininess");
 	GLint uEyePos = glGetUniformLocation(program, "uEyePos");
 	GLint uLights = glGetUniformLocation(program, "uLights");
 	GLint uLightPos = glGetUniformLocation(program, "uLightPos");
 	GLint uLightColor = glGetUniformLocation(program, "uLightColor");
 	GLint uLightRange = glGetUniformLocation(program, "uLightRange");
-	GLint uShininess = glGetUniformLocation(program, "uShininess");
+	GLint uDiffuse = glGetUniformLocation(program, "uDiffuse");
 
-	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, Mat4x4(((Object*)caller)->matrix).e);
+	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, object->matrix.e);
 	glUniformColor(uAmbientColor, curScene->ambientColor);
 	glUniformVec3(uEyePos, curCamera->position);
 
@@ -54,7 +55,8 @@ void RayEngine::setupPhong(GLuint program, void* caller) {
 	glUniform4fv(uLightColor, lightCount, (float*)lightColor);
 	glUniform1fv(uLightRange, lightCount, lightRange);
 
-	//glUniform1f(uShininess, ((Object*)caller)->mesh->material->shininess);
+	glUniformColor(uDiffuse, mesh->material->diffuse);
+	glUniform1f(uShininess, mesh->material->shininess);
 
 	delete lightPos;
 	delete lightColor;

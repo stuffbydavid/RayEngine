@@ -7,14 +7,10 @@ void RayEngine::renderOpenGL() {
 
 	Mat4x4 proj = curCamera->getMatrix(window.ratio);
 
-	for (uint i = 0; i < curScene->objects.size(); i++)
-		curScene->objects[i]->renderOpenGL(OPENGL_SHADER, proj);
-
-}
-
-void Object::renderOpenGL(Shader* shader, Mat4x4 proj) {
-
-	for (uint i = 0; i < geometries.size(); i++)
-		shader->use((TriangleMesh*)geometries[i], proj * matrix, this);
+	for (uint i = 0; i < curScene->objects.size(); i++) {
+		Object* obj = curScene->objects[i];
+		for (uint i = 0; i < obj->geometries.size(); i++)
+			OPENGL_SHADER->use(proj * obj->matrix, obj, (TriangleMesh*)obj->geometries[i]);
+	}
 
 }

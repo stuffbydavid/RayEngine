@@ -15,6 +15,6 @@ void Camera::setFov(float angle) {
 
 Mat4x4 Camera::getMatrix(float ratio) {
 	Mat4x4 P = Mat4x4::perspective(tFov, ratio, 0.1f, 10000.f);
-	Mat4x4 V = Mat4x4::view(xaxis, yaxis, zaxis) * Mat4x3::translate(-position);
+	Mat4x4 V = Mat4x4::view(xaxis, yaxis, zaxis) * Mat4x4::translate(-position);
 	return P * V;
 }

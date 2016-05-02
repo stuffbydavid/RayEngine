@@ -94,7 +94,7 @@ void Object::initOptix(optix::Context context) {
 		// Make transform
 		OptixData.transform = context->createTransform();
 		OptixData.transform->setChild(OptixData.geometryGroup);
-		OptixData.transform->setMatrix(true, Mat4x4(matrix).e, NULL);
+		OptixData.transform->setMatrix(true, matrix.e, NULL);
 
 	} catch (optix::Exception e) {
 		printException(e);

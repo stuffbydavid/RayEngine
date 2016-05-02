@@ -66,40 +66,40 @@ struct Vec2 {
 };
 
 // Unary operators
-__forceinline Vec2 operator-(const Vec2& a) {
-	return embree::operator-(a.eVec);
+__forceinline Vec2 operator - (const Vec2& a) {
+	return embree::operator - (a.eVec);
 }
-__forceinline std::ostream& operator<<(std::ostream& cout, const Vec2& a) {
-	return embree::operator<<(cout, a.eVec);
+__forceinline std::ostream& operator << (std::ostream& cout, const Vec2& a) {
+	return embree::operator << (cout, a.eVec);
 }
 
 // Binary operators
-__forceinline Vec2 operator+(const Vec2& a, const Vec2& b) {
-	return embree::operator+(a.eVec, b.eVec);
+__forceinline Vec2 operator + (const Vec2& a, const Vec2& b) {
+	return embree::operator + (a.eVec, b.eVec);
 }
-__forceinline void operator+=(Vec2& a, const Vec2& b) {
-	embree::operator+=(a.eVec, b.eVec);
+__forceinline void operator += (Vec2& a, const Vec2& b) {
+	embree::operator += (a.eVec, b.eVec);
 }
-__forceinline Vec2 operator-(const Vec2& a, const Vec2& b) {
-	return embree::operator-(a.eVec, b.eVec);
+__forceinline Vec2 operator - (const Vec2& a, const Vec2& b) {
+	return embree::operator - (a.eVec, b.eVec);
 }
-__forceinline void operator-=(Vec2& a, const Vec2& b) {
-	embree::operator-=(a.eVec, b.eVec);
+__forceinline void operator -= (Vec2& a, const Vec2& b) {
+	embree::operator -= (a.eVec, b.eVec);
 }
-__forceinline Vec2 operator*(const Vec2& a, const float& b) {
-	return embree::operator*(a.eVec, b);
+__forceinline Vec2 operator * (const Vec2& a, const float& b) {
+	return embree::operator * (a.eVec, b);
 }
-__forceinline Vec2 operator*(const float& a, const Vec2& b) {
-	return embree::operator*(a, b.eVec);
+__forceinline Vec2 operator * (const float& a, const Vec2& b) {
+	return embree::operator * (a, b.eVec);
 }
-__forceinline void operator*=(Vec2& a, const float& b) {
-	embree::operator*=(a.eVec, b);
+__forceinline void operator *= (Vec2& a, const float& b) {
+	embree::operator *= (a.eVec, b);
 }
 
 // Comparison operators
-__forceinline bool operator==(const Vec2& a, const Vec2& b) {
-	return embree::operator==(a.eVec, b.eVec);
+__forceinline bool operator == (const Vec2& a, const Vec2& b) {
+	return embree::operator == (a.eVec, b.eVec);
 }
-__forceinline bool operator!=(const Vec2& a, const Vec2& b) {
-	return embree::operator!=(a.eVec, b.eVec);
+__forceinline bool operator != (const Vec2& a, const Vec2& b) {
+	return embree::operator != (a.eVec, b.eVec);
 }

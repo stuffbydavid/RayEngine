@@ -7,7 +7,7 @@ struct Material {
 
 	Material();
 
-	Color ambient, diffuse, specular;
+	Color diffuse;
 	float shininess;
 	Image* image;
 

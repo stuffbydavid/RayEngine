@@ -4,10 +4,10 @@
 #define RAY_INVALID 0
 
 // Stores a diffuse hit
-struct {
+struct DiffuseHit {
 	int x, y;
 	Color color;
-} DiffuseHit;
+};
 
 void RayEngine::renderEmbree() {
 
@@ -32,6 +32,7 @@ void RayEngine::renderEmbree() {
 	// Diffuse pass
 	int numDiffusePixels = EmbreeData.width * window.height;
 	int numDiffusePackets = ceil((float)numDiffusePixels / 8);
+	vector<DiffuseHit> diffuseHits;
 
 	// Try 16x16 packets
     #pragma omp parallel for schedule(dynamic)
@@ -84,14 +85,46 @@ void RayEngine::renderEmbree() {
 				continue;
 			}
 
+			// Set hit properties
+			Vec3 hitPos = Vec3(packet.orgx[j], packet.orgy[j], packet.orgz[j]) + Vec3(packet.dirx[j], packet.diry[j], packet.dirz[j]) * packet.tfar[j];
 			Object* hitObj = curScene->EmbreeData.instIDmap[packet.instID[j]];
-
 			TriangleMesh* hitMesh = (TriangleMesh*)hitObj->EmbreeData.geomIDmap[packet.geomID[j]];
 			Material* hitMaterial = hitMesh->material;
-			Vec3 hitNorm = Vec3::normalize(hitObj->matrix * hitMesh->getNormal(packet.primID[j], packet.u[j], packet.v[j]));
-			Vec2 coord = hitMesh->getTexCoord(packet.primID[j], packet.u[j], packet.v[j]);
+			Vec3 hitNormal = Vec3::normalize(hitObj->matrix * hitMesh->getNormal(packet.primID[j], packet.u[j], packet.v[j]));
+			Vec2 hitTexCoord = hitMesh->getTexCoord(packet.primID[j], packet.u[j], packet.v[j]);
+			Vec3 toEye = Vec3::normalize(curCamera->position - hitPos);
 
-			EmbreeData.buffer[y * EmbreeData.width + x] = hitMaterial->image->getPixel(coord);
+			// Calculate color
+			Color col;
+			Color totalDiffuse, totalSpecular;
+			totalDiffuse = totalSpecular = { 0.f };
+
+			// Go through the lights
+			for (Light* light : curScene->lights) {
+				Vec3 incidence = Vec3::normalize(light->position - hitPos);
+
+				// Calculate attenuation (falloff)
+				float distance = Vec3::length(light->position - hitPos);
+				float attenuation = max(1.f - distance / light->range, 0.f);
+
+				// Diffuse factor
+				float diffuse = max(Vec3::dot(hitNormal, incidence), 0.f) * attenuation;
+				totalDiffuse += diffuse * light->color;
+
+				// Specular factor
+				if (hitMaterial->shininess > 0.0) {
+					Vec3 reflection = 2.f * Vec3::dot(incidence, hitNormal) * hitNormal - incidence;
+					float specular = pow(max(Vec3::dot(reflection, toEye), 0.f), 1.f / hitMaterial->shininess) * attenuation;
+					totalSpecular += specular * light->color;
+				}
+			}
+
+			// Create color
+			Color texColor = hitMaterial->diffuse * hitMaterial->image->getPixel(hitTexCoord);
+			col = texColor * (curScene->ambientColor + totalDiffuse) + totalSpecular;
+			col.a(texColor.a());
+
+			EmbreeData.buffer[y * EmbreeData.width + x] = col;
 		
 		}
 
@@ -117,7 +150,7 @@ void RayEngine::renderEmbreeTexture() {
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, EmbreeData.width, window.height, GL_RGBA, GL_FLOAT, EmbreeData.buffer);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	shdrTexture->use2D(window.ortho, EmbreeData.offset, 0, EmbreeData.width, window.height, EmbreeData.texture);
+	shdrTexture->use(window.ortho, EmbreeData.offset, 0, EmbreeData.width, window.height, EmbreeData.texture);
 	//glDrawPixels(EmbreeData.width, window.height, GL_RGBA, GL_FLOAT, EmbreeData.buffer);
 
 #if EMBREE_PRINT_TIME

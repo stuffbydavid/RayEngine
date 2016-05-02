@@ -26,14 +26,14 @@ struct Scene {
 	Color ambientColor, backgroundColor;
 
 	// Embree
-	struct {
+	struct EmbreeData {
 		RTCScene scene;
 		map<uint, Object*> instIDmap;
 	} EmbreeData;
 	void initEmbree(RTCDevice device);
 
 	// OptiX
-	struct {
+	struct OptixData {
 		optix::Group group;
 	} OptixData;
 	void initOptix(optix::Context context);

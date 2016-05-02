@@ -54,7 +54,7 @@ void RayEngine::renderOptixTexture() {
 #endif
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	shdrTexture->use2D(window.ortho, OptixData.offset, 0, OptixData.width, window.height, OptixData.texture);
+	shdrTexture->use(window.ortho, OptixData.offset, 0, OptixData.width, window.height, OptixData.texture);
 
 #if OPTIX_PRINT_TIME
 	float end = glfwGetTime();

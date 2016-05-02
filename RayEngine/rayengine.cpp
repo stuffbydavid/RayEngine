@@ -12,9 +12,9 @@ RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, R
 	Magick::InitializeMagick(NULL);
 	
 	// Shaders
-	shdrNormals = new Shader("Normals", bind(&RayEngine::setupNormals, this, _1, _2), "normals.vshader", "normals.fshader");
-	shdrTexture = new Shader("Texture", bind(&RayEngine::setupTexture, this, _1, _2), "texture.vshader", "texture.fshader");
-	shdrPhong = new Shader("Phong", bind(&RayEngine::setupPhong, this, _1, _2), "phong.vshader", "phong.fshader");
+	shdrNormals = new Shader("Normals", bind(&RayEngine::setupNormals, this, _1, _2, _3), "normals.vshader", "normals.fshader");
+	shdrTexture = new Shader("Texture", bind(&RayEngine::setupTexture, this, _1, _2, _3), "texture.vshader", "texture.fshader");
+	shdrPhong = new Shader("Phong", bind(&RayEngine::setupPhong, this, _1, _2, _3), "phong.vshader", "phong.fshader");
 
 }
 

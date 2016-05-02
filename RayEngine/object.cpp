@@ -8,15 +8,15 @@ Object::~Object() {
 }
 
 void Object::translate(Vec3 vector) {
-	matrix = Mat4x3::translate(vector) * matrix;
+	matrix = Mat4x4::translate(vector) * matrix;
 }
 
 void Object::rotate(Vec3 vector, float angle) {
-	matrix = Mat4x3::rotate(vector, angle) * matrix;
+	matrix = Mat4x4::rotate(vector, angle) * matrix;
 }
 
 void Object::scale(Vec3 vector) {
-	matrix = Mat4x3::scale(vector) * matrix;
+	matrix = Mat4x4::scale(vector) * matrix;
 }
 
 Object* Object::load(string file) {
@@ -47,10 +47,8 @@ Object* Object::load(string file) {
 
 			Material* mat = new Material();
 
-			mat->ambient = Color(fileMaterials[i].ambient);
 			mat->diffuse = Color(fileMaterials[i].diffuse);
-			mat->specular = Color(fileMaterials[i].specular);
-			mat->shininess = fileMaterials[i].shininess; // TODO: Don't use this for reflection
+			mat->shininess = fileMaterials[i].shininess;
 
 			if (fileMaterials[i].diffuse_texname != "")
 				mat->image = new Image(path + fileMaterials[i].diffuse_texname, GL_NEAREST);

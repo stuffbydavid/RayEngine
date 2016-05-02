@@ -17,7 +17,6 @@
 
 #include "vec3.h"
 #include "vec2.h"
-#include "mat4x3.h"
 #include "mat4x4.h"
 #include "color.h"
 

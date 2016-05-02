@@ -1,6 +1,6 @@
 #include "shader.h"
 
-Shader::Shader(string name, function<void(GLuint, void*)> setup, string vertexFilename, string fragmentFilename, string geometryFilename) {
+Shader::Shader(string name, function<void(GLuint, Object*, TriangleMesh*)> setup, string vertexFilename, string fragmentFilename, string geometryFilename) {
 
 	string vsString, fsString, gsString, line;
 	const GLchar *vsSource, *fsSource, *gsSource;
@@ -87,7 +87,7 @@ Shader::Shader(string name, function<void(GLuint, void*)> setup, string vertexFi
 	glLinkProgram(program);
 }
 
-void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
+void Shader::use(Mat4x4 matrix, Object* object, TriangleMesh* mesh) {
 
 	// Start up shader
 	glUseProgram(program);
@@ -123,7 +123,7 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 
 	// Set up shader specific uniforms
 	if (setup)
-		setup(program, caller);
+		setup(program, object, mesh);
 
 	// Draw all triangles
 	glEnable(GL_CULL_FACE);
@@ -140,7 +140,7 @@ void Shader::use(TriangleMesh* mesh, Mat4x4 matrix, void* caller) {
 
 }
 
-void Shader::use2D(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture, Color color) {
+void Shader::use(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture, Color color) {
 
 	// Start up shader
 	glUseProgram(program);
