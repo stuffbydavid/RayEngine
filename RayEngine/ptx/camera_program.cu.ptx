@@ -95,7 +95,7 @@
 
 )
 {
-	.local .align 16 .b8 	__local_depot0[16];
+	.local .align 16 .b8 	__local_depot0[32];
 	.reg .b64 	%SP;
 	.reg .b64 	%SPL;
 	.reg .f32 	%f<44>;
@@ -105,17 +105,15 @@
 
 	mov.u64 	%rd21, __local_depot0;
 	cvta.local.u64 	%SP, %rd21;
-	add.u64 	%rd1, %SP, 0;
-	cvta.to.local.u64 	%rd8, %rd1;
 	ldu.global.f32 	%f9, [offset];
 	ldu.global.v2.u32 	{%r6, %r7}, [launchIndex];
 	cvt.rn.f32.u32	%f10, %r6;
 	add.f32 	%f11, %f9, %f10;
 	cvt.rn.f32.u32	%f12, %r7;
 	ldu.global.f32 	%f13, [windowWidth];
-	mov.u64 	%rd9, launchDim;
-	add.s64 	%rd10, %rd9, 4;
-	ldu.global.u32 	%r10, [%rd10];
+	mov.u64 	%rd8, launchDim;
+	add.s64 	%rd9, %rd8, 4;
+	ldu.global.u32 	%r10, [%rd9];
 	cvt.rn.f32.u32	%f14, %r10;
 	div.rn.f32 	%f15, %f11, %f13;
 	div.rn.f32 	%f16, %f12, %f14;
@@ -124,50 +122,54 @@
 	ld.global.v2.f32 	{%f19, %f20}, [eye];
 	ld.global.f32 	%f3, [eye+8];
 	ldu.global.f32 	%f21, [xaxis];
-	mov.u64 	%rd11, xaxis;
-	add.s64 	%rd12, %rd11, 4;
-	ldu.global.f32 	%f22, [%rd12];
-	add.s64 	%rd13, %rd11, 8;
-	ldu.global.f32 	%f23, [%rd13];
-	mov.u64 	%rd14, yaxis;
+	mov.u64 	%rd10, xaxis;
+	add.s64 	%rd11, %rd10, 4;
+	ldu.global.f32 	%f22, [%rd11];
+	add.s64 	%rd12, %rd10, 8;
+	ldu.global.f32 	%f23, [%rd12];
+	mov.u64 	%rd13, yaxis;
 	ldu.global.f32 	%f24, [yaxis];
 	mul.f32 	%f25, %f18, %f24;
-	add.s64 	%rd15, %rd14, 4;
-	ldu.global.f32 	%f26, [%rd15];
+	add.s64 	%rd14, %rd13, 4;
+	ldu.global.f32 	%f26, [%rd14];
 	mul.f32 	%f27, %f18, %f26;
-	add.s64 	%rd16, %rd14, 8;
-	ldu.global.f32 	%f28, [%rd16];
+	add.s64 	%rd15, %rd13, 8;
+	ldu.global.f32 	%f28, [%rd15];
 	mul.f32 	%f29, %f18, %f28;
 	fma.rn.f32 	%f30, %f17, %f21, %f25;
 	fma.rn.f32 	%f31, %f17, %f22, %f27;
 	fma.rn.f32 	%f32, %f17, %f23, %f29;
-	mov.u64 	%rd17, zaxis;
+	mov.u64 	%rd16, zaxis;
 	ldu.global.f32 	%f33, [zaxis];
 	add.f32 	%f4, %f30, %f33;
-	add.s64 	%rd18, %rd17, 4;
-	ldu.global.f32 	%f34, [%rd18];
+	add.s64 	%rd17, %rd16, 4;
+	ldu.global.f32 	%f34, [%rd17];
 	add.f32 	%f5, %f31, %f34;
-	add.s64 	%rd19, %rd17, 8;
-	ldu.global.f32 	%f35, [%rd19];
+	add.s64 	%rd18, %rd16, 8;
+	ldu.global.f32 	%f35, [%rd18];
 	add.f32 	%f6, %f32, %f35;
-	ldu.global.u32 	%r1, [sceneObj];
+	add.u64 	%rd1, %SP, 0;
+	cvta.to.local.u64 	%rd19, %rd1;
 	mov.u32 	%r2, 0;
+	st.local.u32 	[%rd19+16], %r2;
+	ldu.global.u32 	%r1, [sceneObj];
 	mov.f32 	%f7, 0f3C23D70A;
 	mov.f32 	%f8, 0f6C4ECB8F;
-	mov.u32 	%r5, 16;
+	mov.u32 	%r3, 32;
 	// inline asm
-	call _rt_trace_64, (%r1, %f19, %f20, %f3, %f4, %f5, %f6, %r2, %f7, %f8, %rd1, %r5);
+	call _rt_trace_64, (%r1, %f19, %f20, %f3, %f4, %f5, %f6, %r2, %f7, %f8, %rd1, %r3);
 	// inline asm
 	ld.global.u32 	%rd4, [launchIndex];
 	ld.global.u32 	%rd5, [launchIndex+4];
 	mov.u64 	%rd20, renderBuffer;
 	cvta.global.u64 	%rd3, %rd20;
 	mov.u32 	%r4, 2;
+	mov.u32 	%r5, 16;
 	mov.u64 	%rd7, 0;
 	// inline asm
 	call (%rd2), _rt_buffer_get_64, (%rd3, %r4, %r5, %rd4, %rd5, %rd7, %rd7);
 	// inline asm
-	ld.local.v4.f32 	{%f36, %f37, %f38, %f39}, [%rd8];
+	ld.local.v4.f32 	{%f36, %f37, %f38, %f39}, [%rd19];
 	st.v4.f32 	[%rd2], {%f36, %f37, %f38, %f39};
 	ret;
 }

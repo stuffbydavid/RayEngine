@@ -3,7 +3,7 @@
 struct Image {
 
 	// Create an image from a file.
-	Image(string filename, GLuint filter);
+	Image(GLuint filter, string filename, string alphaFilename = "");
 
 	// Create an image from a single color.
 	Image(Color color);
@@ -13,6 +13,7 @@ struct Image {
 
 	// Gets the color of a pixel.
 	Color getPixel(Vec2 coord);
+	Color getPixel(int x, int y);
 
 	// Variables
 	Color *pixels;

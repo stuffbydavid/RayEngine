@@ -79,3 +79,11 @@ __forceinline void operator*=(Color& x, const Color& y) {
 __forceinline void operator*=(Color& x, float y) {
 	x = x * y;
 }
+
+// Comparison operators
+__forceinline bool operator == (const Color& a, const Color& b) {
+	return embree::operator == (a.eCol, b.eCol);
+}
+__forceinline bool operator != (const Color& a, const Color& b) {
+	return embree::operator != (a.eCol, b.eCol);
+}

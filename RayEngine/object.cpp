@@ -21,13 +21,13 @@ void Object::scale(Vec3 vector) {
 
 Object* Object::load(string file) {
 
-	static Image defaultTexture({ 1.f, 1.f, 1.f });
-
+	static Image defaultTexture({ 1.f });
 	vector<tinyobj::shape_t> fileShapes;
 	vector<tinyobj::material_t> fileMaterials;
 	string err;
 	string path = file.substr(0, file.find_last_of("/\\") + 1);
 
+	// Load file
 	cout << "Loading " << file << "..." << endl;
 	tinyobj::LoadObj(fileShapes, fileMaterials, err, &file[0], &path[0]);
 
@@ -47,12 +47,34 @@ Object* Object::load(string file) {
 
 			Material* mat = new Material();
 
+			// Colors
+			mat->ambient = Color(fileMaterials[i].ambient);
+			mat->specular = Color(fileMaterials[i].specular);
 			mat->diffuse = Color(fileMaterials[i].diffuse);
-			mat->shininess = fileMaterials[i].shininess;
 
-			if (fileMaterials[i].diffuse_texname != "")
-				mat->image = new Image(path + fileMaterials[i].diffuse_texname, GL_NEAREST);
+			// Specular
+			if (mat->specular != Color(0.f))
+				mat->shininess = fileMaterials[i].shininess;
 			else
+				mat->shininess = 0.f;
+
+			// Diffuse image
+			if (fileMaterials[i].diffuse_texname != "") {
+
+				string imageFilename, alphaFilename;
+				imageFilename = path + fileMaterials[i].diffuse_texname;
+
+				// Alpha image
+				if (fileMaterials[i].alpha_texname != "")
+					alphaFilename = path + fileMaterials[i].alpha_texname;
+				else
+					alphaFilename = "";
+
+				// Detect filter from extension (.png=nearest, other=linear)
+				GLuint filter = (imageFilename.substr(imageFilename.rfind('.') + 1) == "png") ? GL_NEAREST : GL_LINEAR;
+				mat->image = new Image(filter, imageFilename, alphaFilename);
+
+			} else
 				mat->image = &defaultTexture;
 
 			materials[i] = mat;
@@ -88,7 +110,7 @@ Object* Object::load(string file) {
 			};
 		}
 
-		// Texture Coords
+		// Texture coords
 		triangleMesh->texCoordData = vector<Vec2>(vertices);
 		if (fileShapes[i].mesh.texcoords.size() > 0) {
 			for (uint v = 0; v < vertices; v++) {

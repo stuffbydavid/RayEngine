@@ -12,7 +12,7 @@
 
 	// .globl	_Z4missv
 .global .align 16 .b8 background[16];
-.global .align 16 .b8 rayColorData[16];
+.global .align 16 .b8 curColorData[32];
 .global .align 8 .u64 _ZN21rti_internal_register20reg_bitness_detectorE;
 .global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail0E;
 .global .align 8 .u64 _ZN21rti_internal_register24reg_exception_64_detail1E;
@@ -38,15 +38,15 @@
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_yE;
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_zE;
 .global .align 4 .b8 _ZN21rti_internal_typeinfo10backgroundE[8] = {82, 97, 121, 0, 16, 0, 0, 0};
-.global .align 4 .b8 _ZN21rti_internal_typeinfo12rayColorDataE[8] = {82, 97, 121, 0, 16, 0, 0, 0};
+.global .align 4 .b8 _ZN21rti_internal_typeinfo12curColorDataE[8] = {82, 97, 121, 0, 32, 0, 0, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename10backgroundE[7] = {102, 108, 111, 97, 116, 52, 0};
-.global .align 1 .b8 _ZN21rti_internal_typename12rayColorDataE[13] = {82, 97, 121, 67, 111, 108, 111, 114, 68, 97, 116, 97, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename12curColorDataE[13] = {82, 97, 121, 67, 111, 108, 111, 114, 68, 97, 116, 97, 0};
 .global .align 4 .u32 _ZN21rti_internal_typeenum10backgroundE = 4919;
-.global .align 4 .u32 _ZN21rti_internal_typeenum12rayColorDataE = 4919;
+.global .align 4 .u32 _ZN21rti_internal_typeenum12curColorDataE = 4919;
 .global .align 1 .b8 _ZN21rti_internal_semantic10backgroundE[1];
-.global .align 1 .b8 _ZN21rti_internal_semantic12rayColorDataE[10] = {114, 116, 80, 97, 121, 108, 111, 97, 100, 0};
+.global .align 1 .b8 _ZN21rti_internal_semantic12curColorDataE[10] = {114, 116, 80, 97, 121, 108, 111, 97, 100, 0};
 .global .align 1 .b8 _ZN23rti_internal_annotation10backgroundE[1];
-.global .align 1 .b8 _ZN23rti_internal_annotation12rayColorDataE[1];
+.global .align 1 .b8 _ZN23rti_internal_annotation12curColorDataE[1];
 
 .visible .entry _Z4missv(
 
@@ -56,7 +56,7 @@
 
 
 	ld.global.v4.f32 	{%f1, %f2, %f3, %f4}, [background];
-	st.global.v4.f32 	[rayColorData], {%f1, %f2, %f3, %f4};
+	st.global.v4.f32 	[curColorData], {%f1, %f2, %f3, %f4};
 	ret;
 }
 

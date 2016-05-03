@@ -73,8 +73,8 @@ void RayEngine::input() {
 	if (moveCamera) {
 
 		float lookFactor = 0.2f;
-		float moveFactor = 0.2f;
-		float rotateFactor = 0.2f;
+		float moveFactor = 2.f;
+		float rotateFactor = 0.5f;
 
 		// Rotate X and Z axis around Y axis for yaw
 

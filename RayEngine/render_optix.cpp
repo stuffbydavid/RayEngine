@@ -1,7 +1,10 @@
 #include "rayengine.h"
 
 void RayEngine::renderOptix() {
-	
+
+	if (!OPTIX_ENABLE)
+		return;
+
 #if OPTIX_PRINT_TIME
 	float start = glfwGetTime();
 #endif
@@ -35,7 +38,7 @@ void RayEngine::renderOptix() {
 
 void RayEngine::renderOptixTexture() {
 
-	if (!showOptixRender)
+	if (!OPTIX_ENABLE || !showOptixRender)
 		return;
 
 #if OPTIX_PRINT_TIME

@@ -126,11 +126,9 @@ void Shader::use(Mat4x4 matrix, Object* object, TriangleMesh* mesh) {
 		setup(program, object, mesh);
 
 	// Draw all triangles
-	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glDrawElements(GL_TRIANGLES, mesh->indexData.size() * 3, GL_UNSIGNED_INT, 0);
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
 
 	// Disable shader
 	glDisableVertexAttribArray(aPos);

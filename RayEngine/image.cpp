@@ -1,14 +1,13 @@
 #include "image.h"
 
-Image::Image(string filename, GLuint filter) :
+Image::Image(GLuint filter, string filename, string alphaFilename) :
     filter(filter)
 {
 	cout << "Loading image " << filename << "..." << endl;
 
 	Magick::Image image;
-	Magick::PixelPacket* data;
-	image.read(filename); 
-	data = image.getPixels(0, 0, image.columns(), image.rows());
+	image.read(filename);
+	Magick::PixelPacket* data = image.getPixels(0, 0, image.columns(), image.rows());
 	width = image.columns();
 	height = image.rows();
 
@@ -29,6 +28,30 @@ Image::Image(string filename, GLuint filter) :
 			};
 		}
 	}
+
+	// Load alpha map
+	if (alphaFilename != "") {
+
+		cout << "  Alpha map found: " << alphaFilename << endl;
+
+		Magick::Image aImage;
+		aImage.read(alphaFilename);
+		Magick::PixelPacket* aData = aImage.getPixels(0, 0, aImage.columns(), aImage.rows());
+		int aWidth = aImage.columns();
+		int aHeight = aImage.rows();
+
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				if (x >= aWidth || y >= aHeight)
+					continue;
+				int idest = x + y * width;
+				int isrc = x + (aHeight - 1 - y) * aWidth;
+				pixels[idest].a((float)aData[isrc].red / USHRT_MAX);
+			}
+		}
+
+	}
+
 	createTexture();
 
 }
@@ -63,9 +86,26 @@ long mod(long a, long b) {
 
 Color Image::getPixel(Vec2 coord) {
 
-	int x = mod(coord.x() * width, width);
-	int y = mod(coord.y() * height, height);
+	if (filter == GL_LINEAR) {
+		float u = coord.x() * width - 0.5f;
+		float v = coord.y() * height - 0.5f;
+		int px = u;
+		int py = v;
+		float u_ratio = u - px;
+		float v_ratio = v - py;
+		float u_opposite = 1.f - u_ratio;
+		float v_opposite = 1.f - v_ratio;
+		return (getPixel(px, py) * u_opposite + getPixel(px + 1, py) * u_ratio) * v_opposite +
+			   (getPixel(px, py + 1) * u_opposite + getPixel(px + 1, py + 1) * u_ratio) * v_ratio;
+	} else
+		return getPixel(coord.x() * width, coord.y() * height);
 
-	return pixels[x + y * width];
+}
+
+Color Image::getPixel(int x, int y) {
+
+	int mx = mod(x, width);
+	int my = mod(y, height);
+	return pixels[mx + my * width];
 
 }

@@ -2,8 +2,8 @@
 
 rtDeclareVariable(float4, background, , );
 
-rtDeclareVariable(RayColorData, rayColorData, rtPayload, );
+rtDeclareVariable(RayColorData, curColorData, rtPayload, );
 
 RT_PROGRAM void miss() {
-	rayColorData.result = background;
+	curColorData.result = background;
 }

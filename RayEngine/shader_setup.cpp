@@ -27,17 +27,17 @@ void RayEngine::setupPhong(GLuint program, Object* object, TriangleMesh* mesh) {
 	uint lightCount = curScene->lights.size();
 
 	GLint uMatWorld = glGetUniformLocation(program, "uMatWorld");
-	GLint uambient = glGetUniformLocation(program, "uambient");
-	GLint uShininess = glGetUniformLocation(program, "uShininess");
 	GLint uEyePos = glGetUniformLocation(program, "uEyePos");
 	GLint uLights = glGetUniformLocation(program, "uLights");
 	GLint uLightPos = glGetUniformLocation(program, "uLightPos");
 	GLint uLightColor = glGetUniformLocation(program, "uLightColor");
 	GLint uLightRange = glGetUniformLocation(program, "uLightRange");
-	GLint udiffuse = glGetUniformLocation(program, "udiffuse");
+	GLint uAmbient = glGetUniformLocation(program, "uAmbient");
+	GLint uSpecular = glGetUniformLocation(program, "uSpecular");
+	GLint uDiffuse = glGetUniformLocation(program, "uDiffuse");
+	GLint uShininess = glGetUniformLocation(program, "uShininess");
 
 	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, object->matrix.e);
-	glUniformColor(uambient, curScene->ambient);
 	glUniformVec3(uEyePos, curCamera->position);
 
 	// Create light arrays
@@ -55,7 +55,9 @@ void RayEngine::setupPhong(GLuint program, Object* object, TriangleMesh* mesh) {
 	glUniform4fv(uLightColor, lightCount, (float*)lightColor);
 	glUniform1fv(uLightRange, lightCount, lightRange);
 
-	glUniformColor(udiffuse, mesh->material->diffuse);
+	glUniformColor(uAmbient, curScene->ambient + mesh->material->ambient);
+	glUniformColor(uSpecular, mesh->material->specular);
+	glUniformColor(uDiffuse, mesh->material->diffuse);
 	glUniform1f(uShininess, mesh->material->shininess);
 
 	delete lightPos;

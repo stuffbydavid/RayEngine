@@ -11,21 +11,25 @@ void printException(optix::Exception e) {
 
 void RayEngine::initOptix() {
 
+	if (!OPTIX_ENABLE)
+		return;
+
 	cout << "Starting OptiX..." << endl;
 
 	try {
-		
+
+		// Make context
+		OptixData.context = optix::Context::create();
+		OptixData.context->setRayTypeCount(2);
+		OptixData.context->setEntryPointCount(1);
+		OptixData.context->setStackSize(4096);
+
 		// Generate texture
 		glGenTextures(1, &OptixData.texture);
 		glBindTexture(GL_TEXTURE_2D, OptixData.texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glBindTexture(GL_TEXTURE_2D, 0);
-
-		// Make context
-		OptixData.context = optix::Context::create();
-		OptixData.context->setRayTypeCount(2);
-		OptixData.context->setEntryPointCount(1);
 
 		// Make output buffer
 #if OPTIX_USE_OUTPUT_VBO
@@ -57,9 +61,9 @@ void RayEngine::initOptix() {
 		for (uint i = 0; i < scenes.size(); i++)
 			scenes[i]->initOptix(OptixData.context);
 
-		OptixData.context["ambient"]->setFloat(curScene->ambient.r(), curScene->ambient.g(), curScene->ambient.b(), curScene->ambient.a());
 		OptixData.context["background"]->setFloat(0.9f, 0.3f, 0.3f, 1.f);
-		OptixData.context["sceneObj"]->set(scenes[0]->OptixData.group);
+		OptixData.context["sceneObj"]->set(curScene->OptixData.group);
+		OptixData.context["sceneAmbient"]->setFloat(curScene->ambient.r(), curScene->ambient.g(), curScene->ambient.b(), curScene->ambient.a());
 		OptixData.context["lights"]->set(OptixData.lights);
 		OptixData.context["renderBuffer"]->set(OptixData.renderBuffer);
 
@@ -172,7 +176,7 @@ void TriangleMesh::initOptix(optix::Context context) {
 
 		// Make instance
 		if (!material->OptixData.material) {
-
+			
 #if 0
 			// This is broken with the normal attribute in OpenGL shaders
 			material->OptixData.sampler = context->createTextureSamplerFromGLImage(material->image->texture, RT_TARGET_GL_TEXTURE_2D);
@@ -190,15 +194,18 @@ void TriangleMesh::initOptix(optix::Context context) {
 			material->OptixData.sampler->setIndexingMode(RT_TEXTURE_INDEX_NORMALIZED_COORDINATES);
 			material->OptixData.sampler->setReadMode(RT_TEXTURE_READ_NORMALIZED_FLOAT);
 			material->OptixData.sampler->setMaxAnisotropy(1.f);
-			material->OptixData.sampler->setFilteringModes(RT_FILTER_NEAREST, RT_FILTER_NEAREST, RT_FILTER_NONE);
-
+			RTfiltermode filter = (material->image->filter == GL_NEAREST) ? RT_FILTER_NEAREST : RT_FILTER_LINEAR;
+			material->OptixData.sampler->setFilteringModes(filter, filter, RT_FILTER_NONE);
+			
 			material->OptixData.material = context->createMaterial();
 			material->OptixData.material->setClosestHitProgram(0, materialClosestHitProgram);
 			material->OptixData.material->setAnyHitProgram(1, materialAnyHitProgram);
 			material->OptixData.material["sampler"]->setTextureSampler(material->OptixData.sampler);
-
+			material->OptixData.material["ambient"]->setFloat(material->ambient.r(), material->ambient.g(), material->ambient.b(), material->ambient.a());
+			material->OptixData.material["diffuse"]->setFloat(material->specular.r(), material->specular.g(), material->specular.b(), material->specular.a());
 			material->OptixData.material["diffuse"]->setFloat(material->diffuse.r(), material->diffuse.g(), material->diffuse.b(), material->diffuse.a());
 			material->OptixData.material["shininess"]->setFloat(material->shininess);
+
 		}
 
 		OptixData.geometryInstance = context->createGeometryInstance();
@@ -212,6 +219,9 @@ void TriangleMesh::initOptix(optix::Context context) {
 }
 
 void RayEngine::resizeOptix() {
+
+	if (!OPTIX_ENABLE)
+		return;
 
 	// Set dimensions
 	if (rayTracingTarget == RTT_HYBRID) {

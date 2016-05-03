@@ -1,8 +1,10 @@
 #include "material.h"
 
 Material::Material() :
-    diffuse({ 1.f, 1.f, 1.f }),
-    shininess(0.05f)
+    ambient({ 0.f }),
+    specular({ 1.f }),
+    diffuse({ 1.f }),
+    shininess(10.f)
 {
 	OptixData.material = nullptr;
 }

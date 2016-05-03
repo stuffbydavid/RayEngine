@@ -109,21 +109,21 @@ void RayEngine::renderEmbree() {
 
 				if (attenuation > 0.0) {
 					// Diffuse factor
-					float diffuse = max(Vec3::dot(hitNormal, incidence), 0.f) * attenuation;
-					totalDiffuse += diffuse * light.color;
+					float diffuseFactor = max(Vec3::dot(hitNormal, incidence), 0.f) * attenuation;
+					totalDiffuse += diffuseFactor * light.color;
 
 					// Specular factor
 					if (hitMaterial->shininess > 0.0) {
 						Vec3 reflection = 2.f * Vec3::dot(incidence, hitNormal) * hitNormal - incidence;
-						float specular = pow(max(Vec3::dot(reflection, toEye), 0.f), 1.f / hitMaterial->shininess) * attenuation;
-						totalSpecular += specular * light.color;
+						float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hitMaterial->shininess) * attenuation;
+						totalSpecular += specularFactor * hitMaterial->specular;
 					}
 				}
 			}
 
 			// Create color
 			Color texColor = hitMaterial->diffuse * hitMaterial->image->getPixel(hitTexCoord);
-			col = texColor * (curScene->ambient + totalDiffuse) + totalSpecular;
+			col = texColor * (curScene->ambient + hitMaterial->ambient + totalDiffuse) + totalSpecular;
 			col.a(texColor.a());
 
 			EmbreeData.buffer[y * EmbreeData.width + x] = col;

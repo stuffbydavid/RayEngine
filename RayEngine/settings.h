@@ -1,13 +1,14 @@
 // Program settings
 
-#define WINDOW_WIDTH 900
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 640
+#define WINDOW_HEIGHT 400
 
-#define RENDER_MODE RM_RAY_TRACING
-#define RAY_TRACING_TARGET RTT_GPU
+#define RENDER_MODE RM_OPENGL
+#define RAY_TRACING_TARGET RTT_CPU
 
 #define OPENGL_SHADER shdrPhong
 
+#define OPTIX_ENABLE 1
 #define OPTIX_PRINT_TIME 0
 #define OPTIX_USE_GEOMETRY_VBO 1
 #define OPTIX_USE_OUTPUT_VBO 1 // Slower rendering, but faster texture and must run on Master thread

@@ -4,20 +4,22 @@ rtBuffer<Light> lights;
 rtTextureSampler<float4, 2> sampler;
 rtDeclareVariable(float3, eye, , );
 rtDeclareVariable(float4, ambient, , );
+rtDeclareVariable(float4, specular, , );
 rtDeclareVariable(float4, diffuse, , );
 rtDeclareVariable(float, shininess, , );
+rtDeclareVariable(float4, sceneAmbient, , );
 rtDeclareVariable(rtObject, sceneObj, , );
 
 rtDeclareVariable(float3, normal, attribute normal, );
 rtDeclareVariable(float2, texCoord, attribute texCoord, );
 
 rtDeclareVariable(Ray, ray, rtCurrentRay, );
-rtDeclareVariable(RayColorData, rayColorData, rtPayload, );
-rtDeclareVariable(RayShadowData, rayShadowData, rtPayload, );
+rtDeclareVariable(RayColorData, curColorData, rtPayload, );
+rtDeclareVariable(RayShadowData, curShadowData, rtPayload, );
 
 RT_PROGRAM void anyHit() {
 
-	rayShadowData.attenuation = 0.f;
+	curShadowData.attenuation = 0.f;
 	rtTerminateRay();
 
 }
@@ -29,8 +31,8 @@ RT_PROGRAM void closestHit() {
 	float3 toEye = normalize(eye - hitPos);
 
 	// Calculate color
-	float4 totalDiffuse, totalSpecular;
-	totalDiffuse = totalSpecular = make_float4(0.f);
+	float4 totalDiffuse, totalSpecular, totalReflect;
+	totalDiffuse = totalSpecular = totalReflect = make_float4(0.f);
 
 	// Go through the lights
 	for (int i = 0; i < lights.size(); i++) {
@@ -45,7 +47,7 @@ RT_PROGRAM void closestHit() {
 
 			// Cast shadow ray
 			RayShadowData shadowData = { 1.f };
-			optix::Ray shadowRay(hitPos, incidence, 1, 0.1f, distance);
+			Ray shadowRay(hitPos, incidence, 1, 0.01f, distance);
 			rtTrace(sceneObj, shadowRay, shadowData);
 
 			if (shadowData.attenuation > 0.f) {
@@ -53,14 +55,14 @@ RT_PROGRAM void closestHit() {
 				attenuation *= shadowData.attenuation;
 
 				// Diffuse factor
-				float diffuse = max(dot(normal, incidence), 0.f) * attenuation;
-				totalDiffuse += diffuse * light.color;
+				float diffuseFactor = max(dot(normal, incidence), 0.f) * attenuation;
+				totalDiffuse += diffuseFactor * light.color;
 
 				// Specular factor
 				if (shininess > 0.0) {
 					float3 reflection = 2.f * dot(incidence, normal) * normal - incidence;
-					float specular = pow(max(dot(reflection, toEye), 0.f), 1.f / shininess) * attenuation;
-					totalSpecular += specular * light.color;
+					float specularFactor = pow(max(dot(reflection, toEye), 0.f), shininess) * attenuation;
+					totalSpecular += specularFactor * specular;
 				}
 
 			}
@@ -68,9 +70,18 @@ RT_PROGRAM void closestHit() {
 		}
 	}
 
+	// Reflection
+	if (curColorData.depth < 1) {
+		RayColorData reflectData;
+		reflectData.depth = curColorData.depth + 1;
+		Ray reflectRay(hitPos, reflect(ray.direction, normal), 0, 0.01f);
+		rtTrace(sceneObj, reflectRay, reflectData);
+		totalReflect = reflectData.result * make_float4(0.1f);
+	}
+
 	// Create color
 	float4 texColor = diffuse * tex2D(sampler, texCoord.x, texCoord.y);
-	rayColorData.result = texColor * (ambient + totalDiffuse) + totalSpecular;
-	rayColorData.result.w = texColor.w;
+	curColorData.result = texColor * (sceneAmbient + ambient + totalDiffuse) + totalSpecular + totalReflect;
+	curColorData.result.w = texColor.w;
 
 }

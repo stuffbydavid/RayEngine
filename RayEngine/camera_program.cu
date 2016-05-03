@@ -21,6 +21,7 @@ RT_PROGRAM void camera() {
 	optix::Ray ray = make_Ray(rayOrg, rayDir, 0, 0.01f, RT_DEFAULT_MAX);
 
 	RayColorData data;
+	data.depth = 0;
 	rtTrace(sceneObj, ray, data);
 
 	renderBuffer[launchIndex] = data.result;

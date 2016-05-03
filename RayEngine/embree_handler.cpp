@@ -6,18 +6,18 @@ void RayEngine::initEmbree() {
 
 	cout << "Starting Embree..." << endl;
 
+	// Init library
+	EmbreeData.device = rtcNewDevice(NULL);
+	EmbreeData.buffer = nullptr;
+	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+
 	// Generate texture
 	glGenTextures(1, &EmbreeData.texture);
 	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// Init library
-	EmbreeData.device = rtcNewDevice(NULL);
-	EmbreeData.buffer = nullptr;
-	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 
 	// Init scenes
 	for (uint i = 0; i < scenes.size(); i++)
