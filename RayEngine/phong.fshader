@@ -37,7 +37,7 @@ void main(void) {
 		
 		// Specular factor
 		if (uShininess > 0.0) {
-			vec3 reflection = 2 * dot(incidence, vNormalWorld) * vNormalWorld - incidence;
+			vec3 reflection = -reflect(incidence, vNormalWorld);
 			vec3 toEye = normalize(uEyePos - vPosWorld);
 			float specularFactor = pow(max(dot(reflection, toEye), 0.0), uShininess) * attenuation;
 			totalSpecular += specularFactor * uSpecular.rgb;

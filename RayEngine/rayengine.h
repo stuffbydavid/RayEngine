@@ -36,13 +36,7 @@ struct RayEngine {
 
 	void loop();
 	void resize();
-	void resizeEmbree();
-	void resizeOptix();
 	void renderOpenGL();
-	void renderEmbree();
-	void renderEmbreeTexture();
-	void renderOptix();
-	void renderOptixTexture();
 	void renderHybrid();
 	void input();
 
@@ -66,12 +60,46 @@ struct RayEngine {
 
 	// Embree
 	struct EmbreeData{
+
 		RTCDevice device;
 		Color* buffer;
 		GLuint texture;
 		int offset, width;
+
+		// Stores a radiance ray
+		struct Ray {
+			int x, y;
+			Vec3 pos, dir;
+			float factor;
+		};
+
+		// Stores a ray hit
+		struct RayHit {
+			int x, y;
+			Color diffuse, specular;
+			Vec3 pos;
+			Object* obj;
+			TriangleMesh* mesh;
+			Material* material;
+			Vec3 normal;
+			Vec2 texCoord;
+			float factor;
+		};
+
+		// Stores a shadow ray
+		struct ShadowRay {
+			int hitID;
+			Color lightColor;
+			Vec3 incidence;
+			float distance, attenuation;
+		};
+			
 	} EmbreeData;
 	void initEmbree();
+	void resizeEmbree();
+	void renderEmbree();
+	void renderEmbreeProcessRays(vector<EmbreeData::Ray>& rays, int depth);
+	void renderEmbreeTexture();
 
 	// OptiX
 	struct OptixData  {
@@ -82,5 +110,8 @@ struct RayEngine {
 		int offset, width;
 	} OptixData;
 	void initOptix();
+	void resizeOptix();
+	void renderOptix();
+	void renderOptixTexture();
 
 };
