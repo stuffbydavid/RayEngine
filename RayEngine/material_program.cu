@@ -60,7 +60,7 @@ RT_PROGRAM void closestHit() {
 
 				// Specular factor
 				if (shininess > 0.0) {
-					float3 reflection = 2.f * dot(incidence, normal) * normal - incidence;
+					float3 reflection = -reflect(incidence, normal);
 					float specularFactor = pow(max(dot(reflection, toEye), 0.f), shininess) * attenuation;
 					totalSpecular += specularFactor * specular;
 				}
@@ -82,6 +82,5 @@ RT_PROGRAM void closestHit() {
 	// Create color
 	float4 texColor = diffuse * tex2D(sampler, texCoord.x, texCoord.y);
 	curColorData.result = texColor * (sceneAmbient + ambient + totalDiffuse) + totalSpecular + totalReflect;
-	curColorData.result.w = texColor.w;
 
 }

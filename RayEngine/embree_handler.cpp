@@ -8,7 +8,6 @@ void RayEngine::initEmbree() {
 
 	// Init library
 	EmbreeData.device = rtcNewDevice(NULL);
-	EmbreeData.buffer = nullptr;
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 
@@ -76,9 +75,7 @@ void RayEngine::resizeEmbree() {
 	}
 
 	// Resize buffer
-	if (EmbreeData.buffer)
-		delete EmbreeData.buffer;
-	EmbreeData.buffer = new Color[EmbreeData.width * window.height];
+	EmbreeData.buffer.resize(EmbreeData.width * window.height);
 
 	// Resize texture
 	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);

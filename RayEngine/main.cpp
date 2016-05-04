@@ -19,16 +19,16 @@ int main(int argc, char **argv) {
 	myScene->loadObject("obj/floor.obj");
 	myScene->addLight({ 100.f, 200.f, 100.f }, { 1.f, 1.f, 1.f }, 1000.f);
 	Object* teapot = myScene->loadObject("obj/teapot.obj");
-	teapot->scale({ 0.5f, 1.5f, 0.5f });
-	teapot->rotate({ 0, 1, 0 }, 180.f);
+	//teapot->scale({ 0.5f, 1.5f, 0.5f });
+	//teapot->rotate({ 0, 1, 0 }, 180.f);
 
-	for (float x = 40.f; x < 400.f; x += 100.f) {
+	/*for (float x = 40.f; x < 400.f; x += 100.f) {
 		Object* clone = myScene->addObject(teapot->geometries[0]);
 		clone->scale({ 0.75f + frand() * 0.75f, 0.75f + frand() * 0.75f, 0.75f + frand() * 0.75f });
 		clone->rotate({ 0, 1, 0 }, frand() * 360.f);
 		clone->translate({ x, 0.f, 0.f });
 		clone->rotate({ 0, 1, 0 }, frand() * 360.f);
-	}
+	}*/
 
 	/*Scene* cornellBox = rayEngine.createScene("Cornell Box", { 0.1f, 0.1f, 0.2f });
 	cornellBox->loadObject("obj/cornell_box.obj");

@@ -62,43 +62,51 @@ struct RayEngine {
 	struct EmbreeData{
 
 		RTCDevice device;
-		Color* buffer;
+		vector<Color> buffer;
 		GLuint texture;
 		int offset, width;
 
-		// Stores a radiance ray
-		struct Ray {
-			int x, y;
-			Vec3 pos, dir;
-			float factor;
-		};
+        #if EMBREE_RAY_LISTS
 
-		// Stores a ray hit
-		struct RayHit {
-			int x, y;
-			Color diffuse, specular;
-			Vec3 pos;
-			Object* obj;
-			TriangleMesh* mesh;
-			Material* material;
-			Vec3 normal;
-			Vec2 texCoord;
-			float factor;
-		};
+			// Stores a radiance ray
+			struct Ray {
+				int x, y;
+				Vec3 pos, dir;
+				float factor;
+			};
 
-		// Stores a shadow ray
-		struct ShadowRay {
-			int hitID;
-			Color lightColor;
-			Vec3 incidence;
-			float distance, attenuation;
-		};
+			// Stores a ray hit
+			struct RayHit {
+				int x, y;
+				Color diffuse, specular;
+				Vec3 pos;
+				Object* obj;
+				TriangleMesh* mesh;
+				Material* material;
+				Vec3 normal;
+				Vec2 texCoord;
+				float factor;
+			};
+
+			// Stores a shadow ray
+			struct ShadowRay {
+				int hitID;
+				Color lightColor;
+				Vec3 incidence;
+				float distance, attenuation;
+			};
+
+        #endif
 			
 	} EmbreeData;
 	void initEmbree();
 	void resizeEmbree();
 	void renderEmbree();
-	void renderEmbreeProcessRays(vector<EmbreeData::Ray>& rays, int depth);
+    #if EMBREE_RAY_LISTS
+	    void renderEmbreeProcessRays(vector<EmbreeData::Ray>& rays, int depth);
+    #else
+	    Color renderEmbreeProcessRay(RTCRay& ray, int depth);
+    #endif
 	void renderEmbreeTexture();
 
 	// OptiX

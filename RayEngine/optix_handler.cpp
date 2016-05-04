@@ -202,7 +202,7 @@ void TriangleMesh::initOptix(optix::Context context) {
 			material->OptixData.material->setAnyHitProgram(1, materialAnyHitProgram);
 			material->OptixData.material["sampler"]->setTextureSampler(material->OptixData.sampler);
 			material->OptixData.material["ambient"]->setFloat(material->ambient.r(), material->ambient.g(), material->ambient.b(), material->ambient.a());
-			material->OptixData.material["diffuse"]->setFloat(material->specular.r(), material->specular.g(), material->specular.b(), material->specular.a());
+			material->OptixData.material["specular"]->setFloat(material->specular.r(), material->specular.g(), material->specular.b(), material->specular.a());
 			material->OptixData.material["diffuse"]->setFloat(material->diffuse.r(), material->diffuse.g(), material->diffuse.b(), material->diffuse.a());
 			material->OptixData.material["shininess"]->setFloat(material->shininess);
 
