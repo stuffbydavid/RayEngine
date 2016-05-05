@@ -25,6 +25,7 @@
 #include <optix.h>
 #include <optix_world.h>
 #include <optixu/optixpp_namespace.h>
+#include <optixu/optixu_math_namespace.h>
 //#include "ft2build.h"
 //#include FT_FREETYPE_H
 #include <Magick++.h>  // Put C:\Libs\imagemagick-6.9.3-Q16 in path

@@ -41,20 +41,19 @@ void RayEngine::input() {
 
 	// Rendering
 
-	if (window.keyPressed[GLFW_KEY_F5]) {
+	if (window.keyPressed[GLFW_KEY_F5])
+		showEmbreeRender = !showEmbreeRender;
+
+	if (window.keyPressed[GLFW_KEY_F6])
+		showOptixRender = !showOptixRender;
+
+	if (window.keyPressed[GLFW_KEY_F12]) {
 		cout << curCamera->position << endl;
 		cout << curCamera->xaxis << endl;
 		cout << curCamera->yaxis << endl;
 		cout << curCamera->zaxis << endl;
 		cout << endl;
 	}
-
-
-	if (window.keyPressed[GLFW_KEY_F6])
-		showEmbreeRender = !showEmbreeRender;
-
-	if (window.keyPressed[GLFW_KEY_F7])
-		showOptixRender = !showOptixRender;
 
 	// Hybrid partition
 

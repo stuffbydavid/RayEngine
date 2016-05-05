@@ -1,10 +1,14 @@
 #include "Scene.h"
 
-Scene::Scene(string name, Color ambient, Color background) :
+Scene::Scene(string name, Color ambient, string skyFile, Color skyColor) :
     name(name),
-	ambient(ambient),
-	background(background)
-{}
+	ambient(ambient)
+{
+	if (skyFile != "")
+		sky = new Image(GL_LINEAR, skyFile);
+	else
+		sky = new Image(skyColor);
+}
 
 Object* Scene::loadObject(string file) {
 

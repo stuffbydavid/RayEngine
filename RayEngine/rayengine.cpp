@@ -64,9 +64,9 @@ void RayEngine::resize() {
 
 }
 
-Scene* RayEngine::createScene(string name, Color ambient, Color background) {
+Scene* RayEngine::createScene(string name, Color ambient, string skyFile, Color background) {
 
-	curScene = new Scene(name, ambient, background);
+	curScene = new Scene(name, ambient, skyFile, background);
 	curCamera = &curScene->camera;
 	scenes.push_back(curScene);
 	return curScene;

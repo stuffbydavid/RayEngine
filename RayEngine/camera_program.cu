@@ -18,7 +18,7 @@ RT_PROGRAM void camera() {
 	float3 rayOrg = eye;
 	float3 rayDir = d.x * xaxis + d.y * yaxis + zaxis;
 
-	optix::Ray ray = make_Ray(rayOrg, rayDir, 0, 0.01f, RT_DEFAULT_MAX);
+	Ray ray = make_Ray(rayOrg, rayDir, 0, 0.01f, RT_DEFAULT_MAX);
 
 	RayColorData data;
 	data.depth = 0;

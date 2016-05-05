@@ -29,7 +29,7 @@ struct RayEngine {
 	~RayEngine();
 
 	// Adds a new, empty scene.
-	Scene* createScene(string name, Color ambient = { 0.f }, Color background = { 0.f });
+	Scene* createScene(string name, Color ambient = { 0.f }, string skyFile = "", Color skyColor = { 0.f });
 
 	// Launches the program and starts rendering.
 	void launch();
@@ -107,6 +107,7 @@ struct RayEngine {
     #else
 	    Color renderEmbreeProcessRay(RTCRay& ray, int depth);
     #endif
+	Color renderEmbreeSky(Vec3 dir);
 	void renderEmbreeTexture();
 
 	// OptiX

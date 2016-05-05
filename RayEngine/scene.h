@@ -7,7 +7,7 @@
 
 struct Scene {
 
-	Scene(string name, Color ambient, Color background);
+	Scene(string name, Color ambient, string skyFile, Color skyColor);
 
 	// Loads object(s) from a file and adds it to the scene.
 	Object* loadObject(string file);
@@ -20,10 +20,11 @@ struct Scene {
 
 	// Variables
 	string name;
+	Color ambient;
+	Image* sky;
 	Camera camera;
 	vector<Object*> objects;
 	vector<Light> lights;
-	Color ambient, background;
 
 	// Embree
 	struct EmbreeData {
@@ -35,6 +36,7 @@ struct Scene {
 	// OptiX
 	struct OptixData {
 		optix::Group group;
+		optix::TextureSampler sky;
 	} OptixData;
 	void initOptix(optix::Context context);
 

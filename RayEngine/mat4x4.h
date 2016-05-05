@@ -1,13 +1,13 @@
 #pragma once
 
 // 4x4 Matrix
-// Used for viewing transformations
 struct Mat4x4 {
 
 	// Matrix elements
 	float e[16];
 
-	// Constructors
+	//// Constructors ////
+
 	Mat4x4() {
 		e[0] = 1.f; e[4] = 0.f; e[8] = 0.f; e[12] = 0.f;
 		e[1] = 0.f; e[5] = 1.f; e[9] = 0.f; e[13] = 0.f;
@@ -36,7 +36,7 @@ struct Mat4x4 {
 		return *this;
 	}
 
-	// Functions
+	//// Functions ////
 
 	// Builds a translation matrix.
 	static __forceinline Mat4x4 translate(const Vec3& vec) {
@@ -102,7 +102,8 @@ struct Mat4x4 {
 
 };
 
-// Unary operators
+//// Unary operators ////
+
 __forceinline std::ostream& operator << (std::ostream& cout, const Mat4x4& a) {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++)
@@ -112,7 +113,8 @@ __forceinline std::ostream& operator << (std::ostream& cout, const Mat4x4& a) {
 	return cout;
 }
 
-// Binary operators
+//// Binary operators ////
+
 __forceinline Mat4x4 operator * (const Mat4x4& a, const Mat4x4& b) {
 	Mat4x4 product;
 	for (int i = 0; i < 4; i++) {
@@ -124,7 +126,6 @@ __forceinline Mat4x4 operator * (const Mat4x4& a, const Mat4x4& b) {
 	}
 	return product;
 }
-
 
 __forceinline Vec3 operator * (const Mat4x4& a, const Vec3& b) {
 	return Vec3(

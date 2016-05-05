@@ -10,11 +10,12 @@
 
 #define OPTIX_ENABLE 1
 #define OPTIX_PRINT_TIME 0
-#define OPTIX_USE_GEOMETRY_VBO 1
+#define OPTIX_USE_OPENGL_TEXTURE 1 // This is broken with the normal attribute in OpenGL shaders?
+#define OPTIX_USE_GEOMETRY_VBO 1 // Can't combine VBOs
 #define OPTIX_USE_OUTPUT_VBO 1 // OptiX must run on Master thread
 
-#define EMBREE_PRINT_TIME 1
-#define EMBREE_RAY_LISTS 0 // Slower(?) and heavily uses stacks which can lead to weird errors
+#define EMBREE_PRINT_TIME 0
+#define EMBREE_RAY_LISTS 0 // Slower and heavily uses stacks which leads to weird errors
 #define EMBREE_SFLAGS_SCENE RTC_SCENE_DYNAMIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY
 #define EMBREE_SFLAGS_OBJECT RTC_SCENE_STATIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY
 #define EMBREE_AFLAGS_SCENE RTC_INTERSECT8 | RTC_INTERSECT1

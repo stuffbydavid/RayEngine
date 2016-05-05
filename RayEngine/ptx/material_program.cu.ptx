@@ -528,10 +528,10 @@ BB1_22:
 	call _rt_trace_64, (%r34, %f1, %f2, %f3, %f263, %f264, %f265, %r35, %f266, %f267, %rd37, %r36);
 	// inline asm
 	ld.local.v4.f32 	{%f283, %f284, %f285, %f286}, [%rd38];
-	mul.f32 	%f355, %f283, 0f3DCCCCCD;
-	mul.f32 	%f356, %f284, 0f3DCCCCCD;
-	mul.f32 	%f357, %f285, 0f3DCCCCCD;
-	mul.f32 	%f358, %f286, 0f3DCCCCCD;
+	mul.f32 	%f355, %f283, 0f3E800000;
+	mul.f32 	%f356, %f284, 0f3E800000;
+	mul.f32 	%f357, %f285, 0f3E800000;
+	mul.f32 	%f358, %f286, 0f3E800000;
 
 BB1_24:
 	ld.global.v2.f32 	{%f291, %f292}, [texCoord];

@@ -10,25 +10,27 @@ int main(int argc, char **argv) {
 
 	RayEngine rayEngine;
 
-	Scene* myScene = rayEngine.createScene("myScene", { 0.1f, 0.1f, 0.2f });
-	myScene->camera.position = { 90.9064f, 148.59f, 202.493f };
-	myScene->camera.xaxis = { 0.805529f, -0.00260918f, -0.592553f };
-	myScene->camera.yaxis = { -0.393318f, 0.745581f, -0.537971f };
-	myScene->camera.zaxis = { -0.443199f, -0.666411f, -0.599562f };
+	/// Teapot scene /// 
 
-	myScene->loadObject("obj/floor.obj");
-	myScene->addLight({ 100.f, 200.f, 100.f }, { 1.f, 1.f, 1.f }, 1000.f);
-	Object* teapot = myScene->loadObject("obj/teapot.obj");
-	//teapot->scale({ 0.5f, 1.5f, 0.5f });
-	//teapot->rotate({ 0, 1, 0 }, 180.f);
+	Scene* teapotScene = rayEngine.createScene("myScene", { 0.1f, 0.1f, 0.2f }, "img/CedarCity.ppm");
+	teapotScene->camera.position = { 90.9064f, 148.59f, 202.493f };
+	teapotScene->camera.xaxis = { 0.805529f, -0.00260918f, -0.592553f };
+	teapotScene->camera.yaxis = { -0.393318f, 0.745581f, -0.537971f };
+	teapotScene->camera.zaxis = { -0.443199f, -0.666411f, -0.599562f };
+	teapotScene->addLight({ 100.f, 200.f, 100.f }, { 1.f, 1.f, 1.f }, 1000.f);
 
-	/*for (float x = 40.f; x < 400.f; x += 100.f) {
-		Object* clone = myScene->addObject(teapot->geometries[0]);
+	teapotScene->loadObject("obj/floor.obj");
+	Object* teapot = teapotScene->loadObject("obj/teapot.obj");
+	teapot->scale({ 0.5f, 1.5f, 0.5f });
+	teapot->rotate({ 0, 1, 0 }, 180.f);
+
+	for (float x = 40.f; x < 400.f; x += 20.f) {
+		Object* clone = teapotScene->addObject(teapot->geometries[0]);
 		clone->scale({ 0.75f + frand() * 0.75f, 0.75f + frand() * 0.75f, 0.75f + frand() * 0.75f });
 		clone->rotate({ 0, 1, 0 }, frand() * 360.f);
 		clone->translate({ x, 0.f, 0.f });
 		clone->rotate({ 0, 1, 0 }, frand() * 360.f);
-	}*/
+	}
 
 	/*Scene* cornellBox = rayEngine.createScene("Cornell Box", { 0.1f, 0.1f, 0.2f });
 	cornellBox->loadObject("obj/cornell_box.obj");

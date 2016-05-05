@@ -2,7 +2,7 @@
 
 void RayEngine::renderOptix() {
 
-	if (!OPTIX_ENABLE)
+	if (!OPTIX_ENABLE || OptixData.width == 0)
 		return;
 
 #if OPTIX_PRINT_TIME

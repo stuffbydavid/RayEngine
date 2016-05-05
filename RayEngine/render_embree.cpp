@@ -5,12 +5,15 @@
 
 void RayEngine::renderEmbree() {
 
+	if (EmbreeData.width == 0)
+		return;
+
 	#if EMBREE_PRINT_TIME
 		float start = glfwGetTime();
 		printf("Frame start\n");
 	#endif
 
-	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST); // Worth a shot
 
 	Vec3 rpos = curCamera->position;
 	Vec3 rxaxis = curCamera->xaxis * window.ratio * curCamera->tFov;
@@ -195,9 +198,9 @@ void RayEngine::renderEmbreeProcessRays(vector<EmbreeData::Ray>& rays, int depth
 			int k = i * 8 + j;
 			EmbreeData::Ray& ray = rays[k];
 
+			// No hit, add background
 			if (packet.geomID[j] == RTC_INVALID_GEOMETRY_ID) {
-				int a = ray.y;
-				EmbreeData.buffer[ray.y * EmbreeData.width + ray.x] += ray.factor * Color(0.3f, 0.3f, 0.9f);
+				EmbreeData.buffer[ray.y * EmbreeData.width + ray.x] += ray.factor * renderEmbreeSky(ray.dir);
 				continue;
 			}
 
@@ -214,7 +217,7 @@ void RayEngine::renderEmbreeProcessRays(vector<EmbreeData::Ray>& rays, int depth
 			hit.texCoord = hit.mesh->getTexCoord(packet.primID[j], packet.u[j], packet.v[j]);
 			hit.factor = ray.factor;
 
-			// Create shadow rays
+			// Create shadow rays to all nearby lights
 			for (uint l = 0; l < curScene->lights.size(); l++) {
 				
 				Light& light = curScene->lights[l];
@@ -222,9 +225,11 @@ void RayEngine::renderEmbreeProcessRays(vector<EmbreeData::Ray>& rays, int depth
 				float distance = Vec3::length(light.position - hit.pos);
 				float attenuation = max(1.f - distance / light.range, 0.f);
 
+				// Too far away
 				if (attenuation == 0.f)
 					continue;
 
+				// Store shadow ray
 				EmbreeData::ShadowRay sRay;
 				sRay.hitID = numRayHits;
 				sRay.lightColor = light.color;
@@ -345,7 +350,7 @@ void RayEngine::renderEmbreeProcessRays(vector<EmbreeData::Ray>& rays, int depth
 Color RayEngine::renderEmbreeProcessRay(RTCRay& ray, int depth) {
 
 	if (ray.geomID == RTC_INVALID_GEOMETRY_ID)
-		return { 0.3f, 0.3f, 0.9f };
+		return renderEmbreeSky(ray.dir);
 
 	// Store hit objects
 	Object* hitObject = curScene->EmbreeData.instIDmap[ray.instID];
@@ -358,6 +363,7 @@ Color RayEngine::renderEmbreeProcessRay(RTCRay& ray, int depth) {
 	Vec2 hitTexCoord = hitMesh->getTexCoord(ray.primID, ray.u, ray.v);
 	Vec3 toEye = Vec3::normalize(curCamera->position - hitPos);
 
+	// Init colors
 	Color totalDiffuse, totalSpecular, totalReflect;
 	totalDiffuse = totalSpecular = totalReflect = { 0.f };
 
@@ -409,7 +415,7 @@ Color RayEngine::renderEmbreeProcessRay(RTCRay& ray, int depth) {
 	// Reflection
 	if (depth < 1) {
 
-		Vec3 reflectDir = -Vec3::reflect(Vec3(ray.dir), hitNormal); // Embree's reflect is OpenGL and OptiX flipped
+		Vec3 reflectDir = -Vec3::reflect(Vec3(ray.dir), hitNormal); // Embree's reflect is flipped
 		RTCRay rRay;
 		rRay.org[0] = hitPos.x();
 		rRay.org[1] = hitPos.y();
@@ -417,15 +423,15 @@ Color RayEngine::renderEmbreeProcessRay(RTCRay& ray, int depth) {
 		rRay.dir[0] = reflectDir.x();
 		rRay.dir[1] = reflectDir.y();
 		rRay.dir[2] = reflectDir.z();
-		rRay.tnear = ray.tnear;
-		rRay.tfar = ray.tfar;
+		rRay.tnear = 0.1f;
+		rRay.tfar = FLT_MAX;
 		rRay.instID = rRay.geomID = rRay.primID = RTC_INVALID_GEOMETRY_ID;
-		rRay.mask = -1;
+		rRay.mask = RAY_VALID;
 		rRay.time = 0;
 
 		rtcIntersect(curScene->EmbreeData.scene, rRay);
 
-		totalReflect = renderEmbreeProcessRay(rRay, depth + 1) * Color(0.1f);
+		totalReflect = renderEmbreeProcessRay(rRay, depth + 1) * Color(0.25f);
 
 	}
 
@@ -436,6 +442,18 @@ Color RayEngine::renderEmbreeProcessRay(RTCRay& ray, int depth) {
 }
 
 #endif
+
+Color RayEngine::renderEmbreeSky(Vec3 dir) {
+
+	Vec3 nDir = Vec3::normalize(dir);
+	float theta = atan2f(nDir.x(), nDir.z());
+	float phi = M_PIf * 0.5f - acosf(nDir.y());
+	float u = (theta + M_PIf) * (0.5f * M_1_PIf);
+	float v = 0.5f * (1.0f + sin(phi));
+	return curScene->sky->getPixel(Vec2(u, v));
+
+}
+
 
 void RayEngine::renderEmbreeTexture() {
 

@@ -61,7 +61,6 @@ void RayEngine::initOptix() {
 		for (uint i = 0; i < scenes.size(); i++)
 			scenes[i]->initOptix(OptixData.context);
 
-		OptixData.context["background"]->setFloat(0.9f, 0.3f, 0.3f, 1.f);
 		OptixData.context["sceneObj"]->set(curScene->OptixData.group);
 		OptixData.context["sceneAmbient"]->setFloat(curScene->ambient.r(), curScene->ambient.g(), curScene->ambient.b(), curScene->ambient.a());
 		OptixData.context["lights"]->set(OptixData.lights);
@@ -79,6 +78,7 @@ void RayEngine::initOptix() {
 
 void Scene::initOptix(optix::Context context) {
 
+	// Group containing each object transform
 	OptixData.group = context->createGroup();
 	OptixData.group->setAcceleration(context->createAcceleration("Sbvh", "Bvh")); // TODO: change during runtime?
 
@@ -86,6 +86,27 @@ void Scene::initOptix(optix::Context context) {
 		objects[i]->initOptix(context);
 		OptixData.group->addChild(objects[i]->OptixData.transform);
 	}
+
+	// Sky texture sampler
+#if OPTIX_USE_OPENGL_TEXTURE
+	OptixData.sky = context->createTextureSamplerFromGLImage(sky->texture, RT_TARGET_GL_TEXTURE_2D);
+#else
+	optix::Buffer buf = context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_FLOAT4, sky->width, sky->height);
+	memcpy(buf->map(), sky->pixels, sky->width * sky->height * sizeof(Color));
+	buf->unmap();
+	OptixData.sky = context->createTextureSampler();
+	OptixData.sky->setArraySize(1);
+	OptixData.sky->setMipLevelCount(1);
+	OptixData.sky->setBuffer(0, 0, buf);
+#endif
+	OptixData.sky->setWrapMode(0, RT_WRAP_REPEAT);
+	OptixData.sky->setWrapMode(1, RT_WRAP_REPEAT);
+	OptixData.sky->setIndexingMode(RT_TEXTURE_INDEX_NORMALIZED_COORDINATES);
+	OptixData.sky->setReadMode(RT_TEXTURE_READ_NORMALIZED_FLOAT);
+	OptixData.sky->setMaxAnisotropy(1.f);
+	OptixData.sky->setFilteringModes(RT_FILTER_LINEAR, RT_FILTER_LINEAR, RT_FILTER_NONE);
+	context["sky"]->setTextureSampler(OptixData.sky);
+
 
 }
 
@@ -177,8 +198,7 @@ void TriangleMesh::initOptix(optix::Context context) {
 		// Make instance
 		if (!material->OptixData.material) {
 			
-#if 0
-			// This is broken with the normal attribute in OpenGL shaders
+#if OPTIX_USE_OPENGL_TEXTURE
 			material->OptixData.sampler = context->createTextureSamplerFromGLImage(material->image->texture, RT_TARGET_GL_TEXTURE_2D);
 #else
 			optix::Buffer buf = context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_FLOAT4, material->image->width, material->image->height);
