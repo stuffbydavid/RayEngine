@@ -3,9 +3,7 @@
 RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, RayTracingTarget rayTracingTarget, float hybridPartition) :
 	renderMode(renderMode),
 	rayTracingTarget(rayTracingTarget),
-	hybridPartition(hybridPartition),
-	showEmbreeRender(true),
-	showOptixRender(true)
+	hybridPartition(hybridPartition)
 {
 
 	window.init(windowWidth, windowHeight);
@@ -35,22 +33,26 @@ void RayEngine::loop() {
 
 	input();
 	
-	string mode = "";
+	rayOrg = curCamera->position;
+	rayXaxis = curCamera->xaxis * window.ratio * curCamera->tFov;
+	rayYaxis = curCamera->yaxis * curCamera->tFov;
+	rayZaxis = curCamera->zaxis;
 
+	string mode = "";
 	if (renderMode == RM_OPENGL) {
-		openglRender();
 		mode = "OpenGL";
+		openglRender();
 	} else if (rayTracingTarget == RTT_CPU) {
+		mode = "Embree";
 		embreeRender();
 		embreeRenderUpdateTexture();
-		mode = "Embree";
 	} else if (rayTracingTarget == RTT_GPU) {
+		mode = "OptiX";
 		optixRender();
 		optixRenderUpdateTexture();
-		mode = "OptiX";
 	} else if (rayTracingTarget == RTT_HYBRID) {
-		hybridRender();
 		mode = "Hybrid";
+		hybridRender();
 	}
 
 	window.setTitle("RayEngine - " + mode + " - FPS: " + to_string(window.fps));

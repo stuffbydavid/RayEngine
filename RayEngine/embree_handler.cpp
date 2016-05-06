@@ -28,7 +28,6 @@ void Scene::embreeInit(RTCDevice device) {
 
 	EmbreeData.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_SCENE, EMBREE_AFLAGS_SCENE);
 
-	//TODO: Check other instance modes?
 	for (uint i = 0; i < objects.size(); i++) {
 		objects[i]->embreeInit(device);
 		uint instID = rtcNewInstance2(EmbreeData.scene, objects[i]->EmbreeData.scene);

@@ -20,6 +20,7 @@
 .global .align 4 .f32 shininess;
 .global .align 16 .b8 sceneAmbient[16];
 .global .align 8 .b8 sceneObj[4];
+.global .align 4 .u32 maxReflections;
 .global .align 4 .b8 normal[12];
 .global .align 8 .b8 texCoord[8];
 .global .align 4 .b8 ray[36];
@@ -56,6 +57,7 @@
 .global .align 4 .b8 _ZN21rti_internal_typeinfo9shininessE[8] = {82, 97, 121, 0, 4, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo12sceneAmbientE[8] = {82, 97, 121, 0, 16, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo8sceneObjE[8] = {82, 97, 121, 0, 4, 0, 0, 0};
+.global .align 4 .b8 _ZN21rti_internal_typeinfo14maxReflectionsE[8] = {82, 97, 121, 0, 4, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo6normalE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo8texCoordE[8] = {82, 97, 121, 0, 8, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo3rayE[8] = {82, 97, 121, 0, 36, 0, 0, 0};
@@ -68,6 +70,7 @@
 .global .align 1 .b8 _ZN21rti_internal_typename9shininessE[6] = {102, 108, 111, 97, 116, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename12sceneAmbientE[7] = {102, 108, 111, 97, 116, 52, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename8sceneObjE[9] = {114, 116, 79, 98, 106, 101, 99, 116, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename14maxReflectionsE[4] = {105, 110, 116, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename6normalE[7] = {102, 108, 111, 97, 116, 51, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename8texCoordE[7] = {102, 108, 111, 97, 116, 50, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename3rayE[4] = {82, 97, 121, 0};
@@ -80,6 +83,7 @@
 .global .align 4 .u32 _ZN21rti_internal_typeenum9shininessE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum12sceneAmbientE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum8sceneObjE = 4919;
+.global .align 4 .u32 _ZN21rti_internal_typeenum14maxReflectionsE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum6normalE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum8texCoordE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum3rayE = 4919;
@@ -92,6 +96,7 @@
 .global .align 1 .b8 _ZN21rti_internal_semantic9shininessE[1];
 .global .align 1 .b8 _ZN21rti_internal_semantic12sceneAmbientE[1];
 .global .align 1 .b8 _ZN21rti_internal_semantic8sceneObjE[1];
+.global .align 1 .b8 _ZN21rti_internal_semantic14maxReflectionsE[1];
 .global .align 1 .b8 _ZN21rti_internal_semantic6normalE[17] = {97, 116, 116, 114, 105, 98, 117, 116, 101, 32, 110, 111, 114, 109, 97, 108, 0};
 .global .align 1 .b8 _ZN21rti_internal_semantic8texCoordE[19] = {97, 116, 116, 114, 105, 98, 117, 116, 101, 32, 116, 101, 120, 67, 111, 111, 114, 100, 0};
 .global .align 1 .b8 _ZN21rti_internal_semantic3rayE[13] = {114, 116, 67, 117, 114, 114, 101, 110, 116, 82, 97, 121, 0};
@@ -104,6 +109,7 @@
 .global .align 1 .b8 _ZN23rti_internal_annotation9shininessE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation12sceneAmbientE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation8sceneObjE[1];
+.global .align 1 .b8 _ZN23rti_internal_annotation14maxReflectionsE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation6normalE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation8texCoordE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation3rayE[1];
@@ -136,7 +142,7 @@
 	.reg .pred 	%p<36>;
 	.reg .s16 	%rs<33>;
 	.reg .f32 	%f<359>;
-	.reg .s32 	%r<39>;
+	.reg .s32 	%r<40>;
 	.reg .s64 	%rd<46>;
 
 
@@ -203,7 +209,7 @@
 	mov.f32 	%f349, %f354;
 	mov.f32 	%f348, %f354;
 	mov.f32 	%f347, %f354;
-	mov.u32 	%r38, 0;
+	mov.u32 	%r39, 0;
 	mov.u64 	%rd44, 0;
 	bra.uni 	BB1_2;
 
@@ -479,8 +485,8 @@ BB1_20:
 	fma.rn.f32 	%f347, %f247, %f251, %f347;
 
 BB1_21:
-	add.s32 	%r38, %r38, 1;
-	cvt.s64.s32	%rd44, %r38;
+	add.s32 	%r39, %r39, 1;
+	cvt.s64.s32	%rd44, %r39;
 	// inline asm
 	call (%rd30, %rd31, %rd32, %rd33), _rt_buffer_get_size_64, (%rd9, %r4, %r5);
 	// inline asm
@@ -490,17 +496,18 @@ BB1_21:
 
 BB1_22:
 	mov.f32 	%f358, 0f00000000;
+	ld.global.u32 	%r34, [maxReflections];
 	ld.global.u32 	%r3, [curColorData+16];
 	mov.f32 	%f357, %f358;
 	mov.f32 	%f356, %f358;
 	mov.f32 	%f355, %f358;
-	setp.gt.s32	%p35, %r3, 0;
+	setp.ge.s32	%p35, %r3, %r34;
 	@%p35 bra 	BB1_24;
 
-	add.s32 	%r37, %r3, 1;
+	add.s32 	%r38, %r3, 1;
 	add.u64 	%rd37, %SP, 0;
 	cvta.to.local.u64 	%rd38, %rd37;
-	st.local.u32 	[%rd38+16], %r37;
+	st.local.u32 	[%rd38+16], %r38;
 	ld.global.f32 	%f268, [normal];
 	add.f32 	%f269, %f268, %f268;
 	ld.global.f32 	%f270, [normal+4];
@@ -519,13 +526,13 @@ BB1_22:
 	sub.f32 	%f263, %f274, %f280;
 	sub.f32 	%f264, %f275, %f281;
 	sub.f32 	%f265, %f278, %f282;
-	ld.global.u32 	%r34, [sceneObj];
-	mov.u32 	%r35, 0;
+	ld.global.u32 	%r35, [sceneObj];
+	mov.u32 	%r36, 0;
 	mov.f32 	%f266, 0f3C23D70A;
 	mov.f32 	%f267, 0f6C4ECB8F;
-	mov.u32 	%r36, 32;
+	mov.u32 	%r37, 32;
 	// inline asm
-	call _rt_trace_64, (%r34, %f1, %f2, %f3, %f263, %f264, %f265, %r35, %f266, %f267, %rd37, %r36);
+	call _rt_trace_64, (%r35, %f1, %f2, %f3, %f263, %f264, %f265, %r36, %f266, %f267, %rd37, %r37);
 	// inline asm
 	ld.local.v4.f32 	{%f283, %f284, %f285, %f286}, [%rd38];
 	mul.f32 	%f355, %f283, 0f3E800000;

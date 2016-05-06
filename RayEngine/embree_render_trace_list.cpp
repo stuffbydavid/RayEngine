@@ -1,53 +1,7 @@
 #include "rayengine.h"
 
-void RayEngine::embreeRenderLists() {
-
-	Vec3 rpos = curCamera->position;
-	Vec3 rxaxis = curCamera->xaxis * window.ratio * curCamera->tFov;
-	Vec3 ryaxis = curCamera->yaxis * curCamera->tFov;
-	Vec3 rzaxis = curCamera->zaxis;
-
-    #pragma omp parallel num_threads(4)
-	{
-
-		// Give each thread a subsection to work with
-		int wid, off;
-		wid = EmbreeData.width / omp_get_num_threads();
-		off = wid * omp_get_thread_num();
-		if (omp_get_thread_num() == omp_get_num_threads() - 1)
-			wid = EmbreeData.width - off;
-
-		// Cast primary rays
-		vector<EmbreeData::Ray> primaryRays(wid * window.height);
-
-		for (int x = 0; x < wid; x++) {
-			for (int y = 0; y < window.height; y++) {
-
-				float dx = ((float)(EmbreeData.offset + off + x) / window.width) * 2.f - 1.f;
-				float dy = ((float)y / window.height) * 2.f - 1.f;
-
-				EmbreeData::Ray ray;
-				ray.x = off + x;
-				ray.y = y;
-				ray.pos = curScene->camera.position;
-				ray.dir = dx * rxaxis + dy * ryaxis + rzaxis;
-				ray.factor = 1.f;
-
-				primaryRays[y * wid + x] = ray;
-				EmbreeData.buffer[y * EmbreeData.width + off + x] = { 0.f };
-
-			}
-		}
-
-		embreeRenderProcessList(primaryRays, 0);
-
-	}
-
-}
-
-
-void RayEngine::embreeRenderProcessList(vector<EmbreeData::Ray>& rays, int depth) {
-
+void RayEngine::embreeRenderTraceList(vector<EmbreeData::Ray>& rays, int depth) {
+	/*
 	// Create lists (hits/shadows/reflections)
 	int numRays = rays.size();
 	int numPackets = ceil((float)numRays / 8);
@@ -59,53 +13,55 @@ void RayEngine::embreeRenderProcessList(vector<EmbreeData::Ray>& rays, int depth
 	int numRayHits, numShadowRays, numReflectRays;
 	numRayHits = numShadowRays = numReflectRays = 0;
 
-	//// Find hits ////
+	//// Intersection ////
 
 	for (int i = 0; i < numPackets; i++) {
 
-		RTCRay8 packet;
-		__aligned(32) int valid[8];
+		EmbreeData::RayPacket packet;
 
 		for (int j = 0; j < 8; j++) {
 
 			int k = i * 8 + j;
 
 			if (k > numRays) {
-				valid[j] = RAY_INVALID;
+				packet.valid[j] = EMBREE_RAY_INVALID;
 				continue;
 			} else
-				valid[j] = RAY_VALID;
+				packet.valid[j] = EMBREE_RAY_VALID;
 
 			EmbreeData::Ray& ray = rays[k];
 
-			packet.orgx[j] = ray.pos.x();
-			packet.orgy[j] = ray.pos.y();
-			packet.orgz[j] = ray.pos.z();
-			packet.dirx[j] = ray.dir.x();
-			packet.diry[j] = ray.dir.y();
-			packet.dirz[j] = ray.dir.z();
-			packet.tnear[j] = 0.1f;
-			packet.tfar[j] = FLT_MAX;
-			packet.instID[j] = packet.geomID[j] = packet.primID[j] = RTC_INVALID_GEOMETRY_ID;
-			packet.mask[j] = RAY_VALID;
-			packet.time[j] = 0.f;
+			packet.ePacket.orgx[j] = ray.org.x();
+			packet.ePacket.orgy[j] = ray.org.y();
+			packet.ePacket.orgz[j] = ray.org.z();
+			packet.ePacket.dirx[j] = ray.dir.x();
+			packet.ePacket.diry[j] = ray.dir.y();
+			packet.ePacket.dirz[j] = ray.dir.z();
+			packet.ePacket.tnear[j] = 0.1f;
+			packet.ePacket.tfar[j] = FLT_MAX;
+			packet.ePacket.instID[j] =
+			packet.ePacket.geomID[j] =
+			packet.ePacket.primID[j] = RTC_INVALID_GEOMETRY_ID;
+			packet.ePacket.mask[j] = EMBREE_RAY_VALID;
+			packet.ePacket.time[j] = 0.f;
 
 		}
 
-		rtcIntersect8(valid, curScene->EmbreeData.scene, packet);
+		rtcIntersect8(packet.valid, curScene->EmbreeData.scene, packet.ePacket);
 
 		for (int j = 0; j < 8; j++) {
 
-			if (valid[j] == RAY_INVALID)
+			if (packet.valid[j] == EMBREE_RAY_INVALID)
 				continue;
 
 			int k = i * 8 + j;
 			EmbreeData::Ray& ray = rays[k];
 
 			// No hit, add background
-			if (packet.geomID[j] == RTC_INVALID_GEOMETRY_ID) {
-				EmbreeData.buffer[ray.y * EmbreeData.width + ray.x] += ray.factor * embreeRenderSky(ray.dir);
-				continue;
+			if (packet.ePacket.geomID[j] == RTC_INVALID_GEOMETRY_ID) {
+				EmbreeData.buffer[ray.y * EmbreeData.width + ray.x] += {0.f}; // ray.factor * embreeRenderSky(ray.dir);
+			} else {
+				EmbreeData.buffer[ray.y * EmbreeData.width + ray.x] += {1.f};
 			}
 
 			// Store hit
@@ -141,12 +97,12 @@ void RayEngine::embreeRenderProcessList(vector<EmbreeData::Ray>& rays, int depth
 				sRay.distance = distance;
 				sRay.attenuation = attenuation;
 
-				shadowRays[numShadowRays++] = sRay; // TODO?: Split into several lists for coherency
+				shadowRays[numShadowRays++] = sRay; // TODO: Maybe use separate lists for coherence?
 
 			}
 
 			// Create reflection rays
-			if (depth < 1) {
+			if (depth < MAX_REFLECTIONS) {
 
 				EmbreeData::Ray rRay;
 				rRay.x = hit.x;
@@ -164,7 +120,7 @@ void RayEngine::embreeRenderProcessList(vector<EmbreeData::Ray>& rays, int depth
 		}
 
 	}
-
+	
 	//// Shadow (light) pass ////
 
 	int numShadowPackets = ceil((float)numShadowRays / 8);
@@ -179,10 +135,10 @@ void RayEngine::embreeRenderProcessList(vector<EmbreeData::Ray>& rays, int depth
 			int k = i * 8 + j;
 
 			if (k > numShadowRays) {
-				valid[j] = RAY_INVALID;
+				valid[j] = EMBREE_RAY_INVALID;
 				continue;
 			} else
-				valid[j] = RAY_VALID;
+				valid[j] = EMBREE_RAY_VALID;
 
 			EmbreeData::ShadowRay& ray = shadowRays[k];
 			EmbreeData::RayHit& hit = rayHits[ray.hitID];
@@ -196,7 +152,7 @@ void RayEngine::embreeRenderProcessList(vector<EmbreeData::Ray>& rays, int depth
 			packet.tnear[j] = 0.1f;
 			packet.tfar[j] = ray.distance;
 			packet.instID[j] = packet.geomID[j] = packet.primID[j] = RTC_INVALID_GEOMETRY_ID;
-			packet.mask[j] = RAY_VALID;
+			packet.mask[j] = EMBREE_RAY_VALID;
 			packet.time[j] = 0.f;
 
 		}
@@ -205,22 +161,22 @@ void RayEngine::embreeRenderProcessList(vector<EmbreeData::Ray>& rays, int depth
 
 		for (int j = 0; j < 8; j++) {
 
-			if (valid[j] == RAY_INVALID || packet.geomID[j] != RTC_INVALID_GEOMETRY_ID)
+			if (valid[j] == EMBREE_RAY_INVALID || packet.geomID[j] != RTC_INVALID_GEOMETRY_ID)
 				continue;
 
 			int k = i * 8 + j;
-			EmbreeData::ShadowRay& ray = shadowRays[k];
-			EmbreeData::RayHit& hit = rayHits[ray.hitID];
+			EmbreeData::ShadowRay& sRay = shadowRays[k];
+			EmbreeData::RayHit& hit = rayHits[sRay.hitID];
 
 			// Diffuse factor
-			float diffuseFactor = max(Vec3::dot(hit.normal, ray.incidence), 0.f) * ray.attenuation;
-			hit.diffuse += diffuseFactor * ray.lightColor;
+			float diffuseFactor = max(Vec3::dot(hit.normal, sRay.incidence), 0.f) * sRay.attenuation;
+			hit.diffuse += diffuseFactor * sRay.lightColor;
 
 			// Specular factor
 			if (hit.material->shininess > 0.0) {
 				Vec3 toEye = Vec3::normalize(curCamera->position - hit.pos);
-				Vec3 reflection = Vec3::reflect(ray.incidence, hit.normal);
-				float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hit.material->shininess) * ray.attenuation;
+				Vec3 reflection = Vec3::reflect(sRay.incidence, hit.normal);
+				float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hit.material->shininess) * sRay.attenuation;
 				hit.specular += specularFactor * hit.material->specular;
 			}
 
@@ -245,7 +201,7 @@ void RayEngine::embreeRenderProcessList(vector<EmbreeData::Ray>& rays, int depth
 	// Process reflections
 	if (numReflectRays > 0) {
 		reflectRays.resize(numReflectRays);
-		embreeRenderProcessList(reflectRays, depth + 1);
-	}
+		embreeRenderTraceList(reflectRays, depth + 1);
+	}*/
 
 }

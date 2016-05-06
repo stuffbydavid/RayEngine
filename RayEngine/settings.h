@@ -16,16 +16,19 @@
 #define OPTIX_USE_OUTPUT_VBO 1 // OptiX must run on Master thread
 
 #define EMBREE_PRINT_TIME 0
-#define EMBREE_RENDER_OLD 0 // Old method (single loop, single ray function)
-#define EMBREE_RENDER_TILES 1 // Tiles and packet function
-#define EMBREE_RENDER_LISTS 0 // Slower and heavily uses stacks which leads to weird errors with recursion
+#define EMBREE_RENDER_TILES 1 // 1 = Split into tiles, 0 = Use a single loop
+#define EMBREE_RENDER_PACKETS 1 // 1 = Only packets, 0 = List of rays
+
+#define EMBREE_TILE_WIDTH 16
+#define EMBREE_TILE_HEIGHT 16
+#define EMBREE_PACKET_SIZE 8
+#define EMBREE_PACKET_TYPE RTCRay8
+#define EMBREE_RAY_VALID -1
+#define EMBREE_RAY_INVALID 0
 #define EMBREE_SFLAGS_SCENE RTC_SCENE_DYNAMIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY
 #define EMBREE_SFLAGS_OBJECT RTC_SCENE_STATIC | RTC_SCENE_COHERENT | RTC_SCENE_HIGH_QUALITY
 #define EMBREE_AFLAGS_SCENE RTC_INTERSECT8 | RTC_INTERSECT1
 #define EMBREE_AFLAGS_OBJECT RTC_INTERSECT8 | RTC_INTERSECT1
-
-#define RAY_VALID -1
-#define RAY_INVALID 0
 
 #define HYBRID_THREADED 1
 #define HYBRID_PARTITION 0.4

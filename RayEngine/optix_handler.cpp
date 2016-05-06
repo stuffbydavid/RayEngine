@@ -65,6 +65,7 @@ void RayEngine::optixInit() {
 		OptixData.context["sceneAmbient"]->setFloat(curScene->ambient.r(), curScene->ambient.g(), curScene->ambient.b(), curScene->ambient.a());
 		OptixData.context["lights"]->set(OptixData.lights);
 		OptixData.context["renderBuffer"]->set(OptixData.renderBuffer);
+		OptixData.context["maxReflections"]->setInt(MAX_REFLECTIONS);
 
 		// Compile
 		OptixData.context->validate();

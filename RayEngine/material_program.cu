@@ -9,6 +9,7 @@ rtDeclareVariable(float4, diffuse, , );
 rtDeclareVariable(float, shininess, , );
 rtDeclareVariable(float4, sceneAmbient, , );
 rtDeclareVariable(rtObject, sceneObj, , );
+rtDeclareVariable(int, maxReflections, , );
 
 rtDeclareVariable(float3, normal, attribute normal, );
 rtDeclareVariable(float2, texCoord, attribute texCoord, );
@@ -71,7 +72,7 @@ RT_PROGRAM void closestHit() {
 	}
 
 	// Reflection
-	if (curColorData.depth < 1) {
+	if (curColorData.depth < maxReflections) {
 		RayColorData reflectData;
 		reflectData.depth = curColorData.depth + 1;
 		Ray reflectRay(hitPos, reflect(ray.direction, normal), 0, 0.01f);

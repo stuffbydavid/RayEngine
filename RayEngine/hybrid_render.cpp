@@ -12,8 +12,8 @@ void RayEngine::hybridRender() {
 				embreeRender();
 		}
 	#else
-		embreeRender();
 		optixRender();
+		embreeRender();
 	#endif
 
 	embreeRenderUpdateTexture();

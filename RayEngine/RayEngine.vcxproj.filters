@@ -62,13 +62,13 @@
     <ClCompile Include="hybrid_render.cpp">
       <Filter>RayEngine\Hybrid</Filter>
     </ClCompile>
-    <ClCompile Include="embree_render_old.cpp">
+    <ClCompile Include="embree_render_trace_list.cpp">
       <Filter>RayEngine\Embree</Filter>
     </ClCompile>
-    <ClCompile Include="embree_render_lists.cpp">
+    <ClCompile Include="embree_render_trace_packet.cpp">
       <Filter>RayEngine\Embree</Filter>
     </ClCompile>
-    <ClCompile Include="embree_render_tiles.cpp">
+    <ClCompile Include="embree_render_trace_ray.cpp">
       <Filter>RayEngine\Embree</Filter>
     </ClCompile>
   </ItemGroup>

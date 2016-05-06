@@ -21,6 +21,7 @@ struct RayEngine {
 		RTT_HYBRID // Use both Embree and OptiX for CPU and GPU ray tracing
 	};
 
+	// Constructor
 	RayEngine(int windowWidth = WINDOW_WIDTH,
 			  int windowHeight = WINDOW_HEIGHT,
 			  RenderMode renderMode = RENDER_MODE,
@@ -35,19 +36,19 @@ struct RayEngine {
 	// Launches the program and starts rendering.
 	void launch();
 
+	// Called by the window.
 	void loop();
 	void resize();
 	void input();
-
 
 	// Variables
 	vector<Scene*> scenes;
 	Scene* curScene;
 	Camera* curCamera;
 	Window window;
-
 	RenderMode renderMode;
 	RayTracingTarget rayTracingTarget;
+	Vec3 rayOrg, rayXaxis, rayYaxis, rayZaxis;
 
 	// OpenGL
 	void openglRender();
@@ -66,21 +67,15 @@ struct RayEngine {
 		GLuint texture;
 		int offset, width;
 
-		// Stores a packet of rays
-		struct RayPacket {
-			int x, y;
-		};
-
-		// Stores a radiance ray
+		// Stores a ray
 		struct Ray {
 			int x, y;
-			Vec3 pos, dir;
+			Vec3 org, dir;
 			float factor;
 		};
 
-		// Stores a ray hit
+		// Stores the properties of a ray hit
 		struct RayHit {
-			int x, y;
 			Color diffuse, specular;
 			Vec3 pos;
 			Object* obj;
@@ -88,27 +83,37 @@ struct RayEngine {
 			Material* material;
 			Vec3 normal;
 			Vec2 texCoord;
-			float factor;
+			Ray* ray;
 		};
 
-		// Stores a shadow ray
-		struct ShadowRay {
-			int hitID;
+		// Stores a light ray
+		struct LightRay {
 			Color lightColor;
 			Vec3 incidence;
 			float distance, attenuation;
+			RayHit* hit;
 		};
-			
+
+		// Stores a packet of rays
+		template <typename R> struct Packet {
+			R rays[EMBREE_PACKET_SIZE];
+			EMBREE_PACKET_TYPE ePacket;
+			__aligned(32) int valid[EMBREE_PACKET_SIZE];
+		};
+
+		typedef Packet<Ray> RayPacket;
+		typedef Packet<LightRay> LightRayPacket;
+
 	} EmbreeData;
 	void embreeInit();
 	void embreeResize();
 	void embreeRender();
-	void embreeRenderOld();
-	Color embreeRenderProcessRay(RTCRay& ray, int depth);
 	void embreeRenderTiles();
-	void embreeRenderProcessPacket(EmbreeData::RayPacket& packet, int depth);
-	void embreeRenderLists();
-	void embreeRenderProcessList(vector<EmbreeData::Ray>& rays, int depth);
+	void embreeRenderSingleLoop();
+	void embreeRenderTracePacket(EmbreeData::RayPacket& packet, int depth);
+	void embreeRenderTraceList(vector<EmbreeData::Ray>& rays, int depth);
+	//EmbreeData::RayHit embreeRenderStoreHit(RTCRay& ray1);
+	//EmbreeData::RayHit embreeRenderStoreHit(RTCRay8& ray8, int index);
 	Color embreeRenderSky(Vec3 dir);
 	void embreeRenderUpdateTexture();
 

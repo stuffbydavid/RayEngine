@@ -11,14 +11,10 @@ void RayEngine::optixRender() {
 
 	try {
 
-		Vec3 rpos = curCamera->position;
-		Vec3 rxaxis = curCamera->xaxis * window.ratio * curCamera->tFov;
-		Vec3 ryaxis = curCamera->yaxis * curCamera->tFov;
-		Vec3 rzaxis = curCamera->zaxis;
-		OptixData.context["eye"]->setFloat(rpos.x(), rpos.y(), rpos.z());
-		OptixData.context["xaxis"]->setFloat(rxaxis.x(), rxaxis.y(), rxaxis.z());
-		OptixData.context["yaxis"]->setFloat(ryaxis.x(), ryaxis.y(), ryaxis.z());
-		OptixData.context["zaxis"]->setFloat(rzaxis.x(), rzaxis.y(), rzaxis.z());
+		OptixData.context["org"]->setFloat(rayOrg.x(), rayOrg.y(), rayOrg.z());
+		OptixData.context["xaxis"]->setFloat(rayXaxis.x(), rayXaxis.y(), rayXaxis.z());
+		OptixData.context["yaxis"]->setFloat(rayYaxis.x(), rayYaxis.y(), rayYaxis.z());
+		OptixData.context["zaxis"]->setFloat(rayZaxis.x(), rayZaxis.y(), rayZaxis.z());
 		OptixData.context["offset"]->setFloat(OptixData.offset);
 		OptixData.context["windowWidth"]->setFloat(window.width);
 		OptixData.context->launch(0, OptixData.width, window.height);
