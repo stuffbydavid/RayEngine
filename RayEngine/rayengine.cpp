@@ -12,9 +12,9 @@ RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, R
 	Magick::InitializeMagick(NULL);
 	
 	// Shaders
-	shdrNormals = new Shader("Normals", bind(&RayEngine::setupNormals, this, _1, _2, _3), "normals.vshader", "normals.fshader");
-	shdrTexture = new Shader("Texture", bind(&RayEngine::setupTexture, this, _1, _2, _3), "texture.vshader", "texture.fshader");
-	shdrPhong = new Shader("Phong", bind(&RayEngine::setupPhong, this, _1, _2, _3), "phong.vshader", "phong.fshader");
+	shdrNormals = new Shader("Normals", bind(&RayEngine::openglSetupNormals, this, _1, _2, _3), "normals.vshader", "normals.fshader");
+	shdrTexture = new Shader("Texture", bind(&RayEngine::openglSetupTexture, this, _1, _2, _3), "texture.vshader", "texture.fshader");
+	shdrPhong = new Shader("Phong", bind(&RayEngine::openglSetupPhong, this, _1, _2, _3), "phong.vshader", "phong.fshader");
 
 }
 
@@ -24,8 +24,8 @@ RayEngine::~RayEngine() {
 
 void RayEngine::launch() {
 
-	initEmbree();
-	initOptix();
+	embreeInit();
+	optixInit();
 
 	window.open(bind(&RayEngine::loop, this), bind(&RayEngine::resize, this));
 
@@ -38,18 +38,18 @@ void RayEngine::loop() {
 	string mode = "";
 
 	if (renderMode == RM_OPENGL) {
-		renderOpenGL();
+		openglRender();
 		mode = "OpenGL";
 	} else if (rayTracingTarget == RTT_CPU) {
-		renderEmbree();
-		renderEmbreeTexture();
+		embreeRender();
+		embreeRenderUpdateTexture();
 		mode = "Embree";
 	} else if (rayTracingTarget == RTT_GPU) {
-		renderOptix();
-		renderOptixTexture();
+		optixRender();
+		optixRenderUpdateTexture();
 		mode = "OptiX";
 	} else if (rayTracingTarget == RTT_HYBRID) {
-		renderHybrid();
+		hybridRender();
 		mode = "Hybrid";
 	}
 
@@ -59,8 +59,8 @@ void RayEngine::loop() {
 
 void RayEngine::resize() {
 
-	resizeEmbree();
-	resizeOptix();
+	embreeResize();
+	optixResize();
 
 }
 

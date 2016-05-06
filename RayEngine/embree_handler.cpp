@@ -2,7 +2,7 @@
 #include "triangle_mesh.h"
 #include "object.h"
 
-void RayEngine::initEmbree() {
+void RayEngine::embreeInit() {
 
 	cout << "Starting Embree..." << endl;
 
@@ -20,17 +20,17 @@ void RayEngine::initEmbree() {
 
 	// Init scenes
 	for (uint i = 0; i < scenes.size(); i++)
-		scenes[i]->initEmbree(EmbreeData.device);
+		scenes[i]->embreeInit(EmbreeData.device);
 
 }
 
-void Scene::initEmbree(RTCDevice device) {
+void Scene::embreeInit(RTCDevice device) {
 
 	EmbreeData.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_SCENE, EMBREE_AFLAGS_SCENE);
 
 	//TODO: Check other instance modes?
 	for (uint i = 0; i < objects.size(); i++) {
-		objects[i]->initEmbree(device);
+		objects[i]->embreeInit(device);
 		uint instID = rtcNewInstance2(EmbreeData.scene, objects[i]->EmbreeData.scene);
 		rtcSetTransform2(EmbreeData.scene, instID, RTC_MATRIX_COLUMN_MAJOR_ALIGNED16, objects[i]->matrix.e);
 		EmbreeData.instIDmap[instID] = objects[i];
@@ -40,13 +40,13 @@ void Scene::initEmbree(RTCDevice device) {
 
 }
 
-void Object::initEmbree(RTCDevice device) {
+void Object::embreeInit(RTCDevice device) {
 
 	EmbreeData.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_OBJECT, EMBREE_AFLAGS_OBJECT);
 
 	// Init embree for meshes
 	for (uint i = 0; i < geometries.size(); i++) {
-		uint geomID = geometries[i]->initEmbree(EmbreeData.scene);
+		uint geomID = geometries[i]->embreeInit(EmbreeData.scene);
 		EmbreeData.geomIDmap[geomID] = geometries[i];
 	}
 
@@ -54,7 +54,7 @@ void Object::initEmbree(RTCDevice device) {
 
 }
 
-uint TriangleMesh::initEmbree(RTCScene scene) {
+uint TriangleMesh::embreeInit(RTCScene scene) {
 
 	uint geomID = rtcNewTriangleMesh(scene, RTC_GEOMETRY_STATIC, indexData.size(), posData.size());
 	rtcSetBuffer(scene, geomID, RTC_VERTEX_BUFFER, &posData[0], 0, sizeof(Vec3));
@@ -63,7 +63,7 @@ uint TriangleMesh::initEmbree(RTCScene scene) {
 
 }
 
-void RayEngine::resizeEmbree() {
+void RayEngine::embreeResize() {
 
 	// Set dimensions
 	if (rayTracingTarget == RTT_HYBRID) {

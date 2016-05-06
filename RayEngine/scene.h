@@ -31,13 +31,13 @@ struct Scene {
 		RTCScene scene;
 		map<uint, Object*> instIDmap;
 	} EmbreeData;
-	void initEmbree(RTCDevice device);
+	void embreeInit(RTCDevice device);
 
 	// OptiX
 	struct OptixData {
 		optix::Group group;
 		optix::TextureSampler sky;
 	} OptixData;
-	void initOptix(optix::Context context);
+	void optixInit(optix::Context context);
 
 };

@@ -32,7 +32,6 @@
 #include <omp.h>
 #include "GL/glew.h"
 #include <GLFW/glfw3.h>
-#include "settings.h"
 
 using namespace std;
 using namespace placeholders;

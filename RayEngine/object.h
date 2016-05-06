@@ -32,13 +32,13 @@ struct Object {
 		RTCScene scene;
 		map<uint, Geometry*> geomIDmap;
 	} EmbreeData;
-	void initEmbree(RTCDevice device);
+	void embreeInit(RTCDevice device);
 
 	// OptiX
 	struct OptixData{
 		optix::Transform transform;
 		optix::GeometryGroup geometryGroup;
 	} OptixData;
-	void initOptix(optix::Context context);
+	void optixInit(optix::Context context);
 
 };

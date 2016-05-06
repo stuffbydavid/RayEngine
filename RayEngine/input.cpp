@@ -39,13 +39,7 @@ void RayEngine::input() {
 		resize();
 	}
 
-	// Rendering
-
-	if (window.keyPressed[GLFW_KEY_F5])
-		showEmbreeRender = !showEmbreeRender;
-
-	if (window.keyPressed[GLFW_KEY_F6])
-		showOptixRender = !showOptixRender;
+	// Print camera
 
 	if (window.keyPressed[GLFW_KEY_F12]) {
 		cout << curCamera->position << endl;

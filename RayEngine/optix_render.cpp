@@ -1,6 +1,6 @@
 #include "rayengine.h"
 
-void RayEngine::renderOptix() {
+void RayEngine::optixRender() {
 
 	if (!OPTIX_ENABLE || OptixData.width == 0)
 		return;
@@ -36,9 +36,9 @@ void RayEngine::renderOptix() {
 
 }
 
-void RayEngine::renderOptixTexture() {
+void RayEngine::optixRenderUpdateTexture() {
 
-	if (!OPTIX_ENABLE || !showOptixRender)
+	if (!OPTIX_ENABLE)
 		return;
 
 #if OPTIX_PRINT_TIME

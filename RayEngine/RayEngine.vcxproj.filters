@@ -41,18 +41,6 @@
     <ClCompile Include="triangle_mesh.cpp">
       <Filter>RayEngine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="render_embree.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="render_opengl.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="render_optix.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="render_hybrid.cpp">
-      <Filter>RayEngine\Render</Filter>
-    </ClCompile>
     <ClCompile Include="image.cpp">
       <Filter>RayEngine\Data</Filter>
     </ClCompile>
@@ -61,6 +49,27 @@
     </ClCompile>
     <ClCompile Include="shader_setup.cpp">
       <Filter>RayEngine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="embree_render.cpp">
+      <Filter>RayEngine\Embree</Filter>
+    </ClCompile>
+    <ClCompile Include="optix_render.cpp">
+      <Filter>RayEngine\OptiX</Filter>
+    </ClCompile>
+    <ClCompile Include="opengl_render.cpp">
+      <Filter>RayEngine\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="hybrid_render.cpp">
+      <Filter>RayEngine\Hybrid</Filter>
+    </ClCompile>
+    <ClCompile Include="embree_render_old.cpp">
+      <Filter>RayEngine\Embree</Filter>
+    </ClCompile>
+    <ClCompile Include="embree_render_lists.cpp">
+      <Filter>RayEngine\Embree</Filter>
+    </ClCompile>
+    <ClCompile Include="embree_render_tiles.cpp">
+      <Filter>RayEngine\Embree</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -153,8 +162,8 @@
     <Filter Include="RayEngine\Scene\TinyObjLoader">
       <UniqueIdentifier>{6be24712-5a84-460f-be8f-dff61e3d7897}</UniqueIdentifier>
     </Filter>
-    <Filter Include="RayEngine\Render">
-      <UniqueIdentifier>{5918ede9-182e-412a-a055-6ebfb76a9707}</UniqueIdentifier>
+    <Filter Include="RayEngine\Hybrid">
+      <UniqueIdentifier>{71ce7c32-0ce4-403f-bda8-e9b765b2ba71}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

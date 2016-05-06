@@ -8,21 +8,21 @@ void glUniformColor(GLint location, Color color) {
 	glUniform4f(location, color.r(), color.g(), color.b(), color.a());
 }
 
-void RayEngine::setupNormals(GLuint program, Object* object, TriangleMesh* mesh) {
+void RayEngine::openglSetupNormals(GLuint program, Object* object, TriangleMesh* mesh) {
 
 	GLint uMatWorld = glGetUniformLocation(program, "uMatWorld");
 	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, object->matrix.e);
 
 }
 
-void RayEngine::setupTexture(GLuint program, Object* object, TriangleMesh* mesh) {
+void RayEngine::openglSetupTexture(GLuint program, Object* object, TriangleMesh* mesh) {
 
 	GLint uColor = glGetUniformLocation(program, "uColor");
 	glUniformColor(program, { 1.f, 1.f, 1.f });
 
 }
 
-void RayEngine::setupPhong(GLuint program, Object* object, TriangleMesh* mesh) {
+void RayEngine::openglSetupPhong(GLuint program, Object* object, TriangleMesh* mesh) {
 
 	uint lightCount = curScene->lights.size();
 

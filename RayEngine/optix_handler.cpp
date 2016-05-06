@@ -9,7 +9,7 @@ void printException(optix::Exception e) {
 
 }
 
-void RayEngine::initOptix() {
+void RayEngine::optixInit() {
 
 	if (!OPTIX_ENABLE)
 		return;
@@ -59,7 +59,7 @@ void RayEngine::initOptix() {
 
 		// Init scenes
 		for (uint i = 0; i < scenes.size(); i++)
-			scenes[i]->initOptix(OptixData.context);
+			scenes[i]->optixInit(OptixData.context);
 
 		OptixData.context["sceneObj"]->set(curScene->OptixData.group);
 		OptixData.context["sceneAmbient"]->setFloat(curScene->ambient.r(), curScene->ambient.g(), curScene->ambient.b(), curScene->ambient.a());
@@ -76,14 +76,14 @@ void RayEngine::initOptix() {
 
 }
 
-void Scene::initOptix(optix::Context context) {
+void Scene::optixInit(optix::Context context) {
 
 	// Group containing each object transform
 	OptixData.group = context->createGroup();
 	OptixData.group->setAcceleration(context->createAcceleration("Sbvh", "Bvh")); // TODO: change during runtime?
 
 	for (uint i = 0; i < objects.size(); i++) {
-		objects[i]->initOptix(context);
+		objects[i]->optixInit(context);
 		OptixData.group->addChild(objects[i]->OptixData.transform);
 	}
 
@@ -110,7 +110,7 @@ void Scene::initOptix(optix::Context context) {
 
 }
 
-void Object::initOptix(optix::Context context) {
+void Object::optixInit(optix::Context context) {
 
 	try {
 		
@@ -121,7 +121,7 @@ void Object::initOptix(optix::Context context) {
 
 		// Add geometries
 		for (uint i = 0; i < geometries.size(); i++) {
-			geometries[i]->initOptix(context);
+			geometries[i]->optixInit(context);
 			OptixData.geometryGroup->addChild(((TriangleMesh*)geometries[i])->OptixData.geometryInstance);
 		}
 
@@ -136,7 +136,7 @@ void Object::initOptix(optix::Context context) {
 
 }
 
-void TriangleMesh::initOptix(optix::Context context) {
+void TriangleMesh::optixInit(optix::Context context) {
 
 	try {
 
@@ -238,7 +238,7 @@ void TriangleMesh::initOptix(optix::Context context) {
 
 }
 
-void RayEngine::resizeOptix() {
+void RayEngine::optixResize() {
 
 	if (!OPTIX_ENABLE)
 		return;

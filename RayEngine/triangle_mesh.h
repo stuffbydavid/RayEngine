@@ -35,7 +35,7 @@ struct TriangleMesh : Geometry {
 	GLuint vboPos, vboNormal, vboTexCoord, ibo;
 
 	// Embree
-	uint initEmbree(RTCScene scene);
+	uint embreeInit(RTCScene scene);
 
 	// OptiX
 	struct OptixData {
@@ -43,6 +43,6 @@ struct TriangleMesh : Geometry {
 		optix::GeometryInstance geometryInstance;
 		optix::Buffer posBuffer, normalBuffer, texCoordBuffer, indexBuffer;
 	} OptixData;
-	void initOptix(optix::Context context);
+	void optixInit(optix::Context context);
 
 };
