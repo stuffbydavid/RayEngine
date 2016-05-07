@@ -23,6 +23,8 @@ void RayEngine::optixInit() {
 		OptixData.context->setRayTypeCount(2);
 		OptixData.context->setEntryPointCount(1);
 		OptixData.context->setStackSize(4096);
+		OptixData.frames = 0;
+		OptixData.avgTime = 0.f;
 
 		// Generate texture
 		glGenTextures(1, &OptixData.texture);

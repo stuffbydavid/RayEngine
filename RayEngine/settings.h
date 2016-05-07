@@ -10,17 +10,11 @@
 #define OPENGL_SHADER shdrPhong
 
 #define OPTIX_ENABLE 1
-#define OPTIX_PRINT_TIME 0
 #define OPTIX_USE_OPENGL_TEXTURE 1 // This is broken with the normal attribute in OpenGL shaders?
 #define OPTIX_USE_GEOMETRY_VBO 1 // Can't combine VBOs
 #define OPTIX_USE_OUTPUT_VBO 1 // OptiX must run on Master thread
 
-#define EMBREE_PRINT_TIME 0
-#define EMBREE_RENDER_TILES 1 // 1 = Split into tiles, 0 = Use a single loop
-#define EMBREE_RENDER_PACKETS 1 // 1 = Only packets, 0 = List of rays
-
-#define EMBREE_TILE_WIDTH 16
-#define EMBREE_TILE_HEIGHT 16
+#define EMBREE_RENDER_TILES 0 // 1 = Split into tiles, 0 = Use a single loop
 #define EMBREE_PACKET_SIZE 8
 #define EMBREE_PACKET_TYPE RTCRay8
 #define EMBREE_RAY_VALID -1

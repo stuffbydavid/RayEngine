@@ -65,33 +65,32 @@ struct RayEngine {
 		RTCDevice device;
 		vector<Color> buffer;
 		GLuint texture;
-		int offset, width;
+		int offset, width, frames;
+		float time, avgTime;
 
 		// Stores a ray
 		struct Ray {
 			int x, y;
 			Vec3 org, dir;
 			float factor;
+			Color result;
 		};
 
 		// Stores the properties of a ray hit
 		struct RayHit {
 			Color diffuse, specular;
-			Vec3 pos;
+			Vec3 pos, normal;
+			Vec2 texCoord;
 			Object* obj;
 			TriangleMesh* mesh;
 			Material* material;
-			Vec3 normal;
-			Vec2 texCoord;
-			Ray* ray;
 		};
 
 		// Stores a light ray
 		struct LightRay {
-			Color lightColor;
 			Vec3 incidence;
 			float distance, attenuation;
-			RayHit* hit;
+			Color lightColor;
 		};
 
 		// Stores a packet of rays
@@ -111,19 +110,19 @@ struct RayEngine {
 	void embreeRenderTiles();
 	void embreeRenderSingleLoop();
 	void embreeRenderTracePacket(EmbreeData::RayPacket& packet, int depth);
-	void embreeRenderTraceList(vector<EmbreeData::Ray>& rays, int depth);
-	//EmbreeData::RayHit embreeRenderStoreHit(RTCRay& ray1);
-	//EmbreeData::RayHit embreeRenderStoreHit(RTCRay8& ray8, int index);
 	Color embreeRenderSky(Vec3 dir);
 	void embreeRenderUpdateTexture();
 
 	// OptiX
 	struct OptixData  {
+
 		optix::Context context;
 		optix::Buffer renderBuffer, lights;
 		GLuint vbo;
 		GLuint texture;
-		int offset, width;
+		int offset, width, frames;
+		float time, avgTime;
+
 	} OptixData;
 	void optixInit();
 	void optixResize();

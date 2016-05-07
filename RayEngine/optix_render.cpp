@@ -5,9 +5,7 @@ void RayEngine::optixRender() {
 	if (!OPTIX_ENABLE || OptixData.width == 0)
 		return;
 
-#if OPTIX_PRINT_TIME
 	float start = glfwGetTime();
-#endif
 
 	try {
 
@@ -25,10 +23,9 @@ void RayEngine::optixRender() {
 		system("pause");
 	}
 
-#if OPTIX_PRINT_TIME
 	float end = glfwGetTime();
-	printf("Optix render:   %.6fs\n", end - start);
-#endif
+	OptixData.time += end - start;
+	OptixData.frames++;
 
 }
 
@@ -36,10 +33,6 @@ void RayEngine::optixRenderUpdateTexture() {
 
 	if (!OPTIX_ENABLE)
 		return;
-
-#if OPTIX_PRINT_TIME
-	float start = glfwGetTime();
-#endif
 
 	glBindTexture(GL_TEXTURE_2D, OptixData.texture);
 #if OPTIX_USE_OUTPUT_VBO
@@ -54,10 +47,5 @@ void RayEngine::optixRenderUpdateTexture() {
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	shdrTexture->use(window.ortho, OptixData.offset, 0, OptixData.width, window.height, OptixData.texture);
-
-#if OPTIX_PRINT_TIME
-	float end = glfwGetTime();
-	printf("OptiX texture:  %.6fs\n", end - start);
-#endif
 
 }

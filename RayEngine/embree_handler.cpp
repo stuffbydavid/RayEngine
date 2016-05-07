@@ -7,6 +7,8 @@ void RayEngine::embreeInit() {
 	cout << "Starting Embree..." << endl;
 
 	// Init library
+	EmbreeData.frames = 0;
+	EmbreeData.avgTime = 0.f;
 	EmbreeData.device = rtcNewDevice(NULL);
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
