@@ -2,7 +2,7 @@
 
 rtBuffer<Light> lights;
 rtTextureSampler<float4, 2> sampler;
-rtDeclareVariable(float3, eye, , );
+rtDeclareVariable(float3, org, , );
 rtDeclareVariable(float4, ambient, , );
 rtDeclareVariable(float4, specular, , );
 rtDeclareVariable(float4, diffuse, , );
@@ -29,7 +29,7 @@ RT_PROGRAM void closestHit() {
 
 	// Set hit properties
 	float3 hitPos = ray.origin + ray.tmax * ray.direction;
-	float3 toEye = normalize(eye - hitPos);
+	float3 toEye = normalize(org - hitPos);
 
 	// Calculate color
 	float4 totalDiffuse, totalSpecular, totalReflect;

@@ -22,9 +22,9 @@ int main(int argc, char **argv) {
 	teapotScene->loadObject("obj/floor.obj");
 	Object* teapot = teapotScene->loadObject("obj/teapot.obj");
 	teapot->scale({ 0.5f, 1.5f, 0.5f });
-	teapot->rotate({ 0, 1, 0 }, 180.f);*/
+	teapot->rotate({ 0, 1, 0 }, 180.f);
 
-	/*for (float x = 40.f; x < 400.f; x += 20.f) {
+	for (float x = 40.f; x < 400.f; x += 20.f) {
 		Object* clone = teapotScene->addObject(teapot->geometries[0]);
 		clone->scale({ 0.75f + frand() * 0.75f, 0.75f + frand() * 0.75f, 0.75f + frand() * 0.75f });
 		clone->rotate({ 0, 1, 0 }, frand() * 360.f);

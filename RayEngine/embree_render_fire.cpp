@@ -76,7 +76,6 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 			if (valid[i] == EMBREE_RAY_VALID)
 				EmbreeData.buffer[y * EmbreeData.width + x + i] = result[i];
 
-
 	#else
 
 		for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {

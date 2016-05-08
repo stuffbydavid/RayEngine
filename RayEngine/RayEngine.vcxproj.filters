@@ -182,6 +182,12 @@
     <None Include="phong.vshader">
       <Filter>RayEngine\OpenGL\Shaders</Filter>
     </None>
+    <None Include="color.vshader">
+      <Filter>RayEngine\OpenGL\Shaders</Filter>
+    </None>
+    <None Include="color.fshader">
+      <Filter>RayEngine\OpenGL\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="miss_program.cu">

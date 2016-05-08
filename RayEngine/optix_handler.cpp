@@ -110,7 +110,6 @@ void Scene::optixInit(optix::Context context) {
 	OptixData.sky->setFilteringModes(RT_FILTER_LINEAR, RT_FILTER_LINEAR, RT_FILTER_NONE);
 	context["sky"]->setTextureSampler(OptixData.sky);
 
-
 }
 
 void Object::optixInit(optix::Context context) {

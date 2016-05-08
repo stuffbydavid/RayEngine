@@ -15,13 +15,6 @@ void RayEngine::openglSetupNormals(GLuint program, Object* object, TriangleMesh*
 
 }
 
-void RayEngine::openglSetupTexture(GLuint program, Object* object, TriangleMesh* mesh) {
-
-	GLint uColor = glGetUniformLocation(program, "uColor");
-	glUniformColor(program, { 1.f, 1.f, 1.f });
-
-}
-
 void RayEngine::openglSetupPhong(GLuint program, Object* object, TriangleMesh* mesh) {
 
 	uint lightCount = curScene->lights.size();

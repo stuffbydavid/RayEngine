@@ -96,6 +96,7 @@ void Shader::use(Mat4x4 matrix, Object* object, TriangleMesh* mesh) {
 	GLint aTexCoord = glGetAttribLocation(program, "aTexCoord");
 	GLint uMat = glGetUniformLocation(program, "uMat");
 	GLint uSampler = glGetUniformLocation(program, "uSampler");
+	GLint uColor = glGetUniformLocation(program, "uColor");
 
 	// Pass buffers
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->vboPos);
@@ -115,6 +116,9 @@ void Shader::use(Mat4x4 matrix, Object* object, TriangleMesh* mesh) {
 
 	// Pass the viewing transform to the shader
 	glUniformMatrix4fv(uMat, 1, GL_FALSE, matrix.e);
+
+	// Send in color
+	glUniform4f(uColor, 1.f, 1.f, 1.f, 1.f);
 
 	// Send in texture
 	glActiveTexture(GL_TEXTURE0);
@@ -138,7 +142,7 @@ void Shader::use(Mat4x4 matrix, Object* object, TriangleMesh* mesh) {
 
 }
 
-void Shader::use(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture, Color color) {
+void Shader::use(Mat4x4 matrix, Vec3* posData, Vec2* texCoordData, int vertices, GLuint texture, Color color) {
 
 	// Start up shader
 	glUseProgram(program);
@@ -147,34 +151,17 @@ void Shader::use(Mat4x4 matrix, int x, int y, int width, int height, GLuint text
 	GLint uMat = glGetUniformLocation(program, "uMat");
 	GLint uSampler = glGetUniformLocation(program, "uSampler");
 	GLint uColor = glGetUniformLocation(program, "uColor");
-	
+
 	// Select current resources
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	// Bind buffers
-	Vec3 posData[6] = {
-		{ x, y, 0 },
-		{ x, y + height, 0 },
-		{ x + width, y, 0 },
-		{ x + width, y, 0 },
-		{ x, y + height, 0 },
-		{ x + width, y + height, 0 },
-	};
-	Vec2 texCoordData[6] = {
-		{ 0, 0 },
-		{ 0, 1 },
-		{ 1, 0 },
-		{ 1, 0 },
-		{ 0, 1 },
-		{ 1, 1 }
-	};
-	uint vertices = 6;
 	uint sizePositions = vertices * sizeof(Vec3);
 	uint sizeTexCoords = vertices * sizeof(Vec2);
 	glBufferData(GL_ARRAY_BUFFER, sizePositions + sizeTexCoords, NULL, GL_DYNAMIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizePositions, posData);
 	glBufferSubData(GL_ARRAY_BUFFER, sizePositions, sizeTexCoords, texCoordData);
-	
+
 	// Pass buffers
 	glEnableVertexAttribArray(aPos);
 	glEnableVertexAttribArray(aTexCoord);
@@ -199,5 +186,29 @@ void Shader::use(Mat4x4 matrix, int x, int y, int width, int height, GLuint text
 	glDisableVertexAttribArray(aPos);
 	glDisableVertexAttribArray(aTexCoord);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+}
+
+void Shader::use(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture, Color color) {
+
+	Vec3 posData[6] = {
+		{ x, y, 0 },
+		{ x, y + height, 0 },
+		{ x + width, y, 0 },
+		{ x + width, y, 0 },
+		{ x, y + height, 0 },
+		{ x + width, y + height, 0 },
+	};
+	Vec2 texCoordData[6] = {
+		{ 0, 0 },
+		{ 0, 1 },
+		{ 1, 0 },
+		{ 1, 0 },
+		{ 0, 1 },
+		{ 1, 1 }
+	};
+
+	use(matrix, posData, texCoordData, 6, texture, color);
+	
 
 }

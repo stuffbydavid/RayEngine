@@ -5,6 +5,7 @@
 #include "window.h"
 #include "scene.h"
 #include "shader.h"
+#include "font.h"
 
 struct RayEngine {
 
@@ -50,13 +51,17 @@ struct RayEngine {
 	RayTracingTarget rayTracingTarget;
 	Vec3 rayOrg, rayXaxis, rayYaxis, rayZaxis;
 
+	// GUI
+	void GUIRender();
+	Font* fntGUI;
+
 	// OpenGL
 	void openglRender();
 	void openglSetupNormals(GLuint program, Object* object, TriangleMesh* mesh);
-	void openglSetupTexture(GLuint program, Object* object, TriangleMesh* mesh);
 	void openglSetupPhong(GLuint program, Object* object, TriangleMesh* mesh);
-	Shader* shdrNormals;
+	Shader* shdrColor;
 	Shader* shdrTexture;
+	Shader* shdrNormals;
 	Shader* shdrPhong;
 
 	// Embree

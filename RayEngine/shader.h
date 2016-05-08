@@ -13,6 +13,7 @@ struct Shader {
 	void use(Mat4x4 matrix, Object* object, TriangleMesh* mesh);
 
 	// Renders a 2D graphic.
+	void use(Mat4x4 matrix, Vec3* posData, Vec2* texCoordData, int vertices, GLuint texture = 0, Color color = { 1.f });
 	void use(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture = 0, Color color = { 1.f });
 
 	// Variables

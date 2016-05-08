@@ -13,7 +13,7 @@
 	// .globl	_Z6anyHitv
 .global .align 1 .b8 lights[1];
 .global .texref sampler;
-.global .align 4 .b8 eye[12];
+.global .align 4 .b8 org[12];
 .global .align 16 .b8 ambient[16];
 .global .align 16 .b8 specular[16];
 .global .align 16 .b8 diffuse[16];
@@ -50,7 +50,7 @@
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_xE;
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_yE;
 .global .align 4 .u32 _ZN21rti_internal_register14reg_rayIndex_zE;
-.global .align 4 .b8 _ZN21rti_internal_typeinfo3eyeE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
+.global .align 4 .b8 _ZN21rti_internal_typeinfo3orgE[8] = {82, 97, 121, 0, 12, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo7ambientE[8] = {82, 97, 121, 0, 16, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo8specularE[8] = {82, 97, 121, 0, 16, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo7diffuseE[8] = {82, 97, 121, 0, 16, 0, 0, 0};
@@ -63,7 +63,7 @@
 .global .align 4 .b8 _ZN21rti_internal_typeinfo3rayE[8] = {82, 97, 121, 0, 36, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo12curColorDataE[8] = {82, 97, 121, 0, 32, 0, 0, 0};
 .global .align 4 .b8 _ZN21rti_internal_typeinfo13curShadowDataE[8] = {82, 97, 121, 0, 4, 0, 0, 0};
-.global .align 1 .b8 _ZN21rti_internal_typename3eyeE[7] = {102, 108, 111, 97, 116, 51, 0};
+.global .align 1 .b8 _ZN21rti_internal_typename3orgE[7] = {102, 108, 111, 97, 116, 51, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename7ambientE[7] = {102, 108, 111, 97, 116, 52, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename8specularE[7] = {102, 108, 111, 97, 116, 52, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename7diffuseE[7] = {102, 108, 111, 97, 116, 52, 0};
@@ -76,7 +76,7 @@
 .global .align 1 .b8 _ZN21rti_internal_typename3rayE[4] = {82, 97, 121, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename12curColorDataE[13] = {82, 97, 121, 67, 111, 108, 111, 114, 68, 97, 116, 97, 0};
 .global .align 1 .b8 _ZN21rti_internal_typename13curShadowDataE[14] = {82, 97, 121, 83, 104, 97, 100, 111, 119, 68, 97, 116, 97, 0};
-.global .align 4 .u32 _ZN21rti_internal_typeenum3eyeE = 4919;
+.global .align 4 .u32 _ZN21rti_internal_typeenum3orgE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum7ambientE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum8specularE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum7diffuseE = 4919;
@@ -89,7 +89,7 @@
 .global .align 4 .u32 _ZN21rti_internal_typeenum3rayE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum12curColorDataE = 4919;
 .global .align 4 .u32 _ZN21rti_internal_typeenum13curShadowDataE = 4919;
-.global .align 1 .b8 _ZN21rti_internal_semantic3eyeE[1];
+.global .align 1 .b8 _ZN21rti_internal_semantic3orgE[1];
 .global .align 1 .b8 _ZN21rti_internal_semantic7ambientE[1];
 .global .align 1 .b8 _ZN21rti_internal_semantic8specularE[1];
 .global .align 1 .b8 _ZN21rti_internal_semantic7diffuseE[1];
@@ -102,7 +102,7 @@
 .global .align 1 .b8 _ZN21rti_internal_semantic3rayE[13] = {114, 116, 67, 117, 114, 114, 101, 110, 116, 82, 97, 121, 0};
 .global .align 1 .b8 _ZN21rti_internal_semantic12curColorDataE[10] = {114, 116, 80, 97, 121, 108, 111, 97, 100, 0};
 .global .align 1 .b8 _ZN21rti_internal_semantic13curShadowDataE[10] = {114, 116, 80, 97, 121, 108, 111, 97, 100, 0};
-.global .align 1 .b8 _ZN23rti_internal_annotation3eyeE[1];
+.global .align 1 .b8 _ZN23rti_internal_annotation3orgE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation7ambientE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation8specularE[1];
 .global .align 1 .b8 _ZN23rti_internal_annotation7diffuseE[1];
@@ -165,8 +165,8 @@
 	add.s64 	%rd16, %rd10, 8;
 	ldu.global.f32 	%f98, [%rd16];
 	fma.rn.f32 	%f3, %f93, %f95, %f98;
-	ldu.global.f32 	%f4, [eye];
-	mov.u64 	%rd17, eye;
+	ldu.global.f32 	%f4, [org];
+	mov.u64 	%rd17, org;
 	add.s64 	%rd18, %rd17, 4;
 	ldu.global.f32 	%f5, [%rd18];
 	add.s64 	%rd19, %rd17, 8;

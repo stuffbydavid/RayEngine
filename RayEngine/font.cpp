@@ -1,4 +1,4 @@
-/*#include "font.h"
+#include "font.h"
 
 Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
 	FT_Face face;
@@ -17,7 +17,7 @@ Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
 	FT_Set_Pixel_Sizes(face, 0, size);
 
 	// Create character list
-	character = new charInfo[end];
+	chars = new CharInfo[end];
 
 	// Get map dimensions
 	mapWidth = 0;
@@ -29,7 +29,7 @@ Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
 			continue;
 		}
 
-		character[i] = {
+		chars[i] = {
 			(float)glyph->bitmap.width,
 			(float)glyph->bitmap.rows,
 			(float)glyph->bitmap_left,
@@ -45,15 +45,15 @@ Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
 	}
 
 	// Create map texture
-	glGenTextures(1, &map);
-	glBindTexture(GL_TEXTURE_2D, map);
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mapWidth, mapHeight, 0, GL_RGBA, GL_FLOAT, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// Draw bitmaps onto map
 	for (uint i = start; i < end; i++) {
-		charInfo curChar = character[i];
+		CharInfo curChar = chars[i];
 
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
 			cout << "Loading character " << (char)i << " failed!" << endl;
@@ -76,7 +76,7 @@ Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
 }
 
 void Font::renderText(string text, int x, int y, Color color, Shader* shader) {
-	Graphic textGraphic(map);
+	/*Graphic textGraphic(map);
 	int dx = x, dy = y;
 
 	for (uint i = 0; i < text.size(); i++) {
@@ -91,7 +91,7 @@ void Font::renderText(string text, int x, int y, Color color, Shader* shader) {
 		if (curChar < start || curChar > end)
 			continue;
 
-		charInfo curCharInfo = character[curChar];
+		charInfo curCharInfo = chars[curChar];
 
 		if (curCharInfo.width && curCharInfo.height) {
 			float vx = dx + curCharInfo.left;
@@ -113,6 +113,6 @@ void Font::renderText(string text, int x, int y, Color color, Shader* shader) {
 		dx += curCharInfo.advanceX;
 		dy += curCharInfo.advanceY;
 	}
-
+	*/
 	//shader->use(&textGraphic, window->ortho);
-}*/
+}

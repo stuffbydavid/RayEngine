@@ -85,8 +85,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Libs\optix-3.8.0\include;C:\Libs\glew-1.13.0\include;C:\Libs\imagemagick-6.9.3-Q16\include;C:\Libs\glfw-3.1.2.bin.WIN64\include;C:\Libs\embree-2.9.0.x64.windows\include;C:\Libs\embree-2.9.0\common;C:\Libs\freetype\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>C:\Libs\optix-3.8.0\lib64;C:\Libs\glew-1.13.0\lib\Release\x64;C:\Libs\imagemagick-6.9.3-Q16\lib;C:\Libs\embree-2.9.0.x64.windows\lib;C:\Libs\glfw-3.1.2.bin.WIN64\lib-vc2013;C:\Libs\freetype\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Libs\optix-3.8.0\include;C:\Libs\glew-1.13.0\include;C:\Libs\imagemagick-6.9.3-Q16\include;C:\Libs\glfw-3.1.2.bin.WIN64\include;C:\Libs\embree-2.9.0.x64.windows\include;C:\Libs\embree-2.9.0\common;C:\Libs\freetype-2.6.2\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <LibraryPath>C:\Libs\optix-3.8.0\lib64;C:\Libs\glew-1.13.0\lib\Release\x64;C:\Libs\imagemagick-6.9.3-Q16\lib;C:\Libs\embree-2.9.0.x64.windows\lib;C:\Libs\glfw-3.1.2.bin.WIN64\lib-vc2013;C:\Libs\freetype-2.6.2\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)$(ProjectName)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -227,6 +227,8 @@
     <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="color.fshader" />
+    <None Include="color.vshader" />
     <None Include="normals.fshader">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
     </None>

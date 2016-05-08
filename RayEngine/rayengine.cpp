@@ -8,10 +8,17 @@ RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, R
 
 	window.init(windowWidth, windowHeight);
 	Magick::InitializeMagick(NULL);
-	
+
+	// Font
+	FT_Library freeType;
+	if (FT_Init_FreeType(&freeType))
+		cout << "Could not init freetype library!";
+	fntGUI = new Font(&freeType, "font/tahoma.ttf", 32, 128, 12);
+
 	// Shaders
+	shdrColor = new Shader("Color", nullptr, "texture.vshader", "texture.fshader");
+	shdrTexture = new Shader("Texture", nullptr, "texture.vshader", "texture.fshader");
 	shdrNormals = new Shader("Normals", bind(&RayEngine::openglSetupNormals, this, _1, _2, _3), "normals.vshader", "normals.fshader");
-	shdrTexture = new Shader("Texture", bind(&RayEngine::openglSetupTexture, this, _1, _2, _3), "texture.vshader", "texture.fshader");
 	shdrPhong = new Shader("Phong", bind(&RayEngine::openglSetupPhong, this, _1, _2, _3), "phong.vshader", "phong.fshader");
 
 }

@@ -4,9 +4,9 @@
 #define WINDOW_HEIGHT 600
 #define RENDER_MODE RM_RAY_TRACING
 #define RAY_TRACING_TARGET RTT_CPU
-#define MAX_REFLECTIONS 1
-#define EMBREE_RENDER_TILES 1 // 1 = Split into tiles, 0 = Use a single loop
-#define EMBREE_PACKET_PRIMARY 1 // 1 = Use packets for primary rays, 0 = Shoot single rays
+#define MAX_REFLECTIONS 10
+#define EMBREE_RENDER_TILES 1     // 1 = Split into tiles, 0 = Use a single loop
+#define EMBREE_PACKET_PRIMARY 1   // 1 = Use packets for primary rays, 0 = Shoot single rays
 #define EMBREE_PACKET_SECONDARY 1 // 1 = Use packets for secondary rays (eg. shadows, reflections), 0 = use single rays
 #define EMBREE_TILE_WIDTH 16
 #define EMBREE_TILE_HEIGHT 16
@@ -20,8 +20,8 @@
 
 #define OPTIX_ENABLE 1
 #define OPTIX_USE_OPENGL_TEXTURE 1 // This is broken with the normal attribute in OpenGL shaders?
-#define OPTIX_USE_GEOMETRY_VBO 1 // Can't combine VBOs
-#define OPTIX_USE_OUTPUT_VBO 1 // OptiX must run on Master thread
+#define OPTIX_USE_GEOMETRY_VBO 1   // Can't combine VBOs
+#define OPTIX_USE_OUTPUT_VBO 1     // OptiX must run on Master thread
 
 //// Embree compile settings ////
 
@@ -35,5 +35,5 @@
 #define EMBREE_AFLAGS_SCENE RTC_INTERSECT8 | RTC_INTERSECT1
 #define EMBREE_AFLAGS_OBJECT RTC_INTERSECT8 | RTC_INTERSECT1
 
-/// Hybrid compile settings
+//// Hybrid compile settings ////
 #define HYBRID_THREADED 1
