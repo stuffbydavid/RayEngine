@@ -6,12 +6,9 @@ void RayEngine::embreeRender() {
 		return;
 
 	float start = glfwGetTime();
-	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST); // Worth a shot
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST); // TODO: Find out if this does anything
 	
     #if EMBREE_RENDER_TILES
-
-		#define EMBREE_TILE_WIDTH 16
-		#define EMBREE_TILE_HEIGHT 16
 
 		int numTilesX = ceil((float)EmbreeData.width / EMBREE_TILE_WIDTH);
 		int numTilesY = ceil((float)window.height / EMBREE_TILE_HEIGHT);

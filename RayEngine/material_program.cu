@@ -77,7 +77,7 @@ RT_PROGRAM void closestHit() {
 		reflectData.depth = curColorData.depth + 1;
 		Ray reflectRay(hitPos, reflect(ray.direction, normal), 0, 0.01f);
 		rtTrace(sceneObj, reflectRay, reflectData);
-		totalReflect = reflectData.result * make_float4(0.25f);
+		totalReflect = reflectData.result * make_float4(0.25f); // TODO: Use material reflectiveness
 	}
 
 	// Create color

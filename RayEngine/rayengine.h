@@ -68,50 +68,14 @@ struct RayEngine {
 		int offset, width, frames;
 		float time, avgTime;
 
-		// Stores a ray
-		struct Ray {
-			int x, y;
-			Vec3 org, dir;
-			float factor;
-			Color result;
-			RTCRay eRay;
-		};
-
-		// Stores the properties of a ray hit
-		struct RayHit {
-			Color diffuse, specular;
-			Vec3 pos, normal;
-			Vec2 texCoord;
-			Object* obj;
-			TriangleMesh* mesh;
-			Material* material;
-		};
-
-		// Stores a light ray
-		struct LightRay {
-			Vec3 incidence;
-			float distance, attenuation;
-			Color lightColor;
-		};
-
-		// Stores a packet of rays
-		template <typename R> struct Packet {
-			R rays[EMBREE_PACKET_SIZE];
-			EMBREE_PACKET_TYPE ePacket;
-			__aligned(32) int valid[EMBREE_PACKET_SIZE];
-		};
-
-		typedef Packet<Ray> RayPacket;
-		typedef Packet<LightRay> LightRayPacket;
-
 	} EmbreeData;
 	void embreeInit();
 	void embreeResize();
 	void embreeRender();
 	void embreeRenderFirePrimaryRay(int x, int y);
 	void embreeRenderFirePrimaryPacket(int x, int y);
-	void embreeRenderTraceRay(EmbreeData::Ray& ray, int depth);
-	void embreeRenderTracePacket(EmbreeData::RayPacket& packet, int depth);
+	void embreeRenderTraceRay(RTCRay& ray, int depth, Color& result);
+	void embreeRenderTracePacket(RTCRay8& packet, int* valid, int depth, Color* result);
 	void embreeRenderUpdateTexture();
 	Color embreeRenderSky(Vec3 dir);
 

@@ -1,5 +1,19 @@
 #include "rayengine.h"
 
+// Stores the properties of a ray hit
+struct RayHit {
+
+	Color diffuse, specular;
+	Vec3 pos, normal;
+	Vec2 texCoord;
+	Object* obj;
+	TriangleMesh* mesh;
+	Material* material;
+	bool hitSky;
+
+};
+
+// Returns the color of missed rays
 Color RayEngine::embreeRenderSky(Vec3 dir) {
 
 	Vec3 nDir = Vec3::normalize(dir);
@@ -11,240 +25,298 @@ Color RayEngine::embreeRenderSky(Vec3 dir) {
 
 }
 
-void RayEngine::embreeRenderTraceRay(EmbreeData::Ray& ray, int depth) {
+void RayEngine::embreeRenderTraceRay(RTCRay& ray, int depth, Color& result) {
 
-	if (ray.eRay.geomID == RTC_INVALID_GEOMETRY_ID) {
-		ray.result = embreeRenderSky(ray.dir);
+	// No object hit, return sky color
+	if (ray.geomID == RTC_INVALID_GEOMETRY_ID) {
+		result = embreeRenderSky(ray.dir);
 		return;
 	}
 
 	// Store hit
-	EmbreeData::RayHit hit;
+	RayHit hit;
 	hit.diffuse = hit.specular = { 0.f };
-	hit.pos = ray.org + ray.dir * ray.eRay.tfar;
-	hit.obj = curScene->EmbreeData.instIDmap[ray.eRay.instID];
-	hit.mesh = (TriangleMesh*)hit.obj->EmbreeData.geomIDmap[ray.eRay.geomID];
+	hit.pos = Vec3(ray.org) + Vec3(ray.dir) * ray.tfar;
+	hit.obj = curScene->EmbreeData.instIDmap[ray.instID];
+	hit.mesh = (TriangleMesh*)hit.obj->EmbreeData.geomIDmap[ray.geomID];
 	hit.material = hit.mesh->material;
-	hit.normal = Vec3::normalize(hit.obj->matrix * hit.mesh->getNormal(ray.eRay.primID, ray.eRay.u, ray.eRay.v));
-	hit.texCoord = hit.mesh->getTexCoord(ray.eRay.primID, ray.eRay.u, ray.eRay.v);
+	hit.normal = Vec3::normalize(hit.obj->matrix * hit.mesh->getNormal(ray.primID, ray.u, ray.v));
+	hit.texCoord = hit.mesh->getTexCoord(ray.primID, ray.u, ray.v);
 
 	// Check lights
+#if EMBREE_ONE_LIGHT
+	Light& light = curScene->lights[0];
+#else
 	for (int l = 0; l < curScene->lights.size(); l++) {
-
 		Light& light = curScene->lights[l];
+ #endif
+
 		float distance = Vec3::length(light.position - hit.pos);
 		float attenuation = max(1.f - distance / light.range, 0.f);
 
-		// Light is too far away
-		if (attenuation == 0.f)
-			continue;
+		// Light is in reach
+		if (attenuation > 0.f) {
 
-		// Define light ray
-		Vec3 incidence = Vec3::normalize(light.position - hit.pos);
-		RTCRay leRay;
-		leRay.org[0] = hit.pos.x();
-		leRay.org[1] = hit.pos.y();
-		leRay.org[2] = hit.pos.z();
-		leRay.dir[0] = incidence.x();
-		leRay.dir[1] = incidence.y();
-		leRay.dir[2] = incidence.z();
-		leRay.tnear = 0.1f;
-		leRay.tfar = distance;
-		leRay.instID =
-		leRay.geomID =
-		leRay.primID = RTC_INVALID_GEOMETRY_ID;
-		leRay.mask = EMBREE_RAY_VALID;
-		leRay.time = 0.f;
+			// Define light ray
+			Vec3 incidence = Vec3::normalize(light.position - hit.pos);
+			RTCRay leRay;
+			leRay.org[0] = hit.pos.x();
+			leRay.org[1] = hit.pos.y();
+			leRay.org[2] = hit.pos.z();
+			leRay.dir[0] = incidence.x();
+			leRay.dir[1] = incidence.y();
+			leRay.dir[2] = incidence.z();
+			leRay.tnear = 0.1f;
+			leRay.tfar = distance;
+			leRay.instID =
+			leRay.geomID =
+			leRay.primID = RTC_INVALID_GEOMETRY_ID;
+			leRay.mask = EMBREE_RAY_VALID;
+			leRay.time = 0.f;
 
-		// Intersect
-		rtcIntersect(curScene->EmbreeData.scene, leRay);
-		if (leRay.geomID != RTC_INVALID_GEOMETRY_ID)
-			continue;
+			// Intersect
+			rtcIntersect(curScene->EmbreeData.scene, leRay);
 
-		// Diffuse factor
-		float diffuseFactor = max(Vec3::dot(hit.normal, incidence), 0.f) * attenuation;
-		hit.diffuse += diffuseFactor * light.color;
+			// No object was hit, add contribution
+			if (leRay.geomID == RTC_INVALID_GEOMETRY_ID) {
 
-		// Specular factor
-		if (hit.material->shininess > 0.0) {
-			Vec3 toEye = Vec3::normalize(curCamera->position - hit.pos);
-			Vec3 reflection = Vec3::reflect(incidence, hit.normal);
-			float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hit.material->shininess) * attenuation;
-			hit.specular += specularFactor * hit.material->specular;
+				// Diffuse factor
+				float diffuseFactor = max(Vec3::dot(hit.normal, incidence), 0.f) * attenuation;
+				hit.diffuse += diffuseFactor * light.color;
+
+				// Specular factor
+				if (hit.material->shininess > 0.0) {
+					Vec3 toEye = Vec3::normalize(curCamera->position - hit.pos);
+					Vec3 reflection = Vec3::reflect(incidence, hit.normal);
+					float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hit.material->shininess) * attenuation;
+					hit.specular += specularFactor * hit.material->specular;
+				}
+
+			}
+
 		}
 
+#if !(EMBREE_ONE_LIGHT)
 	}
+#endif
 
 	// Create color
 	Color texColor = hit.material->diffuse * hit.material->image->getPixel(hit.texCoord);
-	ray.result = texColor * (curScene->ambient + hit.material->ambient + hit.diffuse) + hit.specular;
+	result = texColor * (curScene->ambient + hit.material->ambient + hit.diffuse) + hit.specular;
 
 	// Add reflections
 	if (depth < MAX_REFLECTIONS) { // TODO: Check material reflection
 
-		EmbreeData::Ray rRay;
-		rRay.x = ray.x;
-		rRay.y = ray.y;
-		rRay.org = hit.pos;
-		rRay.dir = Vec3::reflect(-ray.dir, hit.normal);
-		rRay.factor = 0.25f; // TODO: Material reflect factor
-		rRay.result = { 0.f };
+		Vec3 rayDir = Vec3::reflect(-Vec3(ray.dir), hit.normal);
 
-		RTCRay& reRay = rRay.eRay;
-		reRay.org[0] = hit.pos.x();
-		reRay.org[1] = hit.pos.y();
-		reRay.org[2] = hit.pos.z();
-		reRay.dir[0] = rRay.dir.x();
-		reRay.dir[1] = rRay.dir.y();
-		reRay.dir[2] = rRay.dir.z();
-		reRay.tnear = 0.1f;
-		reRay.tfar = FLT_MAX;
-		reRay.instID =
-		reRay.geomID =
-		reRay.primID = RTC_INVALID_GEOMETRY_ID;
-		reRay.mask = EMBREE_RAY_VALID;
-		reRay.time = 0.f;
+		RTCRay rRay;
+		rRay.org[0] = hit.pos.x();
+		rRay.org[1] = hit.pos.y();
+		rRay.org[2] = hit.pos.z();
+		rRay.dir[0] = rayDir.x();
+		rRay.dir[1] = rayDir.y();
+		rRay.dir[2] = rayDir.z();
+		rRay.tnear = 0.1f;
+		rRay.tfar = FLT_MAX;
+		rRay.instID =
+		rRay.geomID =
+		rRay.primID = RTC_INVALID_GEOMETRY_ID;
+		rRay.mask = EMBREE_RAY_VALID;
+		rRay.time = 0.f;
 
-		rtcIntersect(curScene->EmbreeData.scene, reRay);
-		embreeRenderTraceRay(rRay, depth + 1);
+		rtcIntersect(curScene->EmbreeData.scene, rRay);
 
-		ray.result += rRay.result * rRay.factor;
+		Color reflectResult;
+		embreeRenderTraceRay(rRay, depth + 1, reflectResult);
+
+		result += reflectResult * 0.25f; // TODO: Use material reflectiveness
 
 	}
 
 }
 
-void RayEngine::embreeRenderTracePacket(EmbreeData::RayPacket& packet, int depth) {
+// Stores a light ray
+struct LightRay {
+	Vec3 incidence;
+	float distance, attenuation;
+	Color lightColor;
+};
 
-	#define MAX_LIGHTS 2
+void RayEngine::embreeRenderTracePacket(RTCRay8& packet, int* valid, int depth, Color* result) {
+	
+#if EMBREE_ONE_LIGHT
+
+	EMBREE_PACKET_TYPE lightPacket;
+	LightRay lightRays[EMBREE_PACKET_SIZE];
+	int lightValid[EMBREE_PACKET_SIZE];
+	for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
+		lightValid[i] = EMBREE_RAY_INVALID;
+
+#else
+
+    #define MAX_LIGHTS 2
 
 	// Create light packets (invalid by default)
 	int numLights = min((int)curScene->lights.size(), MAX_LIGHTS - 1);
-	EmbreeData::LightRayPacket lightPackets[MAX_LIGHTS];
+	EMBREE_PACKET_TYPE lightPackets[MAX_LIGHTS];
+	LightRay lightRays[MAX_LIGHTS][EMBREE_PACKET_SIZE];
+	int lightValid[MAX_LIGHTS][EMBREE_PACKET_SIZE];
+
 	for (int l = 0; l < MAX_LIGHTS; l++)
 		for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
-			lightPackets[l].valid[i] = EMBREE_RAY_INVALID;
-	
+			lightValid[l][i] = EMBREE_RAY_INVALID;
+
+#endif
+
 	// Reflection packet (invalid by default)
 	bool doReflections = false;
-	EmbreeData::RayPacket reflectPacket;
+	EMBREE_PACKET_TYPE reflectPacket;
+	int reflectValid[EMBREE_PACKET_SIZE];
+	Color reflectResult[EMBREE_PACKET_SIZE];
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
-		reflectPacket.valid[i] = EMBREE_RAY_INVALID;
+		reflectValid[i] = EMBREE_RAY_INVALID;
 	
 	//// Store hits ////
 	
-	EmbreeData::RayHit hits[EMBREE_PACKET_SIZE];
+	RayHit hits[EMBREE_PACKET_SIZE];
 	
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
-		
-		if (!packet.valid[i])
+
+		if (valid[i] == EMBREE_RAY_INVALID)
 			continue;
 
-		if (packet.ePacket.geomID[i] == RTC_INVALID_GEOMETRY_ID) {
-			packet.rays[i].result = embreeRenderSky(packet.rays[i].dir);
-			packet.valid[i] = EMBREE_RAY_INVALID;
+		RayHit& hit = hits[i];
+		Vec3 rayOrg = Vec3(packet.orgx[i], packet.orgy[i], packet.orgz[i]);
+		Vec3 rayDir = Vec3(packet.dirx[i], packet.diry[i], packet.dirz[i]);
+
+		if (packet.geomID[i] == RTC_INVALID_GEOMETRY_ID) {
+			result[i] = embreeRenderSky(rayDir);
+			hit.hitSky = true;
 			continue;
 		}
 
-		// Store hit
-		EmbreeData::RayHit& hit = hits[i];
-		EMBREE_PACKET_TYPE& ePacket = packet.ePacket;
-
+		// Store hit properties
 		hit.diffuse = hit.specular = { 0.f };
-		hit.pos = packet.rays[i].org + packet.rays[i].dir * ePacket.tfar[i];
-		hit.obj = curScene->EmbreeData.instIDmap[ePacket.instID[i]];
-		hit.mesh = (TriangleMesh*)hit.obj->EmbreeData.geomIDmap[ePacket.geomID[i]];
+		hit.pos = rayOrg + rayDir * packet.tfar[i];
+		hit.obj = curScene->EmbreeData.instIDmap[packet.instID[i]];
+		hit.mesh = (TriangleMesh*)hit.obj->EmbreeData.geomIDmap[packet.geomID[i]];
 		hit.material = hit.mesh->material;
-		hit.normal = Vec3::normalize(hit.obj->matrix * hit.mesh->getNormal(ePacket.primID[i], ePacket.u[i], ePacket.v[i]));
-		hit.texCoord = hit.mesh->getTexCoord(ePacket.primID[i], ePacket.u[i], ePacket.v[i]);
-		
-		// Check lights
-		for (int l = 0; l < numLights; l++) {
+		hit.normal = Vec3::normalize(hit.obj->matrix * hit.mesh->getNormal(packet.primID[i], packet.u[i], packet.v[i]));
+		hit.texCoord = hit.mesh->getTexCoord(packet.primID[i], packet.u[i], packet.v[i]);
+		hit.hitSky = false;
 
+		// Check lights
+#if EMBREE_ONE_LIGHT
+		Light& light = curScene->lights[0];
+#else
+		for (int l = 0; l < numLights; l++) {
 			Light& light = curScene->lights[l];
+#endif
+
 			float distance = Vec3::length(light.position - hit.pos);
 			float attenuation = max(1.f - distance / light.range, 0.f);
 
-			// Light is too far away
-			if (attenuation == 0.f)
-				continue;
+			// Light is in reach
+			if (attenuation > 0.f) {
 
-			// Define light ray
-			EmbreeData::LightRay& lRay = lightPackets[l].rays[i];
-			lRay.attenuation = attenuation;
-			lRay.distance = distance;
-			lRay.incidence = Vec3::normalize(light.position - hit.pos);
-			lRay.lightColor = light.color;
+				// Define light ray
+#if EMBREE_ONE_LIGHT
+				LightRay& lRay = lightRays[i];
+#else
+				LightRay& lRay = lightRays[l][i];
+#endif
+				lRay.attenuation = attenuation;
+				lRay.distance = distance;
+				lRay.incidence = Vec3::normalize(light.position - hit.pos);
+				lRay.lightColor = light.color;
 
-			EMBREE_PACKET_TYPE& lePacket = lightPackets[l].ePacket;
-			lePacket.orgx[i] = hit.pos.x();
-			lePacket.orgy[i] = hit.pos.y();
-			lePacket.orgz[i] = hit.pos.z();
-			lePacket.dirx[i] = lRay.incidence.x();
-			lePacket.diry[i] = lRay.incidence.y();
-			lePacket.dirz[i] = lRay.incidence.z();
-			lePacket.tnear[i] = 0.1f;
-			lePacket.tfar[i] = distance;
-			lePacket.instID[i] =
-			lePacket.geomID[i] =
-			lePacket.primID[i] = RTC_INVALID_GEOMETRY_ID;
-			lePacket.mask[i] = EMBREE_RAY_VALID;
-			lePacket.time[i] = 0.f;
+#if EMBREE_ONE_LIGHT
+				EMBREE_PACKET_TYPE& lPacket = lightPacket;
+#else
+				EMBREE_PACKET_TYPE& lPacket = lightPackets[l];
+#endif
+				lPacket.orgx[i] = hit.pos.x();
+				lPacket.orgy[i] = hit.pos.y();
+				lPacket.orgz[i] = hit.pos.z();
+				lPacket.dirx[i] = lRay.incidence.x();
+				lPacket.diry[i] = lRay.incidence.y();
+				lPacket.dirz[i] = lRay.incidence.z();
+				lPacket.tnear[i] = 0.1f;
+				lPacket.tfar[i] = distance;
+				lPacket.instID[i] =
+				lPacket.geomID[i] =
+				lPacket.primID[i] = RTC_INVALID_GEOMETRY_ID;
+				lPacket.mask[i] = EMBREE_RAY_VALID;
+				lPacket.time[i] = 0.f;
 
-			// Turn on for occlusion test
-			lightPackets[l].valid[i] = EMBREE_RAY_VALID;
+				// Turn on for occlusion test
+#if EMBREE_ONE_LIGHT
+				lightValid[i] = EMBREE_RAY_VALID;
+#else
+				lightValid[l][i] = EMBREE_RAY_VALID;
+			}
+#endif
+
 
 		}
 
 		// Create reflection rays
 		if (depth < MAX_REFLECTIONS) { // TODO: Check material reflection
 
-			EmbreeData::Ray& rRay = reflectPacket.rays[i];
-			rRay.x = packet.rays[i].x;
-			rRay.y = packet.rays[i].y;
-			rRay.org = hit.pos;
-			rRay.dir = Vec3::reflect(-packet.rays[i].dir, hit.normal);
-			rRay.factor = packet.rays[i].factor * 0.25f; // TODO: Material reflect factor
-			rRay.result = { 0.f };
+			Vec3 reflDir = Vec3::reflect(-rayDir, hit.normal);
 
-			EMBREE_PACKET_TYPE& rePacket = reflectPacket.ePacket;
-			rePacket.orgx[i] = hit.pos.x();
-			rePacket.orgy[i] = hit.pos.y();
-			rePacket.orgz[i] = hit.pos.z();
-			rePacket.dirx[i] = rRay.dir.x();
-			rePacket.diry[i] = rRay.dir.y();
-			rePacket.dirz[i] = rRay.dir.z();
-			rePacket.tnear[i] = 0.1f;
-			rePacket.tfar[i] = FLT_MAX;
-			rePacket.instID[i] =
-			rePacket.geomID[i] =
-			rePacket.primID[i] = RTC_INVALID_GEOMETRY_ID;
-			rePacket.mask[i] = EMBREE_RAY_VALID;
-			rePacket.time[i] = 0.f;
+			reflectPacket.orgx[i] = hit.pos.x();
+			reflectPacket.orgy[i] = hit.pos.y();
+			reflectPacket.orgz[i] = hit.pos.z();
+			reflectPacket.dirx[i] = reflDir.x();
+			reflectPacket.diry[i] = reflDir.y();
+			reflectPacket.dirz[i] = reflDir.z();
+			reflectPacket.tnear[i] = 0.1f;
+			reflectPacket.tfar[i] = FLT_MAX;
+			reflectPacket.instID[i] =
+			reflectPacket.geomID[i] =
+			reflectPacket.primID[i] = RTC_INVALID_GEOMETRY_ID;
+			reflectPacket.mask[i] = EMBREE_RAY_VALID;
+			reflectPacket.time[i] = 0.f;
 
 			// Turn on for recursive call
-			reflectPacket.valid[i] = EMBREE_RAY_VALID;
+			reflectValid[i] = EMBREE_RAY_VALID;
 			doReflections = true;
+
 		}
 		
-
 	}
 	
 	//// Light pass ////
 
+#if EMBREE_ONE_LIGHT
+	
+	rtcOccluded8(lightValid, curScene->EmbreeData.scene, lightPacket);
+
+	for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
+
+		// Light ray was invalid or hit an object
+		if (lightValid[i] == EMBREE_RAY_INVALID || lightPacket.geomID[i] != RTC_INVALID_GEOMETRY_ID)
+			continue;
+
+		LightRay& lRay = lightRays[i];
+
+#else
+
 	for (int l = 0; l < numLights; l++) {
 
-		EmbreeData::LightRayPacket& lPacket = lightPackets[l];
-		rtcOccluded8(lPacket.valid, curScene->EmbreeData.scene, lPacket.ePacket);
+		rtcOccluded8(lightValid[l], curScene->EmbreeData.scene, lightPackets[l]);
 
 		for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
 
 			// Light ray was invalid or hit an object
-			if (lPacket.valid[i] == EMBREE_RAY_INVALID || lPacket.ePacket.geomID[i] != RTC_INVALID_GEOMETRY_ID)
+			if (lightValid[l][i] == EMBREE_RAY_INVALID || lightPackets[l].geomID[i] != RTC_INVALID_GEOMETRY_ID)
 				continue;
 
-			EmbreeData::LightRay& lRay = lightPackets[l].rays[i];
-			EmbreeData::RayHit& hit = hits[i];
+			LightRay& lRay = lightRays[l][i];
+
+#endif
+			RayHit& hit = hits[i];
 
 			// Diffuse factor
 			float diffuseFactor = max(Vec3::dot(hit.normal, lRay.incidence), 0.f) * lRay.attenuation;
@@ -259,14 +331,17 @@ void RayEngine::embreeRenderTracePacket(EmbreeData::RayPacket& packet, int depth
 			}
 
 		}
+
+#if !(EMBREE_ONE_LIGHT)
 	}
+#endif
 
 	//// Reflections ////
 
 	if (doReflections) {
 
-		rtcIntersect8(reflectPacket.valid, curScene->EmbreeData.scene, reflectPacket.ePacket);
-		embreeRenderTracePacket(reflectPacket, depth + 1);
+		rtcIntersect8(reflectValid, curScene->EmbreeData.scene, reflectPacket);
+		embreeRenderTracePacket(reflectPacket, reflectValid, depth + 1, reflectResult);
 
 	}
 
@@ -274,18 +349,18 @@ void RayEngine::embreeRenderTracePacket(EmbreeData::RayPacket& packet, int depth
 
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
 
-		if (packet.valid[i] == EMBREE_RAY_INVALID)
-			continue;
+		RayHit& hit = hits[i];
 
-		EmbreeData::RayHit& hit = hits[i];
+		if (valid[i] == EMBREE_RAY_INVALID || hit.hitSky)
+			continue;
 
 		// Create color
 		Color texColor = hit.material->diffuse * hit.material->image->getPixel(hit.texCoord);
-		packet.rays[i].result = texColor * (curScene->ambient + hit.material->ambient + hit.diffuse) + hit.specular;
+		result[i] = texColor * (curScene->ambient + hit.material->ambient + hit.diffuse) + hit.specular;
 
 		// Add reflections
 		if (doReflections) // TODO: Check material reflection
-			packet.rays[i].result += reflectPacket.rays[i].result * reflectPacket.rays[i].factor;
+			result[i] += reflectResult[i] * 0.25f; // TODO: Use material reflectiveness
 
 	}
 	
