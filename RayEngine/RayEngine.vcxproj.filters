@@ -62,7 +62,10 @@
     <ClCompile Include="hybrid_render.cpp">
       <Filter>RayEngine\Hybrid</Filter>
     </ClCompile>
-    <ClCompile Include="embree_render_trace_packet.cpp">
+    <ClCompile Include="embree_render_trace.cpp">
+      <Filter>RayEngine\Embree</Filter>
+    </ClCompile>
+    <ClCompile Include="embree_render_fire.cpp">
       <Filter>RayEngine\Embree</Filter>
     </ClCompile>
   </ItemGroup>

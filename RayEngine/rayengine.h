@@ -74,6 +74,7 @@ struct RayEngine {
 			Vec3 org, dir;
 			float factor;
 			Color result;
+			RTCRay eRay;
 		};
 
 		// Stores the properties of a ray hit
@@ -107,11 +108,12 @@ struct RayEngine {
 	void embreeInit();
 	void embreeResize();
 	void embreeRender();
-	void embreeRenderTiles();
-	void embreeRenderSingleLoop();
+	void embreeRenderFirePrimaryRay(int x, int y);
+	void embreeRenderFirePrimaryPacket(int x, int y);
+	void embreeRenderTraceRay(EmbreeData::Ray& ray, int depth);
 	void embreeRenderTracePacket(EmbreeData::RayPacket& packet, int depth);
-	Color embreeRenderSky(Vec3 dir);
 	void embreeRenderUpdateTexture();
+	Color embreeRenderSky(Vec3 dir);
 
 	// OptiX
 	struct OptixData  {

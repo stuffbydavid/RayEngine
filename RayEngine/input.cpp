@@ -41,7 +41,7 @@ void RayEngine::input() {
 
 	// Print camera
 
-	if (window.keyPressed[GLFW_KEY_F12]) {
+	if (window.keyPressed[GLFW_KEY_F11]) {
 		cout << curCamera->position << endl;
 		cout << curCamera->xaxis << endl;
 		cout << curCamera->yaxis << endl;

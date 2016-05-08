@@ -182,7 +182,8 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="embree_handler.cpp" />
-    <ClCompile Include="embree_render_trace_packet.cpp" />
+    <ClCompile Include="embree_render_fire.cpp" />
+    <ClCompile Include="embree_render_trace.cpp" />
     <ClCompile Include="image.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="hybrid_render.cpp" />

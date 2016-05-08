@@ -55,24 +55,10 @@ void RayEngine::loop() {
 		hybridRender();
 	}
 
-	// Set title
 	window.setTitle("RayEngine - " + mode +
 					" - FPS: " + to_string(window.fps) +
 					", Embree avg: " + to_string(EmbreeData.avgTime) +
-					", Optix avg: " + to_string(OptixData.avgTime)
-					);
-
-	// Calculate averages
-	if (EmbreeData.frames > 30) {
-		EmbreeData.avgTime = EmbreeData.time / EmbreeData.frames;
-		EmbreeData.time = 0.f;
-		EmbreeData.frames = 0;
-	}
-	if (OptixData.frames > 30) {
-		OptixData.avgTime = OptixData.time / OptixData.frames;
-		OptixData.time = 0.f;
-		OptixData.frames = 0;
-	}
+					", Optix avg: " + to_string(OptixData.avgTime));
 
 }
 
