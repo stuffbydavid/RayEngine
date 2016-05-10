@@ -89,10 +89,6 @@ void Image::createTexture() {
 
 }
 
-long mod(long a, long b) {
-	return (a % b + b) % b;
-}
-
 Color Image::getPixel(Vec2 coord) {
 
 	if (filter == GL_LINEAR) {

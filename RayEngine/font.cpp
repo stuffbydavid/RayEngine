@@ -75,12 +75,17 @@ Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
 	cout << "map is " << mapWidth << "x" << mapHeight << endl << endl;
 }
 
-void Font::renderText(string text, int x, int y, Color color, Shader* shader) {
-	/*Graphic textGraphic(map);
+void Font::renderText(string text, int x, int y, Color color, Shader* shader, Mat4x4 matrix) {
+
+	uint textLength = text.size();
+	Vec3* posData = new Vec3[textLength * 6];
+	Vec2* texCoordData = new Vec2[textLength * 6];
+
 	int dx = x, dy = y;
 
-	for (uint i = 0; i < text.size(); i++) {
-		uchar curChar = text[i];
+	for (uint c = 0; c < textLength; c++) {
+
+		uchar curChar = text[c];
 
 		if (curChar == '\n') {
 			dx = x;
@@ -91,9 +96,10 @@ void Font::renderText(string text, int x, int y, Color color, Shader* shader) {
 		if (curChar < start || curChar > end)
 			continue;
 
-		charInfo curCharInfo = chars[curChar];
+		CharInfo curCharInfo = chars[curChar];
 
 		if (curCharInfo.width && curCharInfo.height) {
+
 			float vx = dx + curCharInfo.left;
 			float vy = dy + mapHeight - curCharInfo.top;
 			float vw = curCharInfo.width;
@@ -102,17 +108,32 @@ void Font::renderText(string text, int x, int y, Color color, Shader* shader) {
 			float tw = curCharInfo.width / mapWidth;
 			float th = curCharInfo.height / mapHeight;
 
-			textGraphic.addVertex({ vx, vy }, { tx, 0 }, color);
-			textGraphic.addVertex({ vx, vy + vh }, { tx, th }, color);
-			textGraphic.addVertex({ vx + vw, vy }, { tx + tw, 0 }, color);
-			textGraphic.addVertex({ vx + vw, vy }, { tx + tw, 0 }, color);
-			textGraphic.addVertex({ vx, vy + vh }, { tx, th }, color);
-			textGraphic.addVertex({ vx + vw, vy + vh }, { tx + tw, th }, color);
+			int i = c * 6;
+
+			posData[i + 0] = { vx, vy, 0.f };
+			posData[i + 1] = { vx, vy + vh, 0.f };
+			posData[i + 2] = { vx + vw, vy, 0.f };
+			posData[i + 3] = { vx + vw, vy, 0.f };
+			posData[i + 4] = { vx, vy + vh, 0.f };
+			posData[i + 5] = { vx + vw, vy + vh, 0.f };
+
+			texCoordData[i + 0] = { tx, 0.f };
+			texCoordData[i + 1] = { tx, th };
+			texCoordData[i + 2] = { tx + tw, 0.f };
+			texCoordData[i + 3] = { tx + tw, 0.f };
+			texCoordData[i + 4] = { tx, th };
+			texCoordData[i + 5] = { tx + tw, th };
+
 		}
 
 		dx += curCharInfo.advanceX;
 		dy += curCharInfo.advanceY;
+
 	}
-	*/
-	//shader->use(&textGraphic, window->ortho);
+	
+	shader->render2D(matrix, posData, texCoordData, textLength * 6, texture, color);
+
+	delete posData;
+	delete texCoordData;
+
 }

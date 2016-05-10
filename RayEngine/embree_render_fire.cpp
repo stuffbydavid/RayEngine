@@ -2,12 +2,12 @@
 
 void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 
-	float dx = ((float)(EmbreeData.offset + x) / window.width) * 2.f - 1.f;
+	float dx = ((float)(Embree.offset + x) / window.width) * 2.f - 1.f;
 	float dy = ((float)y / window.height) * 2.f - 1.f;
 
 	Vec3 rayDir = dx * rayXaxis + dy * rayYaxis + rayZaxis;
 
-	EmbreeData::Ray ray;
+	Embree::Ray ray;
 	ray.org[0] = rayOrg.x();
 	ray.org[1] = rayOrg.y();
 	ray.org[2] = rayOrg.z();
@@ -23,29 +23,28 @@ void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 	ray.time = 0.f;
 	ray.transColor = { 0.f };
 
-	rtcIntersect(curScene->EmbreeData.scene, ray);
+	rtcIntersect(curScene->Embree.scene, ray);
 
 	Color result;
 	embreeRenderTraceRay(ray, 0, result);
 
-	EmbreeData.buffer[y * EmbreeData.width + x] = result;
+	Embree.buffer[y * Embree.width + x] = result;
 
 }
 
 void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 
-	EmbreeData::RayPacket packet;
-	int valid[EMBREE_PACKET_SIZE];
+	Embree::RayPacket packet;
 
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
 
-		if (x + i >= EmbreeData.width) {
-			valid[i] = EMBREE_RAY_INVALID;
+		if (x + i >= Embree.width) {
+			packet.valid[i] = EMBREE_RAY_INVALID;
 			continue;
 		} else
-			valid[i] = EMBREE_RAY_VALID;
+			packet.valid[i] = EMBREE_RAY_VALID;
 
-		float dx = ((float)(EmbreeData.offset + x + i) / window.width) * 2.f - 1.f;
+		float dx = ((float)(Embree.offset + x + i) / window.width) * 2.f - 1.f;
 		float dy = ((float)y / window.height) * 2.f - 1.f;
 
 		Vec3 rayDir = dx * rayXaxis + dy * rayYaxis + rayZaxis;
@@ -67,25 +66,25 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 
 	}
 
-	rtcIntersect8(valid, curScene->EmbreeData.scene, packet);
+	rtcIntersect8(packet.valid, curScene->Embree.scene, packet);
 
-	#if EMBREE_PACKET_SECONDARY
+	if (Embree.packetSecondary) {
 
 	    Color result[EMBREE_PACKET_SIZE];
-		embreeRenderTracePacket(packet, valid, 0, result);
+		embreeRenderTracePacket(packet, 0, result);
 
 		for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
-			if (valid[i] == EMBREE_RAY_VALID)
-				EmbreeData.buffer[y * EmbreeData.width + x + i] = result[i];
+			if (packet.valid[i] == EMBREE_RAY_VALID)
+				Embree.buffer[y * Embree.width + x + i] = result[i];
 
-	#else
+	} else {
 
 		for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
 
-			if (valid[i] == EMBREE_RAY_INVALID)
+			if (packet.valid[i] == EMBREE_RAY_INVALID)
 				continue;
 
-			RTCRay ray;
+			Embree::Ray ray;
 			ray.org[0] = packet.orgx[i];
 			ray.org[1] = packet.orgy[i];
 			ray.org[2] = packet.orgz[i];
@@ -103,10 +102,10 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 			Color result;
 			embreeRenderTraceRay(ray, 0, result);
 
-			EmbreeData.buffer[y * EmbreeData.width + x + i] = result;
+			Embree.buffer[y * Embree.width + x + i] = result;
 
 		}
 
-	#endif
+	}
 
 }

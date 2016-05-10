@@ -87,7 +87,7 @@ Shader::Shader(string name, function<void(GLuint, Object*, TriangleMesh*)> setup
 	glLinkProgram(program);
 }
 
-void Shader::use(Mat4x4 matrix, Object* object, TriangleMesh* mesh) {
+void Shader::render3D(Mat4x4 matrix, Object* object, TriangleMesh* mesh) {
 
 	// Start up shader
 	glUseProgram(program);
@@ -142,7 +142,7 @@ void Shader::use(Mat4x4 matrix, Object* object, TriangleMesh* mesh) {
 
 }
 
-void Shader::use(Mat4x4 matrix, Vec3* posData, Vec2* texCoordData, int vertices, GLuint texture, Color color) {
+void Shader::render2D(Mat4x4 matrix, Vec3* posData, Vec2* texCoordData, int vertices, GLuint texture, Color color) {
 
 	// Start up shader
 	glUseProgram(program);
@@ -189,7 +189,7 @@ void Shader::use(Mat4x4 matrix, Vec3* posData, Vec2* texCoordData, int vertices,
 
 }
 
-void Shader::use(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture, Color color) {
+void Shader::render2DBox(Mat4x4 matrix, int x, int y, int width, int height, GLuint texture, Color color) {
 
 	Vec3 posData[6] = {
 		{ x, y, 0 },
@@ -208,7 +208,7 @@ void Shader::use(Mat4x4 matrix, int x, int y, int width, int height, GLuint text
 		{ 1, 1 }
 	};
 
-	use(matrix, posData, texCoordData, 6, texture, color);
+	render2D(matrix, posData, texCoordData, 6, texture, color);
 	
 
 }

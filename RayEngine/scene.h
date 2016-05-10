@@ -27,17 +27,17 @@ struct Scene {
 	vector<Light> lights;
 
 	// Embree
-	struct EmbreeData {
+	struct Embree {
 		RTCScene scene;
 		map<uint, Object*> instIDmap;
-	} EmbreeData;
+	} Embree;
 	void embreeInit(RTCDevice device);
 
 	// OptiX
-	struct OptixData {
+	struct Optix {
 		optix::Group group;
 		optix::TextureSampler sky;
-	} OptixData;
+	} Optix;
 	void optixInit(optix::Context context);
 
 };

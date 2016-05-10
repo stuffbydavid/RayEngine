@@ -2,16 +2,16 @@
 
 void RayEngine::embreeRender() {
 
-	if (EmbreeData.width == 0)
+	if (Embree.width == 0)
 		return;
 
 	float start = glfwGetTime();
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST); // TODO: Find out if this does anything
 	
-    #if EMBREE_RENDER_TILES
+	if (Embree.renderTiles) {
 
-		int numTilesX = ceil((float)EmbreeData.width / EMBREE_TILE_WIDTH);
-		int numTilesY = ceil((float)window.height / EMBREE_TILE_HEIGHT);
+		int numTilesX = ceil((float)Embree.width / Embree.tileWidth);
+		int numTilesY = ceil((float)window.height / Embree.tileHeight);
 		int numTiles = numTilesX * numTilesY;
 
 		#pragma omp parallel for schedule(dynamic)
@@ -20,55 +20,55 @@ void RayEngine::embreeRender() {
 			int tileX = t % numTilesX;
 			int tileY = t / numTilesX;
 
-			int x0 = tileX * EMBREE_TILE_WIDTH;
-			int x1 = min(x0 + EMBREE_TILE_WIDTH, EmbreeData.width);
-			int y0 = tileY * EMBREE_TILE_HEIGHT;
-			int y1 = min(y0 + EMBREE_TILE_HEIGHT, window.height);
+			int x0 = tileX * Embree.tileWidth;
+			int x1 = min(x0 + Embree.tileWidth, Embree.width);
+			int y0 = tileY * Embree.tileHeight;
+			int y1 = min(y0 + Embree.tileHeight, window.height);
 
-            #if EMBREE_PACKET_PRIMARY
+			if (Embree.packetPrimary) {
 
 				for (int y = y0; y < y1; y++)
 					for (int x = x0; x < x1; x += EMBREE_PACKET_SIZE)
 						embreeRenderFirePrimaryPacket(x, y);
 
-			#else
+			} else {
 
 				for (int y = y0; y < y1; y++)
 					for (int x = x0; x < x1; x++)
 						embreeRenderFirePrimaryRay(x, y);
 
-			#endif
+			}
 
 		}
 
-    #else
+	} else {
 
-        #if EMBREE_PACKET_PRIMARY
+		if (Embree.packetPrimary) {
 
             #pragma omp parallel for schedule(dynamic)
 			for (int y = 0; y < window.height; y++)
-				for (int x = 0; x < EmbreeData.width; x += EMBREE_PACKET_SIZE)
+				for (int x = 0; x < Embree.width; x += EMBREE_PACKET_SIZE)
 					embreeRenderFirePrimaryPacket(x, y);
 
-		#else
+		} else {
 
-			#pragma omp parallel for schedule(dynamic)
+            #pragma omp parallel for schedule(dynamic)
 			for (int y = 0; y < window.height; y++)
-				for (int x = 0; x < EmbreeData.width; x++)
+				for (int x = 0; x < Embree.width; x++)
 					embreeRenderFirePrimaryRay(x, y);
 
-		#endif
+		}
 
-    #endif
+	}
 
 	float end = glfwGetTime();
-	EmbreeData.lastTime = end - start;
-	EmbreeData.time += EmbreeData.lastTime;
-	EmbreeData.frames++;
-	if (EmbreeData.frames > 30) {
-		EmbreeData.avgTime = EmbreeData.time / EmbreeData.frames;
-		EmbreeData.time = 0.f;
-		EmbreeData.frames = 0;
+	Embree.lastTime = end - start;
+	Embree.time += Embree.lastTime;
+	Embree.frames++;
+	if (Embree.frames > 30) {
+		Embree.avgTime = Embree.time / Embree.frames;
+		Embree.time = 0.f;
+		Embree.frames = 0;
 	}
 
 }
@@ -76,11 +76,11 @@ void RayEngine::embreeRender() {
 
 void RayEngine::embreeRenderUpdateTexture() {
 
-	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, EmbreeData.width, window.height, GL_RGBA, GL_FLOAT, &EmbreeData.buffer[0]);
+	glBindTexture(GL_TEXTURE_2D, Embree.texture);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Embree.width, window.height, GL_RGBA, GL_FLOAT, &Embree.buffer[0]);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	//glDrawPixels(EmbreeData.width, window.height, GL_RGBA, GL_FLOAT, &EmbreeData.buffer[0]);
-	shdrTexture->use(window.ortho, EmbreeData.offset, 0, EmbreeData.width, window.height, EmbreeData.texture);
+	//glDrawPixels(Embree.width, window.height, GL_RGBA, GL_FLOAT, &Embree.buffer[0]);
+	OpenGL.shdrTexture->render2DBox(window.ortho, Embree.offset, 0, Embree.width, window.height, Embree.texture);
 
 }

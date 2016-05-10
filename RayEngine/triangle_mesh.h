@@ -38,11 +38,11 @@ struct TriangleMesh : Geometry {
 	uint embreeInit(RTCScene scene);
 
 	// OptiX
-	struct OptixData {
+	struct Optix {
 		optix::Geometry geometry;
 		optix::GeometryInstance geometryInstance;
 		optix::Buffer posBuffer, normalBuffer, texCoordBuffer, indexBuffer;
-	} OptixData;
+	} Optix;
 	void optixInit(optix::Context context);
 
 };

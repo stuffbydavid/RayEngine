@@ -1,27 +1,26 @@
 #include "rayengine.h"
 
-RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, RayTracingTarget rayTracingTarget, float hybridPartition) :
-	renderMode(renderMode),
-	rayTracingTarget(rayTracingTarget),
-	hybridPartition(hybridPartition)
-{
+RayEngine::RayEngine() {
 
-	window.init(windowWidth, windowHeight);
+	window.init(WINDOW_WIDTH, WINDOW_HEIGHT);
+	window.setTitle("RayEngine");
+
+	// ImageMagick
 	Magick::InitializeMagick(NULL);
 
 	// Font
 	FT_Library freeType;
 	if (FT_Init_FreeType(&freeType))
 		cout << "Could not init freetype library!";
-	fntGUI = new Font(&freeType, "font/tahoma.ttf", 32, 128, 12);
+	fntGui = new Font(&freeType, "font/tahoma.ttf", 32, 128, 12);
+	fntGuiBold = new Font(&freeType, "font/tahomabd.ttf", 32, 128, 12);
 
 	// Shaders
-	shdrColor = new Shader("Color", nullptr, "texture.vshader", "texture.fshader");
-	shdrTexture = new Shader("Texture", nullptr, "texture.vshader", "texture.fshader");
-	shdrNormals = new Shader("Normals", bind(&RayEngine::openglSetupNormals, this, _1, _2, _3), "normals.vshader", "normals.fshader");
-	shdrPhong = new Shader("Phong", bind(&RayEngine::openglSetupPhong, this, _1, _2, _3), "phong.vshader", "phong.fshader");
-
-	hybridDirection = -1.f;
+	OpenGL.shdrColor = new Shader("Color", nullptr, "texture.vshader", "texture.fshader");
+	OpenGL.shdrTexture = new Shader("Texture", nullptr, "texture.vshader", "texture.fshader");
+	OpenGL.shdrNormals = new Shader("Normals", bind(&RayEngine::openglSetupNormals, this, _1, _2, _3), "normals.vshader", "normals.fshader");
+	OpenGL.shdrPhong = new Shader("Phong", bind(&RayEngine::openglSetupPhong, this, _1, _2, _3), "phong.vshader", "phong.fshader");
+	showGui = true;
 
 }
 
@@ -33,6 +32,8 @@ void RayEngine::launch() {
 
 	embreeInit();
 	optixInit();
+	hybridInit();
+	settingsInit();
 
 	window.open(bind(&RayEngine::loop, this), bind(&RayEngine::resize, this));
 
@@ -40,37 +41,35 @@ void RayEngine::launch() {
 
 void RayEngine::loop() {
 
-	input();
+	cameraInput();
+	settingsInput();
 	
 	rayOrg = curCamera->position;
 	rayXaxis = curCamera->xaxis * window.ratio * curCamera->tFov;
-	rayYaxis = curCamera->yaxis * curCamera->tFov;
+	rayYaxis = -curCamera->yaxis * curCamera->tFov;
 	rayZaxis = curCamera->zaxis;
 
 	string mode = "";
 	if (renderMode == RM_OPENGL) {
 		mode = "OpenGL";
 		openglRender();
-	} else if (rayTracingTarget == RTT_CPU) {
+	} else if (renderMode == RM_EMBREE) {
 		mode = "Embree";
 		embreeRender();
 		embreeRenderUpdateTexture();
-	} else if (rayTracingTarget == RTT_GPU) {
+	} else if (renderMode == RM_OPTIX) {
 		mode = "OptiX";
 		optixRender();
 		optixRenderUpdateTexture();
-	} else if (rayTracingTarget == RTT_HYBRID) {
+	} else if (renderMode == RM_HYBRID) {
 		mode = "Hybrid";
 		hybridRender();
 		hybridUpdatePartition();
 	}
 
-	window.setTitle("RayEngine - " + mode +
-					" - FPS: " + to_string(window.fps) +
-					", Embree avg: " + to_string(EmbreeData.avgTime) +
-					", Optix avg: " + to_string(OptixData.avgTime));
-
-
+	if (showGui)
+		guiRender();
+		
 }
 
 void RayEngine::resize() {

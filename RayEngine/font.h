@@ -14,7 +14,7 @@ struct Font {
 	Font(FT_Library* lib, string filename, uint start, uint end, uint size);
 
 	// Renders a piece of text using the font.
-	void Font::renderText(string text, int x, int y, Color color, Shader* shader);
+	void Font::renderText(string text, int x, int y, Color color, Shader* shader, Mat4x4 matrix);
 
 	uint start, end, mapWidth, mapHeight;
 	uint texture;

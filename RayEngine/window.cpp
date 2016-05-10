@@ -58,7 +58,7 @@ void windowSizeCallback(GLFWwindow* handle, int width, int height) {
 	height = max(1, height);
 
 	glViewport(0, 0, width, height);
-	w->ortho = Mat4x4::ortho(0, width, 0, height, 0, 1);
+	w->ortho = Mat4x4::ortho(0, width, height, 0, 0, 1);
 	w->width = width;
 	w->height = height;
 	w->ratio = (float)width / height;

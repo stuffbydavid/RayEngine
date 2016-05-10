@@ -20,29 +20,3 @@ void RayEngine::hybridRender() {
 	embreeRenderUpdateTexture();
 	optixRenderUpdateTexture();
 }
-
-void RayEngine::hybridUpdatePartition() {
-
-	/*if (OptixData.avgTime == 0.f && EmbreeData.avgTime == 0.f)
-		return;
-
-	static float lastFrameTime = 0.f;
-	float frameTime = OptixData.avgTime + EmbreeData.avgTime;
-	float dif = lastFrameTime - frameTime;
-
-	if (dif > 0.f)
-		hybridDirection *= -1.f;
-	hybridPartition = max(0.f, min(1.f, hybridPartition + dif * 0.25f));
-
-
-	lastFrameTime = frameTime;*/
-	
-	/*float dif = OptixData.lastTime - EmbreeData.lastTime;
-
-	hybridPartition = max(0.f, min(1.f, hybridPartition + dif * 0.1f));*/
-
-	hybridPartition = OptixData.avgTime / EmbreeData.avgTime - 0.5f;
-	
-	resize();
-
-}

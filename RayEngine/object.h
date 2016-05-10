@@ -28,17 +28,17 @@ struct Object {
 	Mat4x4 matrix;
 
 	// Embree
-	struct EmbreeData {
+	struct Embree {
 		RTCScene scene;
 		map<uint, Geometry*> geomIDmap;
-	} EmbreeData;
+	} Embree;
 	void embreeInit(RTCDevice device);
 
 	// OptiX
-	struct OptixData{
+	struct Optix{
 		optix::Transform transform;
 		optix::GeometryGroup geometryGroup;
-	} OptixData;
+	} Optix;
 	void optixInit(optix::Context context);
 
 };

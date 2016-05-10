@@ -14,7 +14,7 @@ struct Material {
 	struct {
 		optix::Material material;
 		optix::TextureSampler sampler;
-	} OptixData;
+	} Optix;
 
 	/*int id;
 

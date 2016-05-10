@@ -10,7 +10,7 @@ void RayEngine::openglRender() {
 	for (uint i = 0; i < curScene->objects.size(); i++) {
 		Object* obj = curScene->objects[i];
 		for (uint i = 0; i < obj->geometries.size(); i++)
-			OPENGL_SHADER->use(proj * obj->matrix, obj, (TriangleMesh*)obj->geometries[i]);
+			OPENGL_SHADER->render3D(proj * obj->matrix, obj, (TriangleMesh*)obj->geometries[i]);
 	}
 
 }

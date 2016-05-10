@@ -7,42 +7,42 @@ void RayEngine::embreeInit() {
 	cout << "Starting Embree..." << endl;
 
 	// Init library
-	EmbreeData.frames = 0;
-	EmbreeData.lastTime = 0.f;
-	EmbreeData.avgTime = 0.f;
-	EmbreeData.device = rtcNewDevice(NULL);
+	Embree.frames = 0;
+	Embree.lastTime = 0.f;
+	Embree.avgTime = 0.f;
+	Embree.device = rtcNewDevice(NULL);
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 
 	// Generate texture
-	glGenTextures(1, &EmbreeData.texture);
-	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);
+	glGenTextures(1, &Embree.texture);
+	glBindTexture(GL_TEXTURE_2D, Embree.texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Init scenes
 	for (uint i = 0; i < scenes.size(); i++)
-		scenes[i]->embreeInit(EmbreeData.device);
+		scenes[i]->embreeInit(Embree.device);
 
 }
 
 void Scene::embreeInit(RTCDevice device) {
 
-	EmbreeData.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_SCENE, EMBREE_AFLAGS_SCENE);
+	Embree.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_SCENE, EMBREE_AFLAGS_SCENE);
 
 	for (uint i = 0; i < objects.size(); i++) {
 		objects[i]->embreeInit(device);
-		uint instID = rtcNewInstance2(EmbreeData.scene, objects[i]->EmbreeData.scene);
-		rtcSetTransform2(EmbreeData.scene, instID, RTC_MATRIX_COLUMN_MAJOR_ALIGNED16, objects[i]->matrix.e);
-		EmbreeData.instIDmap[instID] = objects[i];
+		uint instID = rtcNewInstance2(Embree.scene, objects[i]->Embree.scene);
+		rtcSetTransform2(Embree.scene, instID, RTC_MATRIX_COLUMN_MAJOR_ALIGNED16, objects[i]->matrix.e);
+		Embree.instIDmap[instID] = objects[i];
 	}
 
-	rtcCommit(EmbreeData.scene);
+	rtcCommit(Embree.scene);
 
 }
 
-void TransparencyIntersectionFilter8(const void* valid, void *ptr, RayEngine::EmbreeData::RayPacket &packet) {
+void TransparencyIntersectionFilter8(const void* valid, void *ptr, RayEngine::Embree::RayPacket &packet) {
 
 	// We hit a transparent object, add contribution to the ray
 
@@ -58,7 +58,7 @@ void TransparencyIntersectionFilter8(const void* valid, void *ptr, RayEngine::Em
 	}
 }
 
-void TransparencyIntersectionFilter(void *ptr, RayEngine::EmbreeData::Ray &ray) {
+void TransparencyIntersectionFilter(void *ptr, RayEngine::Embree::Ray &ray) {
 
 	// We hit a transparent object, add contribution to the ray
 
@@ -68,23 +68,23 @@ void TransparencyIntersectionFilter(void *ptr, RayEngine::EmbreeData::Ray &ray) 
 
 void Object::embreeInit(RTCDevice device) {
 
-	EmbreeData.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_OBJECT, EMBREE_AFLAGS_OBJECT);
+	Embree.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_OBJECT, EMBREE_AFLAGS_OBJECT);
 
 	// Init embree for meshes
 	for (uint i = 0; i < geometries.size(); i++) {
 
-		uint geomID = geometries[i]->embreeInit(EmbreeData.scene);
-		EmbreeData.geomIDmap[geomID] = geometries[i];
+		uint geomID = geometries[i]->embreeInit(Embree.scene);
+		Embree.geomIDmap[geomID] = geometries[i];
 
 		// Set filter functions
-		/*rtcSetIntersectionFilterFunction(EmbreeData.scene, geomID, (RTCFilterFunc)&TransparencyIntersectionFilter);
-		rtcSetIntersectionFilterFunction8(EmbreeData.scene, geomID, (RTCFilterFunc8)&TransparencyIntersectionFilter8);
-		rtcSetOcclusionFilterFunction(EmbreeData.scene, geomID, (RTCFilterFunc)&TransparencyIntersectionFilter);
-		rtcSetOcclusionFilterFunction8(EmbreeData.scene, geomID, (RTCFilterFunc8)&TransparencyIntersectionFilter8);*/
+		/*rtcSetIntersectionFilterFunction(Embree.scene, geomID, (RTCFilterFunc)&TransparencyIntersectionFilter);
+		rtcSetIntersectionFilterFunction8(Embree.scene, geomID, (RTCFilterFunc8)&TransparencyIntersectionFilter8);
+		rtcSetOcclusionFilterFunction(Embree.scene, geomID, (RTCFilterFunc)&TransparencyIntersectionFilter);
+		rtcSetOcclusionFilterFunction8(Embree.scene, geomID, (RTCFilterFunc8)&TransparencyIntersectionFilter8);*/
 
 	}
 
-	rtcCommit(EmbreeData.scene);
+	rtcCommit(Embree.scene);
 
 }
 
@@ -100,23 +100,23 @@ uint TriangleMesh::embreeInit(RTCScene scene) {
 void RayEngine::embreeResize() {
 
 	// Set dimensions
-	if (rayTracingTarget == RTT_HYBRID) {
-		EmbreeData.offset = 0;
-		EmbreeData.width = ceil(window.width * hybridPartition);
+	if (renderMode == RM_HYBRID) {
+		Embree.offset = 0;
+		Embree.width = ceil(window.width * Hybrid.partition);
 	} else {
-		EmbreeData.offset = 0;
-		EmbreeData.width = window.width;
+		Embree.offset = 0;
+		Embree.width = window.width;
 	}
 
-	if (EmbreeData.width == 0)
+	if (Embree.width == 0)
 		return;
 
 	// Resize buffer
-	EmbreeData.buffer.resize(EmbreeData.width * window.height);
+	Embree.buffer.resize(Embree.width * window.height);
 
 	// Resize texture
-	glBindTexture(GL_TEXTURE_2D, EmbreeData.texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, EmbreeData.width, window.height, 0, GL_RGBA, GL_FLOAT, 0);
+	glBindTexture(GL_TEXTURE_2D, Embree.texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Embree.width, window.height, 0, GL_RGBA, GL_FLOAT, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 }

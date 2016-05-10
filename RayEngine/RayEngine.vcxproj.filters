@@ -29,12 +29,6 @@
     <ClCompile Include="shader.cpp">
       <Filter>RayEngine\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="font.cpp">
-      <Filter>RayEngine\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="input.cpp">
-      <Filter>RayEngine</Filter>
-    </ClCompile>
     <ClCompile Include="camera.cpp">
       <Filter>RayEngine\Scene</Filter>
     </ClCompile>
@@ -67,6 +61,21 @@
     </ClCompile>
     <ClCompile Include="embree_render_fire.cpp">
       <Filter>RayEngine\Embree</Filter>
+    </ClCompile>
+    <ClCompile Include="gui_render.cpp">
+      <Filter>RayEngine\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="settings.cpp">
+      <Filter>RayEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="camera_input.cpp">
+      <Filter>RayEngine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="font.cpp">
+      <Filter>RayEngine\GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="hybrid_handler.cpp">
+      <Filter>RayEngine\Hybrid</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -118,9 +127,6 @@
     <ClInclude Include="shader.h">
       <Filter>RayEngine\OpenGL</Filter>
     </ClInclude>
-    <ClInclude Include="font.h">
-      <Filter>RayEngine\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="common.cuh">
       <Filter>RayEngine\OptiX\CUDA</Filter>
     </ClInclude>
@@ -129,6 +135,9 @@
     </ClInclude>
     <ClInclude Include="image.h">
       <Filter>RayEngine\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="font.h">
+      <Filter>RayEngine\GUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +170,9 @@
     </Filter>
     <Filter Include="RayEngine\Hybrid">
       <UniqueIdentifier>{71ce7c32-0ce4-403f-bda8-e9b765b2ba71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RayEngine\GUI">
+      <UniqueIdentifier>{da1ff309-e049-4df6-8fd3-06db9fae2793}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

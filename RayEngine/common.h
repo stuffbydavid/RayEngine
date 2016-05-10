@@ -38,3 +38,11 @@ using namespace placeholders;
 
 typedef unsigned int uint;
 typedef unsigned char uchar;
+
+inline long mod(long a, long b) {
+	return (a % b + b) % b;
+}
+
+inline long clamp(long x, long mi, long ma) {
+	return min(ma, max(mi, x));
+}

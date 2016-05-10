@@ -6,5 +6,5 @@ Material::Material() :
     diffuse({ 1.f }),
     shininess(10.f)
 {
-	OptixData.material = nullptr;
+	Optix.material = nullptr;
 }

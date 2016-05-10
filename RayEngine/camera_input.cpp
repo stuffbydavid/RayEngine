@@ -1,6 +1,6 @@
 #include "rayengine.h"
 
-void RayEngine::input() {
+void RayEngine::cameraInput() {
 
 	static bool moveCamera = false;
 
@@ -14,51 +14,6 @@ void RayEngine::input() {
 	if (window.mouseReleased[GLFW_MOUSE_BUTTON_LEFT]) {
 		moveCamera = false;
 		glfwSetInputMode(window.handle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	}
-
-	// Render mode
-
-	if (window.keyPressed[GLFW_KEY_F1])
-		renderMode = RM_OPENGL;
-
-	if (window.keyPressed[GLFW_KEY_F2]) {
-		renderMode = RM_RAY_TRACING;
-		rayTracingTarget = RTT_CPU;
-		resize();
-	}
-
-	if (window.keyPressed[GLFW_KEY_F3]) {
-		renderMode = RM_RAY_TRACING;
-		rayTracingTarget = RTT_GPU;
-		resize();
-	}
-
-	if (window.keyPressed[GLFW_KEY_F4]) {
-		renderMode = RM_RAY_TRACING;
-		rayTracingTarget = RTT_HYBRID;
-		resize();
-	}
-
-	// Print camera
-
-	if (window.keyPressed[GLFW_KEY_F11]) {
-		cout << curCamera->position << endl;
-		cout << curCamera->xaxis << endl;
-		cout << curCamera->yaxis << endl;
-		cout << curCamera->zaxis << endl;
-		cout << endl;
-	}
-
-	// Hybrid partition
-
-	if (window.keyDown[GLFW_KEY_LEFT]) {
-		hybridPartition = max(hybridPartition - 0.01f, 0.f);
-		resize();
-	}
-
-	if (window.keyDown[GLFW_KEY_RIGHT]) {
-		hybridPartition = min(hybridPartition + 0.01f, 1.f);
-		resize();
 	}
 
 	// Move the camera

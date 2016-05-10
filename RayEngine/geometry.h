@@ -15,7 +15,7 @@ struct Geometry {
 	struct {
 		optix::Geometry geometry;
 		optix::GeometryInstance geometryInstance;
-	} OptixData;
+	} Optix;
 	virtual void optixInit(optix::Context context) = 0;
 
 };

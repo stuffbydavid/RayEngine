@@ -9,63 +9,110 @@
 
 struct RayEngine {
 
-	// Render modes
-	enum RenderMode {
-		RM_RAY_TRACING, // Render using the ray tracing algorithm
-		RM_OPENGL // Render using OpenGL shaders
-	};
+	//todo: public vs private
 
-	// Ray tracing targets
-	enum RayTracingTarget {
-		RTT_CPU, // Use Embree for CPU ray tracing
-		RTT_GPU, // Use OptiX for GPU ray tracing
-		RTT_HYBRID // Use both Embree and OptiX for CPU and GPU ray tracing
-	};
-
-	// Constructor
-	RayEngine(int windowWidth = WINDOW_WIDTH,
-			  int windowHeight = WINDOW_HEIGHT,
-			  RenderMode renderMode = RENDER_MODE,
-			  RayTracingTarget rayTracingTarget = RAY_TRACING_TARGET,
-			  float hybridPartition = HYBRID_PARTITION);
-
+	RayEngine();
 	~RayEngine();
-
-	// Adds a new, empty scene.
-	Scene* createScene(string name, Color ambient = { 0.f }, string skyFile = "", Color skyColor = { 0.f });
 
 	// Launches the program and starts rendering.
 	void launch();
 
-	// Called by the window.
+	//// Window ////
+
+	Window window;
 	void loop();
 	void resize();
-	void input();
 
-	// Variables
+	//// Scene ////
+
 	vector<Scene*> scenes;
 	Scene* curScene;
 	Camera* curCamera;
-	Window window;
-	RenderMode renderMode;
-	RayTracingTarget rayTracingTarget;
 	Vec3 rayOrg, rayXaxis, rayYaxis, rayZaxis;
 
-	// GUI
-	void GUIRender();
-	Font* fntGUI;
+	Scene* createScene(string name, Color ambient = { 0.f }, string skyFile = "", Color skyColor = { 0.f });
+	void cameraInput();
 
-	// OpenGL
+	//// Settings ////
+
+	enum RenderMode {
+		RM_OPENGL, // Render using OpenGL shaders
+		RM_EMBREE, // Use Embree for CPU ray tracing
+		RM_OPTIX,  // Use OptiX for GPU ray tracing
+		RM_HYBRID, // Use both Embree and OptiX for CPU and GPU ray tracing
+	};
+
+	RenderMode renderMode;
+	int maxReflections;
+
+	struct Setting {
+
+		Setting(string name);
+		void addOption(string name, function<void()> func, bool selected = false);
+
+		struct Option {
+			Option(string name, function<void()> func);
+			string name;
+			function<void()> func;
+		};
+
+		vector<Option> options;
+		string name;
+		int selectedOption;
+
+	};
+
+	Setting* settingRenderMode;
+	Setting* settingMaxReflections;
+	Setting* settingEmbreeRenderTiles;
+	Setting* settingEmbreePacketPrimary;
+	Setting* settingEmbreePacketSecondary;
+	Setting* settingEmbreeTileWidth;
+	Setting* settingEmbreeTileHeight;
+	vector<Setting*> settings;
+	int selectedSetting;
+
+	void settingsInit();
+	void settingsInput();
+	void settingsUpdate();
+	Setting* addSetting(string name);
+
+	//// GUI ////
+
+	Font* fntGui;
+	Font* fntGuiBold;
+
+	bool showGui;
+	void guiRender();
+	void guiRenderSetting(Setting* setting, int x, int y);
+	void guiRenderText(string text, int x, int y, Color color);
+
+	//// OpenGL ////
+
+	struct OpenGL {
+
+		Shader* shdrColor;
+		Shader* shdrTexture;
+		Shader* shdrNormals;
+		Shader* shdrPhong;
+
+	} OpenGL;
+
 	void openglRender();
 	void openglSetupNormals(GLuint program, Object* object, TriangleMesh* mesh);
 	void openglSetupPhong(GLuint program, Object* object, TriangleMesh* mesh);
-	Shader* shdrColor;
-	Shader* shdrTexture;
-	Shader* shdrNormals;
-	Shader* shdrPhong;
 
-	// Embree
-	struct EmbreeData{
+	//// Embree ///
+
+	struct Embree {
+
+		struct Ray : RTCRay {
+			Color transColor;
+		};
+		struct RayPacket : EMBREE_PACKET_TYPE {
+			Color transColor[EMBREE_PACKET_SIZE];
+			int valid[EMBREE_PACKET_SIZE];
+		};
 
 		RTCDevice device;
 		vector<Color> buffer;
@@ -73,26 +120,24 @@ struct RayEngine {
 		int offset, width, frames;
 		float time, lastTime, avgTime;
 
-		struct Ray : RTCRay {
-			Color transColor;
-		};
-		struct RayPacket : EMBREE_PACKET_TYPE {
-			Color transColor[EMBREE_PACKET_SIZE];
-		};
+		bool renderTiles, packetPrimary, packetSecondary;
+		int tileWidth, tileHeight;
 
-	} EmbreeData;
+	} Embree;
+
 	void embreeInit();
 	void embreeResize();
 	void embreeRender();
 	void embreeRenderFirePrimaryRay(int x, int y);
 	void embreeRenderFirePrimaryPacket(int x, int y);
-	void embreeRenderTraceRay(EmbreeData::Ray& ray, int depth, Color& result);
-	void embreeRenderTracePacket(EmbreeData::RayPacket& packet, int* valid, int depth, Color* result);
+	void embreeRenderTraceRay(Embree::Ray& ray, int depth, Color& result);
+	void embreeRenderTracePacket(Embree::RayPacket& packet, int depth, Color* result);
 	void embreeRenderUpdateTexture();
 	Color embreeRenderSky(Vec3 dir);
 
-	// OptiX
-	struct OptixData  {
+	//// OptiX ////
+
+	struct Optix  {
 
 		optix::Context context;
 		optix::Buffer renderBuffer, lights;
@@ -101,16 +146,24 @@ struct RayEngine {
 		int offset, width, frames;
 		float time, lastTime, avgTime;
 
-	} OptixData;
+	} Optix;
+
 	void optixInit();
 	void optixResize();
 	void optixRender();
 	void optixRenderUpdateTexture();
 
-	// Hybrid
+	//// Hybrid ////
+
+	struct Hybrid {
+
+		float partition;
+		float direction;
+
+	} Hybrid;
+
+	void hybridInit();
 	void hybridRender();
 	void hybridUpdatePartition();
-	float hybridPartition;
-	float hybridDirection;
 
 };

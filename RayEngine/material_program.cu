@@ -20,11 +20,11 @@ rtDeclareVariable(RayShadowData, curShadowData, rtPayload, );
 
 RT_PROGRAM void anyHit() {
 
-	/*float transColor = diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
+	float transColor = diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
 	curShadowData.attenuation *= 1.f - transColor;
 
 	if (curShadowData.attenuation == 0.f)
-		rtTerminateRay();*/
+		rtTerminateRay();
 
 }
 

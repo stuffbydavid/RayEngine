@@ -184,12 +184,14 @@
     <ClCompile Include="embree_handler.cpp" />
     <ClCompile Include="embree_render_fire.cpp" />
     <ClCompile Include="embree_render_trace.cpp" />
+    <ClCompile Include="gui_render.cpp" />
+    <ClCompile Include="hybrid_handler.cpp" />
     <ClCompile Include="image.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="hybrid_render.cpp" />
     <ClCompile Include="embree_render.cpp" />
     <ClCompile Include="font.cpp" />
-    <ClCompile Include="input.cpp" />
+    <ClCompile Include="camera_input.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="object.cpp" />
     <ClCompile Include="opengl_render.cpp" />
@@ -201,6 +203,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="optix_render.cpp" />
     <ClCompile Include="scene.cpp" />
+    <ClCompile Include="settings.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="shader_setup.cpp" />
     <ClCompile Include="tiny_obj_loader.cc" />

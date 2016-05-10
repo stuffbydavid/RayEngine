@@ -120,9 +120,30 @@
 
 )
 {
+	.reg .pred 	%p<2>;
+	.reg .f32 	%f<15>;
+	.reg .s64 	%rd<4>;
 
 
+	mov.u64 	%rd1, diffuse;
+	add.s64 	%rd2, %rd1, 12;
+	ldu.global.f32 	%f1, [%rd2];
+	ldu.global.v2.f32 	{%f2, %f3}, [texCoord];
+	tex.2d.v4.f32.f32	{%f6, %f7, %f8, %f9}, [sampler, {%f2, %f3}];
+	mul.f32 	%f10, %f1, %f9;
+	mov.f32 	%f11, 0f3F800000;
+	sub.f32 	%f12, %f11, %f10;
+	ld.global.f32 	%f13, [curShadowData];
+	mul.f32 	%f14, %f13, %f12;
+	st.global.f32 	[curShadowData], %f14;
+	setp.neu.f32	%p1, %f14, 0f00000000;
+	@%p1 bra 	BB0_2;
 
+	// inline asm
+	call _rt_terminate_ray, ();
+	// inline asm
+
+BB0_2:
 	ret;
 }
 
