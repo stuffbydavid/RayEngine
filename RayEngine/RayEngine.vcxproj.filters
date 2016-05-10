@@ -17,9 +17,6 @@
     <ClCompile Include="rayengine.cpp">
       <Filter>RayEngine</Filter>
     </ClCompile>
-    <ClCompile Include="window.cpp">
-      <Filter>RayEngine</Filter>
-    </ClCompile>
     <ClCompile Include="scene.cpp">
       <Filter>RayEngine\Scene</Filter>
     </ClCompile>
@@ -65,9 +62,6 @@
     <ClCompile Include="gui_render.cpp">
       <Filter>RayEngine\GUI</Filter>
     </ClCompile>
-    <ClCompile Include="settings.cpp">
-      <Filter>RayEngine</Filter>
-    </ClCompile>
     <ClCompile Include="camera_input.cpp">
       <Filter>RayEngine\Scene</Filter>
     </ClCompile>
@@ -76,6 +70,12 @@
     </ClCompile>
     <ClCompile Include="hybrid_handler.cpp">
       <Filter>RayEngine\Hybrid</Filter>
+    </ClCompile>
+    <ClCompile Include="settings.cpp">
+      <Filter>RayEngine\Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="window.cpp">
+      <Filter>RayEngine\Window</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,9 +115,6 @@
     <ClInclude Include="common.h">
       <Filter>RayEngine</Filter>
     </ClInclude>
-    <ClInclude Include="window.h">
-      <Filter>RayEngine</Filter>
-    </ClInclude>
     <ClInclude Include="scene.h">
       <Filter>RayEngine\Scene</Filter>
     </ClInclude>
@@ -130,14 +127,17 @@
     <ClInclude Include="common.cuh">
       <Filter>RayEngine\OptiX\CUDA</Filter>
     </ClInclude>
-    <ClInclude Include="settings.h">
-      <Filter>RayEngine</Filter>
-    </ClInclude>
     <ClInclude Include="image.h">
       <Filter>RayEngine\Data</Filter>
     </ClInclude>
     <ClInclude Include="font.h">
       <Filter>RayEngine\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>RayEngine\Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="window.h">
+      <Filter>RayEngine\Window</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -173,6 +173,12 @@
     </Filter>
     <Filter Include="RayEngine\GUI">
       <UniqueIdentifier>{da1ff309-e049-4df6-8fd3-06db9fae2793}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RayEngine\Settings">
+      <UniqueIdentifier>{ea0b2d1a-70c7-4fd1-ac85-5e721bf377e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RayEngine\Window">
+      <UniqueIdentifier>{163fc065-29f9-4185-9c0d-7b7c4353e1d0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

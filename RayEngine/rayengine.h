@@ -69,6 +69,8 @@ struct RayEngine {
 	Setting* settingEmbreePacketSecondary;
 	Setting* settingEmbreeTileWidth;
 	Setting* settingEmbreeTileHeight;
+	Setting* settingHybridBalanceMode;
+	Setting* settingHybridDisplayPartition;
 	vector<Setting*> settings;
 	int selectedSetting;
 
@@ -84,8 +86,8 @@ struct RayEngine {
 
 	bool showGui;
 	void guiRender();
-	void guiRenderSetting(Setting* setting, int x, int y);
-	void guiRenderText(string text, int x, int y, Color color);
+	void guiRenderSetting(Setting* setting, int x, int& y, bool indent = false);
+	void guiRenderText(string text, int x, int& y, Color color);
 
 	//// OpenGL ////
 
@@ -121,7 +123,7 @@ struct RayEngine {
 		float time, lastTime, avgTime;
 
 		bool renderTiles, packetPrimary, packetSecondary;
-		int tileWidth, tileHeight;
+		int tileWidth, tileHeight, showTiles;
 
 	} Embree;
 
@@ -155,15 +157,22 @@ struct RayEngine {
 
 	//// Hybrid ////
 
+	enum BalanceMode {
+		BM_TIME,
+		BM_MANUAL
+	};
+
 	struct Hybrid {
 
+		BalanceMode balanceMode;
 		float partition;
 		float direction;
+		bool displayPartition;
 
 	} Hybrid;
 
 	void hybridInit();
 	void hybridRender();
-	void hybridUpdatePartition();
+	void hybridRenderUpdatePartition();
 
 };

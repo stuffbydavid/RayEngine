@@ -53,6 +53,6 @@ void RayEngine::optixRenderUpdateTexture() {
 #endif
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	OpenGL.shdrTexture->render2DBox(window.ortho, Optix.offset, 0, Optix.width, window.height, Optix.texture);
+	OpenGL.shdrTexture->render2DBox(window.ortho, Optix.offset, 0, Optix.width, window.height, Optix.texture, (renderMode == RM_HYBRID && Hybrid.displayPartition) ? OPTIX_HIGHLIGHT_COLOR : Color(1.f));
 
 }

@@ -36,6 +36,15 @@ void RayEngine::settingsInit() {
 	settingEmbreePacketSecondary->addOption("Yes", [this]() { Embree.packetSecondary = true; },   EMBREE_PACKET_SECONDARY);
 	settingEmbreePacketSecondary->addOption("No",  [this]() { Embree.packetSecondary = false; }, !EMBREE_PACKET_SECONDARY);
 
+	// Hybrid settings
+	settingHybridBalanceMode = addSetting("Balance mode");
+	settingHybridBalanceMode->addOption("Time",   [this]() { Hybrid.balanceMode = BM_TIME; },   HYBRID_BALANCE_MODE == BM_TIME);
+	settingHybridBalanceMode->addOption("Manual", [this]() { Hybrid.balanceMode = BM_MANUAL; }, HYBRID_BALANCE_MODE == BM_MANUAL);
+
+	settingHybridDisplayPartition = addSetting("Display partition");
+	settingHybridDisplayPartition->addOption("Yes", [this]() { Hybrid.displayPartition = true; },   HYBRID_DISPLAY_PARTITION);
+	settingHybridDisplayPartition->addOption("No",  [this]() { Hybrid.displayPartition = false; }, !HYBRID_DISPLAY_PARTITION);
+
 }
 
 RayEngine::Setting::Setting(string name) :

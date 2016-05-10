@@ -7,7 +7,18 @@ void RayEngine::hybridInit() {
 
 }
 
-void RayEngine::hybridUpdatePartition() {
+void RayEngine::hybridRenderUpdatePartition() {
+
+	if (Hybrid.balanceMode == BM_TIME) {
+
+		float dif = Optix.lastTime - Embree.lastTime;
+		Hybrid.partition = max(0.f, min(1.f, Hybrid.partition + dif * 0.25f));
+		resize();
+
+	} else {
+
+
+	}
 
 	/*if (Optix.avgTime == 0.f && Embree.avgTime == 0.f)
 	return;
@@ -23,10 +34,5 @@ void RayEngine::hybridUpdatePartition() {
 
 	lastFrameTime = frameTime;*/
 
-	float dif = Optix.lastTime - Embree.lastTime;
-
-	Hybrid.partition = max(0.f, min(1.f, Hybrid.partition + dif * 0.1f));
-
-	resize();
 
 }

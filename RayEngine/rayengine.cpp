@@ -3,7 +3,6 @@
 RayEngine::RayEngine() {
 
 	window.init(WINDOW_WIDTH, WINDOW_HEIGHT);
-	window.setTitle("RayEngine");
 
 	// ImageMagick
 	Magick::InitializeMagick(NULL);
@@ -64,12 +63,14 @@ void RayEngine::loop() {
 	} else if (renderMode == RM_HYBRID) {
 		mode = "Hybrid";
 		hybridRender();
-		hybridUpdatePartition();
+		hybridRenderUpdatePartition();
 	}
 
 	if (showGui)
 		guiRender();
-		
+
+	window.setTitle("RayEngine" + (!showGui ? " - FPS: " + to_string(window.fps) : ""));
+
 }
 
 void RayEngine::resize() {

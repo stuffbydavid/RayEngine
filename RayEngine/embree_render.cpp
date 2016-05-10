@@ -81,6 +81,6 @@ void RayEngine::embreeRenderUpdateTexture() {
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	//glDrawPixels(Embree.width, window.height, GL_RGBA, GL_FLOAT, &Embree.buffer[0]);
-	OpenGL.shdrTexture->render2DBox(window.ortho, Embree.offset, 0, Embree.width, window.height, Embree.texture);
+	OpenGL.shdrTexture->render2DBox(window.ortho, Embree.offset, 0, Embree.width, window.height, Embree.texture, (renderMode == RM_HYBRID && Hybrid.displayPartition) ? EMBREE_HIGHLIGHT_COLOR : Color(1.f));
 
 }

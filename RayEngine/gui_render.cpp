@@ -2,45 +2,55 @@
 
 void RayEngine::guiRender() {
 
-	OpenGL.shdrColor->render2DBox(window.ortho, 10, 10, 250, 200, 0, { 0.f, 0.f, 0.f, 0.5f });
+	OpenGL.shdrColor->render2DBox(window.ortho, 10, 10, 250, 250, 0, { 0.f, 0.f, 0.f, 0.5f });
 
 	int dx = 20, dy = 20;
 	fntGuiBold->renderText("RayEngine 0.1 Alpha", dx, dy, { 1.f }, OpenGL.shdrTexture, window.ortho);
 	dy += 30;
 
 	guiRenderText("Fps: " + to_string(window.fps), dx, dy, { 1.f });
+	dy += 16;
+	guiRenderText("Screen: " + to_string(window.width) + "x" + to_string(window.height), dx, dy, { 1.f });
 	dy += 30;
 
 	guiRenderSetting(settingRenderMode, dx, dy);
-	dy += 16;
 	guiRenderSetting(settingMaxReflections, dx, dy);
-	dy += 16;
 
 	guiRenderSetting(settingEmbreeRenderTiles, dx, dy);
-	dy += 16;
-	guiRenderSetting(settingEmbreeTileWidth, dx, dy);
-	dy += 16;
-	guiRenderSetting(settingEmbreeTileHeight, dx, dy);
-	dy += 16;
+	guiRenderSetting(settingEmbreeTileWidth, dx, dy, true);
+	guiRenderSetting(settingEmbreeTileHeight, dx, dy, true);
 	guiRenderSetting(settingEmbreePacketPrimary, dx, dy);
-	dy += 16;
 	guiRenderSetting(settingEmbreePacketSecondary, dx, dy);
-	dy += 16;
+
+	guiRenderSetting(settingHybridBalanceMode, dx, dy);
+	guiRenderSetting(settingHybridDisplayPartition, dx, dy);
 
 }
 
-void RayEngine::guiRenderText(string text, int x, int y, Color color) {
+void RayEngine::guiRenderSetting(Setting* setting, int x, int& y, bool indent) {
 
-	fntGui->renderText(text, x, y, color, OpenGL.shdrTexture, window.ortho);
-}
+	Color color;
+	bool selected = (settings[selectedSetting] == setting);
+	bool atFirst = (setting->options.size() > 2 && setting->selectedOption == 0);
+	bool atLast = (setting->options.size() > 2 && setting->selectedOption == setting->options.size() - 1);
 
-void RayEngine::guiRenderSetting(Setting* setting, int x, int y) {
-
-	Color color = { 1.f };
-	if (settings[selectedSetting] == setting)
+	if (selected) {
 		color = { 1.f, 1.f, 0.f };
+		if (!atFirst)
+			guiRenderText("<", x + 150 - 12, y, color);
+	} else
+		color = { 0.5f };
 
-	guiRenderText(setting->name, x, y, color);
-	guiRenderText(setting->options[setting->selectedOption].name, x + 150, y, color);
+	guiRenderText(setting->name, x + indent * 16, y, color);
+	guiRenderText(setting->options[setting->selectedOption].name + (selected && !atLast ? " > " : ""), x + 150, y, color);
+
+	y += 16;
+
+}
+
+void RayEngine::guiRenderText(string text, int x, int& y, Color color) {
+
+	fntGui->renderText(text, x + 1, y + 1, { 0.1f }, OpenGL.shdrTexture, window.ortho);
+	fntGui->renderText(text, x, y, color, OpenGL.shdrTexture, window.ortho);
 
 }
