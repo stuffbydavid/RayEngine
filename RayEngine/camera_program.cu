@@ -24,5 +24,5 @@ RT_PROGRAM void camera() {
 	data.depth = 0;
 	rtTrace(sceneObj, ray, data);
 
-	renderBuffer[launchIndex] = data.result;
+	renderBuffer[launchIndex] = data.result;// +make_float4(0.5f, 0.f, 0.f, 1.f);
 }

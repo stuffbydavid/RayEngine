@@ -25,11 +25,11 @@ Color RayEngine::embreeRenderSky(Vec3 dir) {
 
 }
 
-void RayEngine::embreeRenderTraceRay(RTCRay& ray, int depth, Color& result) {
+void RayEngine::embreeRenderTraceRay(EmbreeData::Ray& ray, int depth, Color& result) {
 
 	// No object hit, return sky color
 	if (ray.geomID == RTC_INVALID_GEOMETRY_ID) {
-		result = embreeRenderSky(ray.dir);
+		result = embreeRenderSky(ray.dir) + ray.transColor;
 		return;
 	}
 
@@ -59,7 +59,7 @@ void RayEngine::embreeRenderTraceRay(RTCRay& ray, int depth, Color& result) {
 
 			// Define light ray
 			Vec3 incidence = Vec3::normalize(light.position - hit.pos);
-			RTCRay leRay;
+			EmbreeData::Ray leRay;
 			leRay.org[0] = hit.pos.x();
 			leRay.org[1] = hit.pos.y();
 			leRay.org[2] = hit.pos.z();
@@ -109,7 +109,7 @@ void RayEngine::embreeRenderTraceRay(RTCRay& ray, int depth, Color& result) {
 
 		Vec3 rayDir = Vec3::reflect(-Vec3(ray.dir), hit.normal);
 
-		RTCRay rRay;
+		EmbreeData::Ray rRay;
 		rRay.org[0] = hit.pos.x();
 		rRay.org[1] = hit.pos.y();
 		rRay.org[2] = hit.pos.z();
@@ -123,6 +123,7 @@ void RayEngine::embreeRenderTraceRay(RTCRay& ray, int depth, Color& result) {
 		rRay.primID = RTC_INVALID_GEOMETRY_ID;
 		rRay.mask = EMBREE_RAY_VALID;
 		rRay.time = 0.f;
+		rRay.transColor = 1.f;
 
 		rtcIntersect(curScene->EmbreeData.scene, rRay);
 
@@ -142,11 +143,11 @@ struct LightRay {
 	Color lightColor;
 };
 
-void RayEngine::embreeRenderTracePacket(RTCRay8& packet, int* valid, int depth, Color* result) {
+void RayEngine::embreeRenderTracePacket(EmbreeData::RayPacket& packet, int* valid, int depth, Color* result) {
 	
 #if EMBREE_ONE_LIGHT
 
-	EMBREE_PACKET_TYPE lightPacket;
+	EmbreeData::RayPacket lightPacket;
 	LightRay lightRays[EMBREE_PACKET_SIZE];
 	int lightValid[EMBREE_PACKET_SIZE];
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
@@ -158,7 +159,7 @@ void RayEngine::embreeRenderTracePacket(RTCRay8& packet, int* valid, int depth, 
 
 	// Create light packets (invalid by default)
 	int numLights = min((int)curScene->lights.size(), MAX_LIGHTS - 1);
-	EMBREE_PACKET_TYPE lightPackets[MAX_LIGHTS];
+	EmbreeData::RayPacket lightPackets[MAX_LIGHTS];
 	LightRay lightRays[MAX_LIGHTS][EMBREE_PACKET_SIZE];
 	int lightValid[MAX_LIGHTS][EMBREE_PACKET_SIZE];
 
@@ -170,7 +171,7 @@ void RayEngine::embreeRenderTracePacket(RTCRay8& packet, int* valid, int depth, 
 
 	// Reflection packet (invalid by default)
 	bool doReflections = false;
-	EMBREE_PACKET_TYPE reflectPacket;
+	EmbreeData::RayPacket reflectPacket;
 	int reflectValid[EMBREE_PACKET_SIZE];
 	Color reflectResult[EMBREE_PACKET_SIZE];
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
@@ -190,7 +191,7 @@ void RayEngine::embreeRenderTracePacket(RTCRay8& packet, int* valid, int depth, 
 		Vec3 rayDir = Vec3(packet.dirx[i], packet.diry[i], packet.dirz[i]);
 
 		if (packet.geomID[i] == RTC_INVALID_GEOMETRY_ID) {
-			result[i] = embreeRenderSky(rayDir);
+			result[i] = embreeRenderSky(rayDir) + packet.transColor[i];
 			hit.hitSky = true;
 			continue;
 		}
@@ -356,7 +357,7 @@ void RayEngine::embreeRenderTracePacket(RTCRay8& packet, int* valid, int depth, 
 
 		// Create color
 		Color texColor = hit.material->diffuse * hit.material->image->getPixel(hit.texCoord);
-		result[i] = texColor * (curScene->ambient + hit.material->ambient + hit.diffuse) + hit.specular;
+		result[i] = texColor * (curScene->ambient + hit.material->ambient + hit.diffuse) + hit.specular + packet.transColor[i];
 
 		// Add reflections
 		if (doReflections) // TODO: Check material reflection

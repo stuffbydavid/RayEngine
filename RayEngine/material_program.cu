@@ -20,8 +20,11 @@ rtDeclareVariable(RayShadowData, curShadowData, rtPayload, );
 
 RT_PROGRAM void anyHit() {
 
-	curShadowData.attenuation = 0.f;
-	rtTerminateRay();
+	/*float transColor = diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
+	curShadowData.attenuation *= 1.f - transColor;
+
+	if (curShadowData.attenuation == 0.f)
+		rtTerminateRay();*/
 
 }
 
@@ -83,5 +86,17 @@ RT_PROGRAM void closestHit() {
 	// Create color
 	float4 texColor = diffuse * tex2D(sampler, texCoord.x, texCoord.y);
 	curColorData.result = texColor * (sceneAmbient + ambient + totalDiffuse) + totalSpecular + totalReflect;
+
+	float transColor = diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
+	if (transColor < 1.f) {
+
+		RayColorData transData;
+		transData.depth = curColorData.depth;
+		Ray transRay(hitPos, ray.direction, 0, 0.01f);
+		rtTrace(sceneObj, transRay, transData);
+
+		curColorData.result += transData.result * transColor;
+
+	}
 
 }

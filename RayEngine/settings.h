@@ -4,7 +4,7 @@
 #define WINDOW_HEIGHT 600
 #define RENDER_MODE RM_RAY_TRACING
 #define RAY_TRACING_TARGET RTT_CPU
-#define MAX_REFLECTIONS 10
+#define MAX_REFLECTIONS 0
 #define EMBREE_RENDER_TILES 1     // 1 = Split into tiles, 0 = Use a single loop
 #define EMBREE_PACKET_PRIMARY 1   // 1 = Use packets for primary rays, 0 = Shoot single rays
 #define EMBREE_PACKET_SECONDARY 1 // 1 = Use packets for secondary rays (eg. shadows, reflections), 0 = use single rays

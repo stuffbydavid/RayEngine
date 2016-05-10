@@ -8,6 +8,7 @@ void RayEngine::embreeInit() {
 
 	// Init library
 	EmbreeData.frames = 0;
+	EmbreeData.lastTime = 0.f;
 	EmbreeData.avgTime = 0.f;
 	EmbreeData.device = rtcNewDevice(NULL);
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
@@ -41,14 +42,46 @@ void Scene::embreeInit(RTCDevice device) {
 
 }
 
+void TransparencyIntersectionFilter8(const void* valid, void *ptr, RayEngine::EmbreeData::RayPacket &packet) {
+
+	// We hit a transparent object, add contribution to the ray
+
+	int* valids = (int*)valid;
+	for (int i = 0; i < 8; i++) {
+
+		if (!valids[i])
+			continue;
+
+		packet.instID[i] = packet.geomID[i] = packet.primID[i] = RTC_INVALID_GEOMETRY_ID;
+		packet.transColor[i] = 0.5f;
+
+	}
+}
+
+void TransparencyIntersectionFilter(void *ptr, RayEngine::EmbreeData::Ray &ray) {
+
+	// We hit a transparent object, add contribution to the ray
+
+	ray.instID = ray.geomID = ray.primID = RTC_INVALID_GEOMETRY_ID;
+	ray.transColor += 0.5;
+}
+
 void Object::embreeInit(RTCDevice device) {
 
 	EmbreeData.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_OBJECT, EMBREE_AFLAGS_OBJECT);
 
 	// Init embree for meshes
 	for (uint i = 0; i < geometries.size(); i++) {
+
 		uint geomID = geometries[i]->embreeInit(EmbreeData.scene);
 		EmbreeData.geomIDmap[geomID] = geometries[i];
+
+		// Set filter functions
+		/*rtcSetIntersectionFilterFunction(EmbreeData.scene, geomID, (RTCFilterFunc)&TransparencyIntersectionFilter);
+		rtcSetIntersectionFilterFunction8(EmbreeData.scene, geomID, (RTCFilterFunc8)&TransparencyIntersectionFilter8);
+		rtcSetOcclusionFilterFunction(EmbreeData.scene, geomID, (RTCFilterFunc)&TransparencyIntersectionFilter);
+		rtcSetOcclusionFilterFunction8(EmbreeData.scene, geomID, (RTCFilterFunc8)&TransparencyIntersectionFilter8);*/
+
 	}
 
 	rtcCommit(EmbreeData.scene);
@@ -74,6 +107,9 @@ void RayEngine::embreeResize() {
 		EmbreeData.offset = 0;
 		EmbreeData.width = window.width;
 	}
+
+	if (EmbreeData.width == 0)
+		return;
 
 	// Resize buffer
 	EmbreeData.buffer.resize(EmbreeData.width * window.height);

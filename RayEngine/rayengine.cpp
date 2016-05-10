@@ -21,6 +21,8 @@ RayEngine::RayEngine(int windowWidth, int windowHeight, RenderMode renderMode, R
 	shdrNormals = new Shader("Normals", bind(&RayEngine::openglSetupNormals, this, _1, _2, _3), "normals.vshader", "normals.fshader");
 	shdrPhong = new Shader("Phong", bind(&RayEngine::openglSetupPhong, this, _1, _2, _3), "phong.vshader", "phong.fshader");
 
+	hybridDirection = -1.f;
+
 }
 
 RayEngine::~RayEngine() {
@@ -60,12 +62,14 @@ void RayEngine::loop() {
 	} else if (rayTracingTarget == RTT_HYBRID) {
 		mode = "Hybrid";
 		hybridRender();
+		hybridUpdatePartition();
 	}
 
 	window.setTitle("RayEngine - " + mode +
 					" - FPS: " + to_string(window.fps) +
 					", Embree avg: " + to_string(EmbreeData.avgTime) +
 					", Optix avg: " + to_string(OptixData.avgTime));
+
 
 }
 

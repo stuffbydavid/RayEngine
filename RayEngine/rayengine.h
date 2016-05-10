@@ -71,7 +71,14 @@ struct RayEngine {
 		vector<Color> buffer;
 		GLuint texture;
 		int offset, width, frames;
-		float time, avgTime;
+		float time, lastTime, avgTime;
+
+		struct Ray : RTCRay {
+			Color transColor;
+		};
+		struct RayPacket : EMBREE_PACKET_TYPE {
+			Color transColor[EMBREE_PACKET_SIZE];
+		};
 
 	} EmbreeData;
 	void embreeInit();
@@ -79,8 +86,8 @@ struct RayEngine {
 	void embreeRender();
 	void embreeRenderFirePrimaryRay(int x, int y);
 	void embreeRenderFirePrimaryPacket(int x, int y);
-	void embreeRenderTraceRay(RTCRay& ray, int depth, Color& result);
-	void embreeRenderTracePacket(RTCRay8& packet, int* valid, int depth, Color* result);
+	void embreeRenderTraceRay(EmbreeData::Ray& ray, int depth, Color& result);
+	void embreeRenderTracePacket(EmbreeData::RayPacket& packet, int* valid, int depth, Color* result);
 	void embreeRenderUpdateTexture();
 	Color embreeRenderSky(Vec3 dir);
 
@@ -92,7 +99,7 @@ struct RayEngine {
 		GLuint vbo;
 		GLuint texture;
 		int offset, width, frames;
-		float time, avgTime;
+		float time, lastTime, avgTime;
 
 	} OptixData;
 	void optixInit();
@@ -102,6 +109,8 @@ struct RayEngine {
 
 	// Hybrid
 	void hybridRender();
+	void hybridUpdatePartition();
 	float hybridPartition;
+	float hybridDirection;
 
 };

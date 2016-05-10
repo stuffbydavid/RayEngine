@@ -62,7 +62,8 @@ void RayEngine::embreeRender() {
     #endif
 
 	float end = glfwGetTime();
-	EmbreeData.time += end - start;
+	EmbreeData.lastTime = end - start;
+	EmbreeData.time += EmbreeData.lastTime;
 	EmbreeData.frames++;
 	if (EmbreeData.frames > 30) {
 		EmbreeData.avgTime = EmbreeData.time / EmbreeData.frames;

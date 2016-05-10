@@ -32,20 +32,40 @@ int main(int argc, char **argv) {
 		clone->rotate({ 0, 1, 0 }, frand() * 360.f);
 	}*/
 
-	Scene* cornellBox = rayEngine.createScene("Cornell Box", { 0.1f, 0.1f, 0.2f });
+	/*Scene* cornellBox = rayEngine.createScene("Cornell Box", { 0.1f, 0.1f, 0.2f });
 	cornellBox->loadObject("obj/cornell_box.obj");
 	cornellBox->addLight({ 280.f, 540.f, 280.f }, { 1.f, 1.f, 1.f }, 1000.f);
 	cornellBox->camera.position = { 290.f, 280.f, -290.f };
 	cornellBox->camera.xaxis = { -1.f, 0.f, 0.f };
 	cornellBox->camera.yaxis = { 0.f, 1.f, 0.f };
-	cornellBox->camera.zaxis = { 0.f, 0.f, 1.f };
+	cornellBox->camera.zaxis = { 0.f, 0.f, 1.f };*/
 
-	/*Scene* sponzaScene = rayEngine.createScene("Sponza", { 0.1f, 0.1f, 0.2f });
+	Scene* modernTableScene = rayEngine.createScene("Modern Table", { 0.1f });
+	modernTableScene->loadObject("obj/StylishDesk/StylishDesk.obj");
+	modernTableScene->addLight({ 0.f, 6.f, 0.6f }, { 1.f }, 100.f);
+
+	/*Scene* sponzaScene = rayEngine.createScene("Sponza", { 0.1f, 0.1f, 0.2f }, "img/CedarCity.ppm");
 	sponzaScene->loadObject("obj/sponza/sponza.obj");
 	sponzaScene->addLight({ -6.0f, 6.7f, -0.28f  }, { 1.f, 1.f, 1.f }, 1000.f);
 	sponzaScene->camera.position = { -6.0f, 8.7f, -0.28f };*/
 
-	//myScene->loadObject("C:/Users/david/Documents/Visual Studio 2013/Projects/SimpleEmbree/Meshes/SLS/sls_amg.obj"); // Too big for laptop GPU
+	/*Scene* carScene = rayEngine.createScene("carScene", { 0.1f, 0.1f, 0.2f }, "img/CedarCity.ppm");
+	carScene->loadObject("obj/floor.obj");
+	carScene->addLight({ 100.f, 200.f, 100.f }, { 1.f, 1.f, 1.f }, 1000.f);
+	Object* car = carScene->loadObject("C:/Users/david/Documents/Visual Studio 2013/Projects/SimpleEmbree/Meshes/SLS/sls_amg.obj"); // Too big for laptop GPU
+	car->scale({ 50.f, 50.f, 50.f});
+	car->rotate({ 1, 0, 0 }, -90.f);
+	car->translate({ 0.f, 24.f, 0.f });
+
+	for (int i = 0; i < 360; i += 30) {
+		Object* clone = carScene->addObject();
+		clone->geometries = car->geometries;
+		clone->scale({ 50.f });
+		clone->rotate({ 1, 0, 0 }, -90.f);
+		clone->translate({ 500.f, 24.f, 0.f });
+		clone->rotate({ 0, 1, 0 }, i);
+	}*/
+
 	//myScene->loadObject("C:/Users/david/Documents/Visual Studio 2013/Projects/SimpleEmbree/Meshes/FutHouse/Futuristic rural house.obj"); // Too big for laptop GPU
 	//myScene->loadObject("obj/conference/conference.obj");
 

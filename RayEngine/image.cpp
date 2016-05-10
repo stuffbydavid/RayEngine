@@ -1,9 +1,14 @@
 #include "image.h"
 
+#define IMAGE_PRINT 0
+
 Image::Image(GLuint filter, string filename, string alphaFilename) :
     filter(filter)
 {
+
+#if IMAGE_PRINT
 	cout << "Loading image " << filename << "..." << endl;
+#endif
 
 	Magick::Image image;
 	image.read(filename);
@@ -11,8 +16,10 @@ Image::Image(GLuint filter, string filename, string alphaFilename) :
 	width = image.columns();
 	height = image.rows();
 
+#if IMAGE_PRINT
 	cout << "  Width: " << width << endl;
 	cout << "  Height: " << height << endl;
+#endif
 
 	// Convert to floats and flip vertically
 	pixels = new Color[width * height];
@@ -32,7 +39,9 @@ Image::Image(GLuint filter, string filename, string alphaFilename) :
 	// Load alpha map
 	if (alphaFilename != "") {
 
+#if IMAGE_PRINT
 		cout << "  Alpha map found: " << alphaFilename << endl;
+#endif
 
 		Magick::Image aImage;
 		aImage.read(alphaFilename);

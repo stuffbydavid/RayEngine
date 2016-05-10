@@ -19,6 +19,8 @@ void Object::scale(Vec3 vector) {
 	matrix = Mat4x4::scale(vector) * matrix;
 }
 
+#define OBJECT_PRINT 0
+
 Object* Object::load(string file) {
 
 	static Image defaultTexture({ 1.f });
@@ -28,7 +30,9 @@ Object* Object::load(string file) {
 	string path = file.substr(0, file.find_last_of("/\\") + 1);
 
 	// Load file
+#if OBJECT_PRINT
 	cout << "Loading " << file << "..." << endl;
+#endif
 	tinyobj::LoadObj(fileShapes, fileMaterials, err, &file[0], &path[0]);
 
 	if (!err.empty()) {
@@ -51,6 +55,7 @@ Object* Object::load(string file) {
 			mat->ambient = Color(fileMaterials[i].ambient);
 			mat->specular = Color(fileMaterials[i].specular);
 			mat->diffuse = Color(fileMaterials[i].diffuse);
+			mat->diffuse.a(fileMaterials[i].dissolve);
 
 			// Specular
 			if (mat->specular != Color(0.f))
@@ -91,13 +96,18 @@ Object* Object::load(string file) {
 	// Create a root
 	Object* obj = new Object();
 
+#if OBJECT_PRINT
 	cout << "Shapes found: " << fileShapes.size() << endl;
+#endif
+
 	for (uint i = 0; i < fileShapes.size(); i++) {
 
 		TriangleMesh* triangleMesh = new TriangleMesh();
 		obj->geometries.push_back(triangleMesh);
-		
+
+#if OBJECT_PRINT
 		cout << "  " << fileShapes[i].name << endl;
+#endif
 
 		// Vertices
 		uint vertices = fileShapes[i].mesh.positions.size() / 3;
@@ -140,34 +150,49 @@ Object* Object::load(string file) {
 			material_id = 0;
 		triangleMesh->material = materials[material_id];
 
+#if OBJECT_PRINT
 		cout << "    Vertices: " << vertices << endl;
 		cout << "    Triangles: " << triangles << endl;
+#endif
 
-		// Normals
 		triangleMesh->normalData = vector<Vec3>(vertices);
-		for (uint n = 0; n < vertices; n++)
-			triangleMesh->normalData[n] = Vec3(0.f, 0.f, 0.f);
+		if (fileShapes[i].mesh.normals.size() > 0) {
 
-		//TODO: Check if obj file has normals
-		// Calculate normals by going through each triangle
-		for (uint i = 0; i < triangles; i++) {
-			TrianglePrimitive& currentTriangle = triangleMesh->indexData[i];
+			for (int v = 0; v < vertices; v++) {
+				triangleMesh->normalData[v] = {
+					fileShapes[i].mesh.normals[3 * v + 0],
+					fileShapes[i].mesh.normals[3 * v + 1],
+					fileShapes[i].mesh.normals[3 * v + 2]
+				};
+			}
 
-			// Calculate normal of the triangle
-			Vec3 normal = Vec3::cross(
-				triangleMesh->posData[currentTriangle.indices[1]] - triangleMesh->posData[currentTriangle.indices[0]],
-				triangleMesh->posData[currentTriangle.indices[2]] - triangleMesh->posData[currentTriangle.indices[0]]
-			);
+		} else { // Generate normals from triangle data
 
-			// Add triangle normal to each vertex
-			triangleMesh->normalData[currentTriangle.indices[0]] = triangleMesh->normalData[currentTriangle.indices[0]] + normal;
-			triangleMesh->normalData[currentTriangle.indices[1]] = triangleMesh->normalData[currentTriangle.indices[1]] + normal;
-			triangleMesh->normalData[currentTriangle.indices[2]] = triangleMesh->normalData[currentTriangle.indices[2]] + normal;
+			// Reset
+			for (uint n = 0; n < vertices; n++)
+				triangleMesh->normalData[n] = Vec3(0.f, 0.f, 0.f);
+
+			// Calculate normals by going through each triangle
+			for (uint i = 0; i < triangles; i++) {
+				TrianglePrimitive& currentTriangle = triangleMesh->indexData[i];
+
+				// Calculate normal of the triangle
+				Vec3 normal = Vec3::cross(
+					triangleMesh->posData[currentTriangle.indices[1]] - triangleMesh->posData[currentTriangle.indices[0]],
+					triangleMesh->posData[currentTriangle.indices[2]] - triangleMesh->posData[currentTriangle.indices[0]]
+				);
+
+				// Add triangle normal to each vertex
+				triangleMesh->normalData[currentTriangle.indices[0]] = triangleMesh->normalData[currentTriangle.indices[0]] + normal;
+				triangleMesh->normalData[currentTriangle.indices[1]] = triangleMesh->normalData[currentTriangle.indices[1]] + normal;
+				triangleMesh->normalData[currentTriangle.indices[2]] = triangleMesh->normalData[currentTriangle.indices[2]] + normal;
+			}
+
+			// Normalize normals
+			for (uint n = 0; n < vertices; n++)
+				triangleMesh->normalData[n] = Vec3::normalize(triangleMesh->normalData[n]);
+
 		}
-
-		// Normalize normals
-		for (uint n = 0; n < vertices; n++)
-			triangleMesh->normalData[n] = Vec3::normalize(triangleMesh->normalData[n]);
 
 		// Set up VBOs (Vertex buffer objects) and IBO (Index buffer object)
 		// OptiX doesn't accept a single buffer for position+normal+texture, so we need three VBOs.
@@ -190,7 +215,9 @@ Object* Object::load(string file) {
 
 	}
 
+#if OBJECT_PRINT
 	cout << endl;
+#endif
 
 	return obj;
 

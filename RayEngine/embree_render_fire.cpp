@@ -7,7 +7,7 @@ void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 
 	Vec3 rayDir = dx * rayXaxis + dy * rayYaxis + rayZaxis;
 
-	RTCRay ray;
+	EmbreeData::Ray ray;
 	ray.org[0] = rayOrg.x();
 	ray.org[1] = rayOrg.y();
 	ray.org[2] = rayOrg.z();
@@ -21,6 +21,7 @@ void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 	ray.primID = RTC_INVALID_GEOMETRY_ID;
 	ray.mask = EMBREE_RAY_VALID;
 	ray.time = 0.f;
+	ray.transColor = { 0.f };
 
 	rtcIntersect(curScene->EmbreeData.scene, ray);
 
@@ -33,7 +34,7 @@ void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 
 void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 
-	RTCRay8 packet;
+	EmbreeData::RayPacket packet;
 	int valid[EMBREE_PACKET_SIZE];
 
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
@@ -62,6 +63,7 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 		packet.primID[i] = RTC_INVALID_GEOMETRY_ID;
 		packet.mask[i] = EMBREE_RAY_VALID;
 		packet.time[i] = 0.f;
+		packet.transColor[i] = { 0.f };
 
 	}
 

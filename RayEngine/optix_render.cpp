@@ -24,7 +24,8 @@ void RayEngine::optixRender() {
 	}
 
 	float end = glfwGetTime();
-	OptixData.time += end - start;
+	OptixData.lastTime = end - start;
+	OptixData.time += OptixData.lastTime;
 	OptixData.frames++;
 	if (OptixData.frames > 30) {
 		OptixData.avgTime = OptixData.time / OptixData.frames;

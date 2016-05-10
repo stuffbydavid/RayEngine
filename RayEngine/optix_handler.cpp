@@ -24,6 +24,7 @@ void RayEngine::optixInit() {
 		OptixData.context->setEntryPointCount(1);
 		OptixData.context->setStackSize(4096);
 		OptixData.frames = 0;
+		OptixData.lastTime = 0.f;
 		OptixData.avgTime = 0.f;
 
 		// Generate texture
@@ -253,6 +254,9 @@ void RayEngine::optixResize() {
 		OptixData.offset = 0;
 		OptixData.width = window.width;
 	}
+
+	if (OptixData.width == 0)
+		return;
 
 	// Resize buffer object
 	OptixData.renderBuffer->setSize(OptixData.width, window.height);
