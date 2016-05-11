@@ -6,7 +6,9 @@ rtDeclareVariable(float3, org, , );
 rtDeclareVariable(float4, ambient, , );
 rtDeclareVariable(float4, specular, , );
 rtDeclareVariable(float4, diffuse, , );
-rtDeclareVariable(float, shininess, , );
+rtDeclareVariable(float, shineExponent, , );
+rtDeclareVariable(float, reflectIntensity, , );
+rtDeclareVariable(float, refractIndex, , );
 rtDeclareVariable(float4, sceneAmbient, , );
 rtDeclareVariable(rtObject, sceneObj, , );
 rtDeclareVariable(int, maxReflections, , );
@@ -35,8 +37,8 @@ RT_PROGRAM void closestHit() {
 	float3 toEye = normalize(org - hitPos);
 
 	// Calculate color
-	float4 totalDiffuse, totalSpecular, totalReflect;
-	totalDiffuse = totalSpecular = totalReflect = make_float4(0.f);
+	float4 totalDiffuse, totalSpecular, totalReflect, totalRefract;
+	totalDiffuse = totalSpecular = totalReflect = totalRefract = make_float4(0.f);
 
 	// Go through the lights
 	for (int i = 0; i < lights.size(); i++) {
@@ -63,9 +65,9 @@ RT_PROGRAM void closestHit() {
 				totalDiffuse += diffuseFactor * light.color;
 
 				// Specular factor
-				if (shininess > 0.0) {
+				if (shineExponent > 0.0) {
 					float3 reflection = -reflect(incidence, normal);
-					float specularFactor = pow(max(dot(reflection, toEye), 0.f), shininess) * attenuation;
+					float specularFactor = pow(max(dot(reflection, toEye), 0.f), shineExponent) * attenuation;
 					totalSpecular += specularFactor * specular;
 				}
 
@@ -75,28 +77,33 @@ RT_PROGRAM void closestHit() {
 	}
 
 	// Reflection
-	if (curColorData.depth < maxReflections) {
+	if (reflectIntensity > 0.f && curColorData.depth < maxReflections) {
 		RayColorData reflectData;
 		reflectData.depth = curColorData.depth + 1;
 		Ray reflectRay(hitPos, reflect(ray.direction, normal), 0, 0.01f);
 		rtTrace(sceneObj, reflectRay, reflectData);
-		totalReflect = reflectData.result * make_float4(0.25f); // TODO: Use material reflectiveness
+		totalReflect = reflectData.result * reflectIntensity; // TODO: Use material reflectiveness
+	}
+
+	// Refract
+	float transparency = diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
+	if (transparency < 1.f) {
+
+		float3 refractVector;
+		if (!refract(refractVector, ray.direction, normal, refractIndex))
+			refractVector = ray.direction;
+
+		RayColorData refractData;
+		refractData.depth = curColorData.depth;
+		Ray refractRay(hitPos, refractVector, 0, 0.01f);
+		rtTrace(sceneObj, refractRay, refractData);
+		totalRefract = refractData.result * (1.f - transparency);
+
 	}
 
 	// Create color
 	float4 texColor = diffuse * tex2D(sampler, texCoord.x, texCoord.y);
-	curColorData.result = texColor * (sceneAmbient + ambient + totalDiffuse) + totalSpecular + totalReflect;
+	curColorData.result = texColor * (sceneAmbient + ambient + totalDiffuse) + totalSpecular + totalReflect + totalRefract;
 
-	float transColor = diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
-	if (transColor < 1.f) {
-
-		RayColorData transData;
-		transData.depth = curColorData.depth;
-		Ray transRay(hitPos, ray.direction, 0, 0.01f);
-		rtTrace(sceneObj, transRay, transData);
-
-		curColorData.result += transData.result * transColor;
-
-	}
 
 }

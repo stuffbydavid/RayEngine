@@ -54,8 +54,9 @@ typedef struct {
   float specular[3];
   float transmittance[3];
   float emission[3];
-  float shininess;
+  float shineExponent;
   float ior;      // index of refraction
+  float reflectIntensity; // Intensity of reflection
   float dissolve; // 1 == opaque; 0 == fully transparent
   // illumination model (see http://www.fileformat.info/format/material/)
   int illum;
@@ -506,8 +507,9 @@ static void InitMaterial(material_t &material) {
   }
   material.illum = 0;
   material.dissolve = 1.f;
-  material.shininess = 0.f;
+  material.shineExponent = 0.f;
   material.ior = 1.f;
+  material.reflectIntensity = 0.f;
   material.unknown_parameter.clear();
 }
 
@@ -690,6 +692,13 @@ void LoadMtl(std::map<std::string, int> &material_map,
       continue;
     }
 
+	// Intensity of reflection
+	if (token[0] == 'I' && token[1] == 'r' && IS_SPACE((token[2]))) {
+		token += 2;
+		material.reflectIntensity = parseFloat(token);
+		continue;
+	}
+
     // ior(index of refraction)
     if (token[0] == 'N' && token[1] == 'i' && IS_SPACE((token[2]))) {
       token += 2;
@@ -708,10 +717,10 @@ void LoadMtl(std::map<std::string, int> &material_map,
       continue;
     }
 
-    // shininess
+    // shineExponent
     if (token[0] == 'N' && token[1] == 's' && IS_SPACE(token[2])) {
       token += 2;
-      material.shininess = parseFloat(token);
+      material.shineExponent = parseFloat(token);
       continue;
     }
 

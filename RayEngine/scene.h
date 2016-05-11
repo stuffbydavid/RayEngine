@@ -18,7 +18,8 @@ struct Scene {
 	// Adds a new light.
 	void addLight(Vec3 position, Color color, float range);
 
-	// Variables
+	//// Variables ////
+
 	string name;
 	Color ambient;
 	Image* sky;
@@ -26,18 +27,22 @@ struct Scene {
 	vector<Object*> objects;
 	vector<Light> lights;
 
-	// Embree
+	//// Embree ////
+
 	struct Embree {
 		RTCScene scene;
 		map<uint, Object*> instIDmap;
 	} Embree;
+
 	void embreeInit(RTCDevice device);
 
-	// OptiX
+	//// OptiX ////
+
 	struct Optix {
 		optix::Group group;
 		optix::TextureSampler sky;
 	} Optix;
+
 	void optixInit(optix::Context context);
 
 };

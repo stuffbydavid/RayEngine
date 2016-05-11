@@ -7,16 +7,19 @@ Object::~Object() {
 	//delete geometry;
 }
 
-void Object::translate(Vec3 vector) {
+Object* Object::translate(Vec3 vector) {
 	matrix = Mat4x4::translate(vector) * matrix;
+	return this;
 }
 
-void Object::rotate(Vec3 vector, float angle) {
+Object* Object::rotate(Vec3 vector, float angle) {
 	matrix = Mat4x4::rotate(vector, angle) * matrix;
+	return this;
 }
 
-void Object::scale(Vec3 vector) {
+Object* Object::scale(Vec3 vector) {
 	matrix = Mat4x4::scale(vector) * matrix;
+	return this;
 }
 
 #define OBJECT_PRINT 0
@@ -56,12 +59,14 @@ Object* Object::load(string file) {
 			mat->specular = Color(fileMaterials[i].specular);
 			mat->diffuse = Color(fileMaterials[i].diffuse);
 			mat->diffuse.a(fileMaterials[i].dissolve);
+			mat->reflectIntensity = fileMaterials[i].reflectIntensity;
+			mat->refractIndex = fileMaterials[i].ior;
 
 			// Specular
 			if (mat->specular != Color(0.f))
-				mat->shininess = fileMaterials[i].shininess;
+				mat->shineExponent = fileMaterials[i].shineExponent;
 			else
-				mat->shininess = 0.f;
+				mat->shineExponent = 0.f;
 
 			// Diffuse image
 			if (fileMaterials[i].diffuse_texname != "") {

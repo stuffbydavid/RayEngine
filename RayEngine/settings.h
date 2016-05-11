@@ -3,8 +3,8 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-#define RENDER_MODE RM_EMBREE
-#define MAX_REFLECTIONS 0
+#define RENDER_MODE RM_OPTIX
+#define MAX_REFLECTIONS 1
 
 #define EMBREE_RENDER_TILES 1     // 1 = Split into tiles, 0 = Use a single loop
 #define EMBREE_PACKET_PRIMARY 1   // 1 = Use packets for primary rays, 0 = Shoot single rays

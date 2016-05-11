@@ -15,9 +15,6 @@ void RayEngine::hybridRenderUpdatePartition() {
 		Hybrid.partition = max(0.f, min(1.f, Hybrid.partition + dif * 0.25f));
 		resize();
 
-	} else {
-
-
 	}
 
 	/*if (Optix.avgTime == 0.f && Embree.avgTime == 0.f)

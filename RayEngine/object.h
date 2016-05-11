@@ -15,13 +15,13 @@ struct Object {
 	static Object* load(string file);
 
 	// Translates the object by a vector.
-	void translate(Vec3 vector);
+	Object* translate(Vec3 vector);
 
 	// Rotates the object by a vector and angle.
-	void rotate(Vec3 vector, float angle);
+	Object* rotate(Vec3 vector, float angle);
 
 	// Scales the object by a vector.
-	void scale(Vec3 vector);
+	Object* scale(Vec3 vector);
 
 	// Variables
 	vector<Geometry*> geometries;

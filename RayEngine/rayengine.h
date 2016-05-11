@@ -123,7 +123,7 @@ struct RayEngine {
 		float time, lastTime, avgTime;
 
 		bool renderTiles, packetPrimary, packetSecondary;
-		int tileWidth, tileHeight, showTiles;
+		int tileWidth, tileHeight;
 
 	} Embree;
 

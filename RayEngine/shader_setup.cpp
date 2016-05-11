@@ -28,7 +28,7 @@ void RayEngine::openglSetupPhong(GLuint program, Object* object, TriangleMesh* m
 	GLint uAmbient = glGetUniformLocation(program, "uAmbient");
 	GLint uSpecular = glGetUniformLocation(program, "uSpecular");
 	GLint uDiffuse = glGetUniformLocation(program, "uDiffuse");
-	GLint uShininess = glGetUniformLocation(program, "uShininess");
+	GLint uShineExponent = glGetUniformLocation(program, "uShineExponent");
 
 	glUniformMatrix4fv(uMatWorld, 1, GL_FALSE, object->matrix.e);
 	glUniformVec3(uEyePos, curCamera->position);
@@ -51,7 +51,7 @@ void RayEngine::openglSetupPhong(GLuint program, Object* object, TriangleMesh* m
 	glUniformColor(uAmbient, curScene->ambient + mesh->material->ambient);
 	glUniformColor(uSpecular, mesh->material->specular);
 	glUniformColor(uDiffuse, mesh->material->diffuse);
-	glUniform1f(uShininess, mesh->material->shininess);
+	glUniform1f(uShineExponent, mesh->material->shineExponent);
 
 	delete lightPos;
 	delete lightColor;

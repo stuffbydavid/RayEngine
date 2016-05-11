@@ -226,7 +226,9 @@ void TriangleMesh::optixInit(optix::Context context) {
 			material->Optix.material["ambient"]->setFloat(material->ambient.r(), material->ambient.g(), material->ambient.b(), material->ambient.a());
 			material->Optix.material["specular"]->setFloat(material->specular.r(), material->specular.g(), material->specular.b(), material->specular.a());
 			material->Optix.material["diffuse"]->setFloat(material->diffuse.r(), material->diffuse.g(), material->diffuse.b(), material->diffuse.a());
-			material->Optix.material["shininess"]->setFloat(material->shininess);
+			material->Optix.material["shineExponent"]->setFloat(material->shineExponent);
+			material->Optix.material["reflectIntensity"]->setFloat(material->reflectIntensity);
+			material->Optix.material["refractIndex"]->setFloat(material->refractIndex);
 
 		}
 

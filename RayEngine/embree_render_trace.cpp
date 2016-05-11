@@ -85,10 +85,10 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int depth, Color& result)
 				hit.diffuse += diffuseFactor * light.color;
 
 				// Specular factor
-				if (hit.material->shininess > 0.0) {
+				if (hit.material->shineExponent > 0.0) {
 					Vec3 toEye = Vec3::normalize(curCamera->position - hit.pos);
 					Vec3 reflection = Vec3::reflect(incidence, hit.normal);
-					float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hit.material->shininess) * attenuation;
+					float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hit.material->shineExponent) * attenuation;
 					hit.specular += specularFactor * hit.material->specular;
 				}
 
@@ -321,10 +321,10 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int depth, Co
 			hit.diffuse += diffuseFactor * lRay.lightColor;
 
 			// Specular factor
-			if (hit.material->shininess > 0.0) {
+			if (hit.material->shineExponent > 0.0) {
 				Vec3 toEye = Vec3::normalize(curCamera->position - hit.pos);
 				Vec3 reflection = Vec3::reflect(lRay.incidence, hit.normal);
-				float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hit.material->shininess) * lRay.attenuation;
+				float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hit.material->shineExponent) * lRay.attenuation;
 				hit.specular += specularFactor * hit.material->specular;
 			}
 

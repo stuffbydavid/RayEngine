@@ -10,7 +10,13 @@ int main(int argc, char **argv) {
 
 	RayEngine rayEngine;
 
-	/// Teapot scene /// 
+	/*Scene* glassScene = rayEngine.createScene("Glass Scene", { 0.4f }, "img/rasen.png");
+	glassScene->loadObject("obj/floor.obj");
+	glassScene->loadObject("obj/Glass/GlassPack.obj") -> scale(0.1f);
+	glassScene->loadObject("obj/teapot.obj") -> translate({ 20.f, 0.f, -50.f });
+	glassScene->addLight({ 100.f, 200.f, 100.f }, { 1.f, 1.f, 1.f }, 1000.f);*/
+
+	/*/// Teapot scene /// 
 
 	Scene* teapotScene = rayEngine.createScene("myScene", { 0.1f, 0.1f, 0.2f }, "img/CedarCity.ppm");
 	teapotScene->camera.position = { 90.9064f, 148.59f, 202.493f };
@@ -30,15 +36,15 @@ int main(int argc, char **argv) {
 		clone->rotate({ 0, 1, 0 }, frand() * 360.f);
 		clone->translate({ x, 0.f, 0.f });
 		clone->rotate({ 0, 1, 0 }, frand() * 360.f);
-	}
+	}*/
 
-	/*Scene* cornellBox = rayEngine.createScene("Cornell Box", { 0.1f, 0.1f, 0.2f });
+	Scene* cornellBox = rayEngine.createScene("Cornell Box", { 0.1f, 0.1f, 0.2f });
 	cornellBox->loadObject("obj/cornell_box.obj");
 	cornellBox->addLight({ 280.f, 540.f, 280.f }, { 1.f, 1.f, 1.f }, 1000.f);
 	cornellBox->camera.position = { 290.f, 280.f, -290.f };
 	cornellBox->camera.xaxis = { -1.f, 0.f, 0.f };
 	cornellBox->camera.yaxis = { 0.f, 1.f, 0.f };
-	cornellBox->camera.zaxis = { 0.f, 0.f, 1.f };*/
+	cornellBox->camera.zaxis = { 0.f, 0.f, 1.f };
 
 	/*Scene* modernTableScene = rayEngine.createScene("Modern Table", { 0.25f }, "img/CedarCity.ppm");
 	modernTableScene->loadObject("obj/StylishDesk/StylishDesk.obj");

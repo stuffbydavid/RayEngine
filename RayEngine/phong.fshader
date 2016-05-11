@@ -14,7 +14,7 @@ uniform float uLightRange[MAXLIGHTS];
 uniform vec4 uAmbient;
 uniform vec4 uSpecular;
 uniform vec4 uDiffuse;
-uniform float uShininess;
+uniform float uShineExponent;
 
 void main(void) {
 	vec3 totalDiffuse = vec3(0.0), totalSpecular = vec3(0.0);
@@ -36,10 +36,10 @@ void main(void) {
 		totalDiffuse += diffuseFactor * uLightColor[i].rgb;
 		
 		// Specular factor
-		if (uShininess > 0.0) {
+		if (uShineExponent > 0.0) {
 			vec3 toEye = normalize(uEyePos - vPosWorld);
 			vec3 reflection = -reflect(incidence, vNormalWorld);
-			float specularFactor = pow(max(dot(reflection, toEye), 0.0), uShininess) * attenuation;
+			float specularFactor = pow(max(dot(reflection, toEye), 0.0), uShineExponent) * attenuation;
 			totalSpecular += specularFactor * uSpecular.rgb;
 		}
 	}
