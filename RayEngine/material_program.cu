@@ -23,8 +23,7 @@ rtDeclareVariable(RayShadowData, curShadowData, rtPayload, );
 
 RT_PROGRAM void anyHit() {
 
-	float transparency = 1.f - diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
-	curShadowData.attenuation *= transparency;
+	curShadowData.attenuation *= 1.f - diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
 
 	if (curShadowData.attenuation == 0.f)
 		rtTerminateRay();
@@ -38,7 +37,8 @@ RT_PROGRAM void closestHit() {
 	float3 toEye = normalize(org - hitPos);
 
 	// Calculate color
-	float transparency = 1.f - diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
+	float4 texture = diffuse * tex2D(sampler, texCoord.x, texCoord.y);
+	float transparency = 1.f - texture.w;
 	float4 totalDiffuse, totalSpecular, totalReflect, totalRefract;
 	totalDiffuse = totalSpecular = totalReflect = totalRefract = make_float4(0.f);
 
@@ -60,6 +60,7 @@ RT_PROGRAM void closestHit() {
 			Ray shadowRay(hitPos, incidence, 1, 0.01f, distance);
 			rtTrace(sceneObj, shadowRay, shadowData);
 
+			// The ray was not fully absorbed, add light contribution
 			if (shadowData.attenuation > 0.f) {
 
 				attenuation *= shadowData.attenuation;
@@ -107,8 +108,7 @@ RT_PROGRAM void closestHit() {
 	}
 
 	// Create color
-	float4 texColor = diffuse * tex2D(sampler, texCoord.x, texCoord.y);
-	curColorData.result = (1.f - transparency) * texColor * (sceneAmbient + ambient + totalDiffuse) + totalSpecular + totalReflect + totalRefract;
-	curColorData.result.w = 1.f;
+	curColorData.result = texture * (sceneAmbient + ambient + totalDiffuse) * (1.f - transparency) + totalSpecular + totalReflect + totalRefract;
+	//curColorData.result.w = 1.f;
 
 }

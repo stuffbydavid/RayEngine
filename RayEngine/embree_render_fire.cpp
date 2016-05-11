@@ -21,12 +21,11 @@ void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 	ray.primID = RTC_INVALID_GEOMETRY_ID;
 	ray.mask = EMBREE_RAY_VALID;
 	ray.time = 0.f;
-	ray.transColor = { 0.f };
 
 	rtcIntersect(curScene->Embree.scene, ray);
 
 	Color result;
-	embreeRenderTraceRay(ray, 0, result);
+	embreeRenderTraceRay(ray, 0, 0, result);
 
 	Embree.buffer[y * Embree.width + x] = result;
 
@@ -62,7 +61,6 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 		packet.primID[i] = RTC_INVALID_GEOMETRY_ID;
 		packet.mask[i] = EMBREE_RAY_VALID;
 		packet.time[i] = 0.f;
-		packet.transColor[i] = { 0.f };
 
 	}
 
@@ -71,7 +69,7 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 	if (Embree.packetSecondary) {
 
 	    Color result[EMBREE_PACKET_SIZE];
-		embreeRenderTracePacket(packet, 0, result);
+		embreeRenderTracePacket(packet, 0, 0, result);
 
 		for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
 			if (packet.valid[i] == EMBREE_RAY_VALID)
@@ -96,11 +94,13 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 			ray.instID = packet.instID[i];
 			ray.geomID = packet.geomID[i];
 			ray.primID = packet.primID[i];
+			ray.u = packet.u[i];
+			ray.v = packet.v[i];
 			ray.mask = packet.mask[i];
 			ray.time = packet.time[i];
 
 			Color result;
-			embreeRenderTraceRay(ray, 0, result);
+			embreeRenderTraceRay(ray, 0, 0, result);
 
 			Embree.buffer[y * Embree.width + x + i] = result;
 

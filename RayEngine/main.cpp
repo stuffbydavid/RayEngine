@@ -10,12 +10,12 @@ int main(int argc, char **argv) {
 
 	RayEngine rayEngine;
 
-	/*Scene* glassScene = rayEngine.createScene("Glass Scene", { 0.4f }, "img/rasen.png");
+	Scene* glassScene = rayEngine.createScene("Glass Scene", { 0.4f }, "img/rasen.png");
 	glassScene->loadObject("obj/floor.obj");
 	glassScene->loadObject("obj/box/box.obj")->rotate({ 0, 1, 0 }, 45)->rotate({ 1, 0, 0 }, 45)->rotate({ 0, 0, 1 }, 45)->scale(10.f)->translate({ -40.f, 15.f, -50.f });
 	glassScene->loadObject("obj/Glass/GlassPack.obj")->scale(0.1f);
 	glassScene->loadObject("obj/teapot.obj")->translate({ 20.f, 0.f, -50.f });
-	glassScene->addLight({ 100.f, 200.f, 100.f }, { 1.f, 1.f, 1.f }, 1000.f);*/
+	glassScene->addLight({ 100.f, 200.f, 100.f }, { 1.f, 1.f, 1.f }, 1000.f);
 
 	/*Scene* teapotScene = rayEngine.createScene("myScene", { 0.1f, 0.1f, 0.2f }, "img/CedarCity.ppm");
 	teapotScene->camera.position = { 90.9064f, 148.59f, 202.493f };
@@ -75,9 +75,9 @@ int main(int argc, char **argv) {
 	houseScene->loadObject("C:/Users/david/Documents/Visual Studio 2013/Projects/SimpleEmbree/Meshes/FutHouse/Futuristic rural house.obj"); // Too big for laptop GPU
 	houseScene->addLight({ 100.f, 1000.f, 100.f }, { 1.f }, 2000.f);*/
 
-	Scene* conferenceScene = rayEngine.createScene("conference room", { 0.5f });
+	/*Scene* conferenceScene = rayEngine.createScene("conference room", { 0.5f });
 	conferenceScene->loadObject("obj/conference/conference.obj");
-	conferenceScene->addLight({ 0, 500, 0 }, { 1.f }, 10000.f);
+	conferenceScene->addLight({ 0, 500, 0 }, { 1.f }, 10000.f); */
 
 	rayEngine.launch();
 

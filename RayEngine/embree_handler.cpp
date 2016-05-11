@@ -2,6 +2,8 @@
 #include "triangle_mesh.h"
 #include "object.h"
 
+void* userData;
+
 void RayEngine::embreeInit() {
 
 	cout << "Starting Embree..." << endl;
@@ -22,6 +24,7 @@ void RayEngine::embreeInit() {
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Init scenes
+	userData = this;
 	for (uint i = 0; i < scenes.size(); i++)
 		scenes[i]->embreeInit(Embree.device);
 
@@ -32,38 +35,16 @@ void Scene::embreeInit(RTCDevice device) {
 	Embree.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_SCENE, EMBREE_AFLAGS_SCENE);
 
 	for (uint i = 0; i < objects.size(); i++) {
+
 		objects[i]->embreeInit(device);
 		uint instID = rtcNewInstance2(Embree.scene, objects[i]->Embree.scene);
 		rtcSetTransform2(Embree.scene, instID, RTC_MATRIX_COLUMN_MAJOR_ALIGNED16, objects[i]->matrix.e);
 		Embree.instIDmap[instID] = objects[i];
+
 	}
 
 	rtcCommit(Embree.scene);
 
-}
-
-void TransparencyIntersectionFilter8(const void* valid, void *ptr, RayEngine::Embree::RayPacket &packet) {
-
-	// We hit a transparent object, add contribution to the ray
-
-	int* valids = (int*)valid;
-	for (int i = 0; i < 8; i++) {
-
-		if (!valids[i])
-			continue;
-
-		packet.instID[i] = packet.geomID[i] = packet.primID[i] = RTC_INVALID_GEOMETRY_ID;
-		packet.transColor[i] = 0.5f;
-
-	}
-}
-
-void TransparencyIntersectionFilter(void *ptr, RayEngine::Embree::Ray &ray) {
-
-	// We hit a transparent object, add contribution to the ray
-
-	ray.instID = ray.geomID = ray.primID = RTC_INVALID_GEOMETRY_ID;
-	ray.transColor += 0.5;
 }
 
 void Object::embreeInit(RTCDevice device) {
@@ -77,10 +58,9 @@ void Object::embreeInit(RTCDevice device) {
 		Embree.geomIDmap[geomID] = geometries[i];
 
 		// Set filter functions
-		/*rtcSetIntersectionFilterFunction(Embree.scene, geomID, (RTCFilterFunc)&TransparencyIntersectionFilter);
-		rtcSetIntersectionFilterFunction8(Embree.scene, geomID, (RTCFilterFunc8)&TransparencyIntersectionFilter8);
-		rtcSetOcclusionFilterFunction(Embree.scene, geomID, (RTCFilterFunc)&TransparencyIntersectionFilter);
-		rtcSetOcclusionFilterFunction8(Embree.scene, geomID, (RTCFilterFunc8)&TransparencyIntersectionFilter8);*/
+		rtcSetOcclusionFilterFunction(Embree.scene, geomID, (RTCFilterFunc)&RayEngine::embreeOcclusionFilter);
+		rtcSetOcclusionFilterFunction8(Embree.scene, geomID, (RTCFilterFunc8)&RayEngine::embreeOcclusionFilter8);
+		rtcSetUserData(Embree.scene, geomID, userData);
 
 	}
 

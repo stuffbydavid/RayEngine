@@ -71,6 +71,12 @@ struct Color {
 
 };
 
+//// Unary operators ////
+
+__forceinline std::ostream& operator << (std::ostream& cout, const Color& a) {
+	return embree::operator << (cout, a.eCol);
+}
+
 //// Binary operators ////
 
 __forceinline Color operator+(const Color& x, const Color& y) {

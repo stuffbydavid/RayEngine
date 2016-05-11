@@ -111,12 +111,17 @@ struct RayEngine {
 
 	struct Embree {
 
-		struct Ray : RTCRay {
-			Color transColor;
+		struct Ray : RTCRay {};
+		struct LightRay : Ray {
+			float attenuation;
 		};
 		struct RayPacket : EMBREE_PACKET_TYPE {
-			Color transColor[EMBREE_PACKET_SIZE];
 			int valid[EMBREE_PACKET_SIZE];
+		};
+		struct LightRayPacket : RayPacket {
+			float attenuation[EMBREE_PACKET_SIZE];
+			float distance[EMBREE_PACKET_SIZE];
+			Vec3 incidence[EMBREE_PACKET_SIZE];
 		};
 
 		RTCDevice device;
@@ -135,10 +140,12 @@ struct RayEngine {
 	void embreeRender();
 	void embreeRenderFirePrimaryRay(int x, int y);
 	void embreeRenderFirePrimaryPacket(int x, int y);
-	void embreeRenderTraceRay(Embree::Ray& ray, int depth, Color& result);
-	void embreeRenderTracePacket(Embree::RayPacket& packet, int depth, Color* result);
+	void embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int refractDepth, Color& result);
+	void embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDepth, int refractDepth, Color* result);
 	void embreeRenderUpdateTexture();
 	Color embreeRenderSky(Vec3 dir);
+	static void embreeOcclusionFilter(void* data, Embree::LightRay& ray);
+	static void embreeOcclusionFilter8(int* valid, void* data, Embree::LightRayPacket& packet);
 
 	//// OptiX ////
 

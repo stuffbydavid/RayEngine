@@ -1,7 +1,6 @@
 #pragma once
 
 #include "math/vec3.h"
-#include "math/vec3fa.h"
 #include "math/affinespace.h"
 
 // 3D vector
@@ -98,6 +97,27 @@ struct Vec3 {
 		return embree::reflect(incidence.eVec, normal.eVec);
 	}
 
+	static __forceinline Vec3 refract(const Vec3& incidence, const Vec3& normal, const float& ior) {
+
+		Vec3 nn = normal;
+		float negNdotV = dot(incidence, nn), eta;
+
+		if (negNdotV > 0.0f) {
+			eta = ior;
+			nn = -normal.eVec;
+			negNdotV = -negNdotV;
+		} else
+			eta = 1.f / ior;
+
+		const float k = 1.f - eta*eta * (1.f - negNdotV * negNdotV);
+
+		if (k < 0.0f)
+			return incidence;
+		else
+			return normalize(eta * incidence.eVec - (eta*negNdotV + sqrtf(k)) * nn.eVec);
+
+	}
+
 	static __forceinline Vec3 rotate(const Vec3& vec, const Vec3& around, float angle) {
 		return embree::xfmVector(embree::AffineSpace3fa::rotate(around.eVec, embree::deg2rad(angle)), vec.eVec);
 	}
@@ -132,12 +152,12 @@ __forceinline void operator -= (Vec3& a, const Vec3& b) {
 	embree::operator -= (a.eVec, b.eVec);
 }
 
-__forceinline Vec3 operator * (const Vec3& a, const float& b) {
-	return embree::operator * (a.eVec, b);
-}
-
 __forceinline Vec3 operator * (const float& a, const Vec3& b) {
 	return embree::operator * (a, b.eVec);
+}
+
+__forceinline Vec3 operator * (const Vec3& a, const float& b) {
+	return embree::operator * (a.eVec, b);
 }
 
 __forceinline void operator *= (Vec3& a, const float& b) {

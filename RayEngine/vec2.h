@@ -13,6 +13,10 @@ struct Vec2 {
 		eVec = embree::Vec2f();
 	}
 
+	Vec2(float x) {
+		eVec = embree::Vec2f(x, x);
+	}
+
 	Vec2(float x, float y) {
 		eVec = embree::Vec2f(x, y);
 	}
