@@ -1,12 +1,17 @@
 #include "font.h"
 
 Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
+
+#define FONT_PRINT 0
+
 	FT_Face face;
 
 	this->start = start;
 	this->end = end;
 
+#if FONT_PRINT
 	cout << "Loading " << filename << "..." << endl;
+#endif
 
 	if (FT_New_Face(*lib, &filename[0], 0, &face)) {
 		cout << "Could not open font!";
@@ -20,8 +25,8 @@ Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
 	chars = new CharInfo[end];
 
 	// Get map dimensions
-	mapWidth = 0;
-	mapHeight = 0;
+	width = 0;
+	height = 0;
 
 	for (uint i = start; i < end; i++) {
 		if (FT_Load_Char(face, i, FT_LOAD_RENDER)) {
@@ -36,18 +41,18 @@ Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
 			(float)glyph->bitmap_top,
 			(float)glyph->advance.x / 64,
 			(float)glyph->advance.y / 64,
-			(float)mapWidth,
+			(float)width,
 		};
 
-		mapWidth += glyph->bitmap.width;
-		mapHeight = max(mapHeight, (uint)glyph->bitmap.rows);
+		width += glyph->bitmap.width;
+		height = max(height, (uint)glyph->bitmap.rows);
 
 	}
 
 	// Create map texture
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mapWidth, mapHeight, 0, GL_RGBA, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
@@ -72,7 +77,10 @@ Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	cout << "map is " << mapWidth << "x" << mapHeight << endl << endl;
+#if FONT_PRINT
+	cout << "Font texture is " << width << "x" << height << endl << endl;
+#endif
+
 }
 
 void Font::renderText(string text, int x, int y, Color color, Shader* shader, Mat4x4 matrix) {
@@ -89,7 +97,7 @@ void Font::renderText(string text, int x, int y, Color color, Shader* shader, Ma
 
 		if (curChar == '\n') {
 			dx = x;
-			dy += mapHeight * 1.25;
+			dy += height * 1.25;
 			continue;
 		}
 
@@ -101,12 +109,12 @@ void Font::renderText(string text, int x, int y, Color color, Shader* shader, Ma
 		if (curCharInfo.width && curCharInfo.height) {
 
 			float vx = dx + curCharInfo.left;
-			float vy = dy + mapHeight - curCharInfo.top;
+			float vy = dy + height - curCharInfo.top;
 			float vw = curCharInfo.width;
 			float vh = curCharInfo.height;
-			float tx = curCharInfo.mapX / mapWidth;
-			float tw = curCharInfo.width / mapWidth;
-			float th = curCharInfo.height / mapHeight;
+			float tx = curCharInfo.mapX / width;
+			float tw = curCharInfo.width / width;
+			float th = curCharInfo.height / height;
 
 			int i = c * 6;
 

@@ -148,10 +148,10 @@
 	add.s64 	%rd18, %rd16, 8;
 	ldu.global.f32 	%f35, [%rd18];
 	add.f32 	%f6, %f32, %f35;
+	mov.u32 	%r2, 0;
 	add.u64 	%rd1, %SP, 0;
 	cvta.to.local.u64 	%rd19, %rd1;
-	mov.u32 	%r2, 0;
-	st.local.u32 	[%rd19+16], %r2;
+	st.local.v2.u32 	[%rd19+16], {%r2, %r2};
 	ldu.global.u32 	%r1, [sceneObj];
 	mov.f32 	%f7, 0f3C23D70A;
 	mov.f32 	%f8, 0f6C4ECB8F;

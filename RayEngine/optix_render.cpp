@@ -16,6 +16,7 @@ void RayEngine::optixRender() {
 		Optix.context["offset"]->setFloat(Optix.offset);
 		Optix.context["windowWidth"]->setFloat(window.width);
 		Optix.context["maxReflections"]->setInt(maxReflections);
+		Optix.context["maxRefractions"]->setInt(maxRefractions);
 		Optix.context->launch(0, Optix.width, window.height);
 
 	} catch (optix::Exception e) {

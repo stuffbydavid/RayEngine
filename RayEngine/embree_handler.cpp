@@ -71,7 +71,7 @@ void Object::embreeInit(RTCDevice device) {
 	Embree.scene = rtcDeviceNewScene(device, EMBREE_SFLAGS_OBJECT, EMBREE_AFLAGS_OBJECT);
 
 	// Init embree for meshes
-	for (uint i = 0; i < geometries.size(); i++) {
+	for (uint i = 0; i < geometries.size(); i++) { // If it crashes here, then it can't find the .mtl or the last line is not empty
 
 		uint geomID = geometries[i]->embreeInit(Embree.scene);
 		Embree.geomIDmap[geomID] = geometries[i];

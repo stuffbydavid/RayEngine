@@ -22,9 +22,10 @@ Object* Object::scale(Vec3 vector) {
 	return this;
 }
 
-#define OBJECT_PRINT 0
 
 Object* Object::load(string file) {
+
+#define OBJECT_PRINT 0
 
 	static Image defaultTexture({ 1.f });
 	vector<tinyobj::shape_t> fileShapes;
@@ -63,7 +64,7 @@ Object* Object::load(string file) {
 			mat->refractIndex = fileMaterials[i].ior;
 
 			// Specular
-			if (mat->specular != Color(0.f))
+			if (fileMaterials[i].shineExponent > 1.f)
 				mat->shineExponent = fileMaterials[i].shineExponent;
 			else
 				mat->shineExponent = 0.f;

@@ -22,7 +22,6 @@ void RayEngine::optixInit() {
 		Optix.context = optix::Context::create();
 		Optix.context->setRayTypeCount(2);
 		Optix.context->setEntryPointCount(1);
-		Optix.context->setStackSize(4096);
 		Optix.frames = 0;
 		Optix.lastTime = 0.f;
 		Optix.avgTime = 0.f;

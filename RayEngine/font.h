@@ -16,7 +16,7 @@ struct Font {
 	// Renders a piece of text using the font.
 	void Font::renderText(string text, int x, int y, Color color, Shader* shader, Mat4x4 matrix);
 
-	uint start, end, mapWidth, mapHeight;
+	uint start, end, width, height;
 	uint texture;
 	CharInfo* chars;
 

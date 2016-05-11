@@ -4,19 +4,24 @@ void RayEngine::settingsInit() {
 
 	selectedSetting = 0;
 
-	// Render mode
+	//// Render mode ////
+
 	settingRenderMode = addSetting("Render mode");
 	settingRenderMode->addOption("OpenGL", [this]() { renderMode = RM_OPENGL; }, RENDER_MODE == RM_OPENGL);
 	settingRenderMode->addOption("Embree", [this]() { renderMode = RM_EMBREE; resize(); }, RENDER_MODE == RM_EMBREE);
 	settingRenderMode->addOption("OptiX", [this]() { renderMode = RM_OPTIX;  resize(); }, RENDER_MODE == RM_OPTIX);
 	settingRenderMode->addOption("Hybrid", [this]() { renderMode = RM_HYBRID; resize(); }, RENDER_MODE == RM_HYBRID);
 
-	// Max reflections
-	settingMaxReflections = addSetting("Max reflections");
-	for (int i = 0; i < 16; i++)
-		settingMaxReflections->addOption(to_string(i), [this, i]() { maxReflections = i; }, MAX_REFLECTIONS == i);
+	//// Max reflections ////
 
-	// Embree settings
+	settingMaxReflections = addSetting("Max reflections");
+	settingMaxRefractions = addSetting("Max refractions");
+	for (int i = 0; i < 32; i++) {
+		settingMaxReflections->addOption(to_string(i), [this, i]() { maxReflections = i; }, MAX_REFLECTIONS == i);
+		settingMaxRefractions->addOption(to_string(i), [this, i]() { maxRefractions = i; }, MAX_REFRACTIONS == i);
+	}
+
+	//// Embree settings ////
 	settingEmbreeRenderTiles = addSetting("Render tiles");
 	settingEmbreeRenderTiles->addOption("Yes", [this]() { Embree.renderTiles = true; },   EMBREE_RENDER_TILES);
 	settingEmbreeRenderTiles->addOption("No",  [this]() { Embree.renderTiles = false; }, !EMBREE_RENDER_TILES);
@@ -34,9 +39,16 @@ void RayEngine::settingsInit() {
 
 	settingEmbreePacketSecondary = addSetting("Secondary packets");
 	settingEmbreePacketSecondary->addOption("Yes", [this]() { Embree.packetSecondary = true; },   EMBREE_PACKET_SECONDARY);
-	settingEmbreePacketSecondary->addOption("No",  [this]() { Embree.packetSecondary = false; }, !EMBREE_PACKET_SECONDARY);
+	settingEmbreePacketSecondary->addOption("No", [this]() { Embree.packetSecondary = false; }, !EMBREE_PACKET_SECONDARY);
 
-	// Hybrid settings
+	//// OptiX settings ////
+
+	settingOptixStackSize = addSetting("Stack size");
+	for (int i = 1024; i <= 65536; i *= 2)
+		settingOptixStackSize->addOption(to_string(i), [this, i]() { Optix.context->setStackSize(i); }, OPTIX_STACK_SIZE == i);
+
+	//// Hybrid settings ////
+
 	settingHybridBalanceMode = addSetting("Balance mode");
 	settingHybridBalanceMode->addOption("Time",   [this]() { Hybrid.balanceMode = BM_TIME; },   HYBRID_BALANCE_MODE == BM_TIME);
 	settingHybridBalanceMode->addOption("Manual", [this]() { Hybrid.balanceMode = BM_MANUAL; }, HYBRID_BALANCE_MODE == BM_MANUAL);

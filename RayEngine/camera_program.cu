@@ -21,7 +21,8 @@ RT_PROGRAM void camera() {
 	Ray ray = make_Ray(rayOrg, rayDir, 0, 0.01f, RT_DEFAULT_MAX);
 
 	RayColorData data;
-	data.depth = 0;
+	data.reflectDepth = 0;
+	data.refractDepth = 0;
 	rtTrace(sceneObj, ray, data);
 
 	renderBuffer[launchIndex] = data.result;// +make_float4(0.5f, 0.f, 0.f, 1.f);

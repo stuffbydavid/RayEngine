@@ -500,14 +500,14 @@ static void InitMaterial(material_t &material) {
   material.alpha_texname = "";
   for (int i = 0; i < 3; i++) {
     material.ambient[i] = 0.f;
-    material.diffuse[i] = 0.f;
-    material.specular[i] = 0.f;
+    material.diffuse[i] = 1.f;
+    material.specular[i] = 1.f;
     material.transmittance[i] = 0.f;
     material.emission[i] = 0.f;
   }
   material.illum = 0;
   material.dissolve = 1.f;
-  material.shineExponent = 0.f;
+  material.shineExponent = 1.f;
   material.ior = 1.f;
   material.reflectIntensity = 0.f;
   material.unknown_parameter.clear();

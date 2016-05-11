@@ -1,11 +1,11 @@
 # Blender MTL File: 'None'
 # Material Count: 1
 
-newmtl Glass
+newmtl teapot
 Ns 96
 Ka 0 0 0
-Kd 0 0 0
+Kd 0.3 0.4 0.3
 Ks 1 1 1
 Ni 1.5
-Ir 0.1
-d 0.1
+Ir 0.25
+d 0.5

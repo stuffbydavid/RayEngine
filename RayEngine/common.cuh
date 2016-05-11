@@ -7,7 +7,7 @@ using namespace optix;
 
 struct RayColorData {
 	float4 result;
-	int depth;
+	int reflectDepth, refractDepth;
 };
 
 struct RayShadowData {

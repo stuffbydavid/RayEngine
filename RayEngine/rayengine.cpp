@@ -48,22 +48,25 @@ void RayEngine::loop() {
 	rayYaxis = -curCamera->yaxis * curCamera->tFov;
 	rayZaxis = curCamera->zaxis;
 
-	string mode = "";
 	if (renderMode == RM_OPENGL) {
-		mode = "OpenGL";
+
 		openglRender();
+
 	} else if (renderMode == RM_EMBREE) {
-		mode = "Embree";
+
 		embreeRender();
 		embreeRenderUpdateTexture();
+
 	} else if (renderMode == RM_OPTIX) {
-		mode = "OptiX";
+
 		optixRender();
 		optixRenderUpdateTexture();
+
 	} else if (renderMode == RM_HYBRID) {
-		mode = "Hybrid";
+
 		hybridRender();
 		hybridRenderUpdatePartition();
+
 	}
 
 	if (showGui)

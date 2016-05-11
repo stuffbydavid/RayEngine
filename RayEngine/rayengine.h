@@ -43,7 +43,7 @@ struct RayEngine {
 	};
 
 	RenderMode renderMode;
-	int maxReflections;
+	int maxReflections, maxRefractions;
 
 	struct Setting {
 
@@ -64,11 +64,13 @@ struct RayEngine {
 
 	Setting* settingRenderMode;
 	Setting* settingMaxReflections;
+	Setting* settingMaxRefractions;
 	Setting* settingEmbreeRenderTiles;
 	Setting* settingEmbreePacketPrimary;
 	Setting* settingEmbreePacketSecondary;
 	Setting* settingEmbreeTileWidth;
 	Setting* settingEmbreeTileHeight;
+	Setting* settingOptixStackSize;
 	Setting* settingHybridBalanceMode;
 	Setting* settingHybridDisplayPartition;
 	vector<Setting*> settings;
@@ -88,6 +90,7 @@ struct RayEngine {
 	void guiRender();
 	void guiRenderSetting(Setting* setting, int x, int& y, bool indent = false);
 	void guiRenderText(string text, int x, int& y, Color color);
+	void guiRenderTextBold(string text, int x, int& y, Color color);
 
 	//// OpenGL ////
 
