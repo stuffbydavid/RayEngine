@@ -4,6 +4,13 @@ void RayEngine::settingsInit() {
 
 	selectedSetting = 0;
 
+	//// Scene ////
+
+	settingScene = addSetting("Scene");
+	for (int i = 0; i < scenes.size(); i++)
+		settingScene->addOption(scenes[i]->name, [this, i]() { curScene = scenes[i]; curCamera = &curScene->camera; optixSetScene(curScene); }, i == 0);
+
+
 	//// Render mode ////
 
 	settingRenderMode = addSetting("Render mode");
@@ -109,15 +116,19 @@ void RayEngine::settingsInput() {
 
 	// Hybrid partition
 
-	/*if (window.keyDown[GLFW_KEY_LEFT]) {
-		hybridPartition = max(hybridPartition - 0.01f, 0.f);
-		resize();
-	}
+	if (Hybrid.balanceMode == BM_MANUAL) {
 
-	if (window.keyDown[GLFW_KEY_RIGHT]) {
-		hybridPartition = min(hybridPartition + 0.01f, 1.f);
-		resize();
-	}*/
+		if (window.keyDown[GLFW_KEY_PAGE_DOWN]) {
+			Hybrid.partition = max(Hybrid.partition - 0.01f, 0.f);
+			resize();
+		}
+
+		if (window.keyDown[GLFW_KEY_PAGE_UP]) {
+			Hybrid.partition = min(Hybrid.partition + 0.01f, 1.f);
+			resize();
+		}
+
+	}
 
 	// Settings
 

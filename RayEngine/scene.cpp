@@ -1,8 +1,9 @@
 #include "Scene.h"
 
-Scene::Scene(string name, Color ambient, string skyFile, Color skyColor) :
+Scene::Scene(string name, string skyFile, Color ambient, float aoRadius, Color skyColor) :
     name(name),
-	ambient(ambient)
+	ambient(ambient),
+	aoRadius(aoRadius)
 {
 	if (skyFile != "")
 		sky = new Image(GL_LINEAR, skyFile);

@@ -46,3 +46,11 @@ inline long mod(long a, long b) {
 inline long clamp(long x, long mi, long ma) {
 	return min(ma, max(mi, x));
 }
+
+inline float frand() {
+	return (float)rand() / RAND_MAX;
+}
+
+inline float frand(float a, float b) {
+	return a + frand() * (b - a);
+}

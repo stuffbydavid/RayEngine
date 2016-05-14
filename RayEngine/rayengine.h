@@ -9,8 +9,6 @@
 
 struct RayEngine {
 
-	//todo: public vs private
-
 	RayEngine();
 	~RayEngine();
 
@@ -26,11 +24,12 @@ struct RayEngine {
 	//// Scene ////
 
 	vector<Scene*> scenes;
+	int selectedScene;
 	Scene* curScene;
 	Camera* curCamera;
 	Vec3 rayOrg, rayXaxis, rayYaxis, rayZaxis;
 
-	Scene* createScene(string name, Color ambient = { 0.f }, string skyFile = "", Color skyColor = { 0.f });
+	Scene* createScene(string name, string skyFile = "", Color ambient = { 0.f }, float aoRadius = 5.f, Color skyColor = { 0.f });
 	void cameraInput();
 
 	//// Settings ////
@@ -44,6 +43,7 @@ struct RayEngine {
 
 	RenderMode renderMode;
 	int maxReflections, maxRefractions;
+	vector<Vec3> aoSamples;
 
 	struct Setting {
 
@@ -62,6 +62,7 @@ struct RayEngine {
 
 	};
 
+	Setting* settingScene;
 	Setting* settingRenderMode;
 	Setting* settingMaxReflections;
 	Setting* settingMaxRefractions;
@@ -153,6 +154,7 @@ struct RayEngine {
 
 		optix::Context context;
 		optix::Buffer renderBuffer, lights;
+		optix::TextureSampler aoNoise;
 		GLuint vbo;
 		GLuint texture;
 		int offset, width, frames;
@@ -161,6 +163,7 @@ struct RayEngine {
 	} Optix;
 
 	void optixInit();
+	void optixSetScene(Scene* scene);
 	void optixResize();
 	void optixRender();
 	void optixRenderUpdateTexture();

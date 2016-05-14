@@ -18,7 +18,7 @@ RT_PROGRAM void camera() {
 	float3 rayOrg = org;
 	float3 rayDir = d.x * xaxis + d.y * yaxis + zaxis;
 
-	Ray ray = make_Ray(rayOrg, rayDir, 0, 0.01f, RT_DEFAULT_MAX);
+	Ray ray = make_Ray(rayOrg, rayDir, 0, 0.1f, RT_DEFAULT_MAX);
 
 	RayColorData data;
 	data.reflectDepth = 0;

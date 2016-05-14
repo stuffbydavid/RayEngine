@@ -42,12 +42,12 @@ void RayEngine::optixInit() {
 #else
 		Optix.buffer = Optix.context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT4, window.width, window.height);
 #endif
+		Optix.context["renderBuffer"]->set(Optix.renderBuffer);
 
 		// Make light buffer
-		Optix.lights = Optix.context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_USER, curScene->lights.size());
+		Optix.lights = Optix.context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_USER, 0);
 		Optix.lights->setElementSize(sizeof(Light));
-		memcpy(Optix.lights->map(), &curScene->lights[0], curScene->lights.size() * sizeof(Light));
-		Optix.lights->unmap();
+		Optix.context["lights"]->set(Optix.lights);
 
 		// Make ray generation program
 		Optix.context->setRayGenerationProgram(0, Optix.context->createProgramFromPTXFile("ptx/camera_program.cu.ptx", "camera"));
@@ -59,14 +59,32 @@ void RayEngine::optixInit() {
 		materialClosestHitProgram = Optix.context->createProgramFromPTXFile("ptx/material_program.cu.ptx", "closestHit");
 		materialAnyHitProgram = Optix.context->createProgramFromPTXFile("ptx/material_program.cu.ptx", "anyHit");
 
+		// Make AO noise
+		int noiseWid, noiseHei;
+		noiseWid = noiseHei = 50;
+		Color* noise = new Color[noiseWid * noiseHei];
+		for (int i = 0; i < noiseWid * noiseHei; i++)
+			noise[i] = { frand(), frand(), frand() };
+		optix::Buffer buf = Optix.context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_FLOAT4, noiseWid, noiseHei);
+		memcpy(buf->map(), noise, noiseWid * noiseHei * sizeof(Color));
+		buf->unmap();
+		delete noise;
+		Optix.aoNoise = Optix.context->createTextureSampler();
+		Optix.aoNoise->setArraySize(1);
+		Optix.aoNoise->setMipLevelCount(1);
+		Optix.aoNoise->setBuffer(0, 0, buf);
+		Optix.aoNoise->setWrapMode(0, RT_WRAP_REPEAT);
+		Optix.aoNoise->setWrapMode(1, RT_WRAP_REPEAT);
+		Optix.aoNoise->setIndexingMode(RT_TEXTURE_INDEX_NORMALIZED_COORDINATES);
+		Optix.aoNoise->setReadMode(RT_TEXTURE_READ_NORMALIZED_FLOAT);
+		Optix.aoNoise->setMaxAnisotropy(1.f);
+		Optix.aoNoise->setFilteringModes(RT_FILTER_LINEAR, RT_FILTER_LINEAR, RT_FILTER_NONE);
+		Optix.context["aoNoise"]->setTextureSampler(Optix.aoNoise);
+
 		// Init scenes
 		for (uint i = 0; i < scenes.size(); i++)
 			scenes[i]->optixInit(Optix.context);
-
-		Optix.context["sceneObj"]->set(curScene->Optix.group);
-		Optix.context["sceneAmbient"]->setFloat(curScene->ambient.r(), curScene->ambient.g(), curScene->ambient.b(), curScene->ambient.a());
-		Optix.context["lights"]->set(Optix.lights);
-		Optix.context["renderBuffer"]->set(Optix.renderBuffer);
+		optixSetScene(scenes[0]);
 
 		// Compile
 		Optix.context->validate();
@@ -75,6 +93,19 @@ void RayEngine::optixInit() {
 	} catch (optix::Exception e) {
 		printException(e);
 	}
+
+}
+
+void RayEngine::optixSetScene(Scene* scene) {
+
+	Optix.context["sceneAmbient"]->setFloat(scene->ambient.r(), scene->ambient.g(), scene->ambient.b(), scene->ambient.a());
+	Optix.context["sceneObj"]->set(scene->Optix.group);
+	Optix.context["sky"]->setTextureSampler(scene->Optix.sky);
+	Optix.context["aoRadius"]->setFloat(scene->aoRadius);
+
+	Optix.lights->setSize(scene->lights.size());
+	memcpy(Optix.lights->map(), &scene->lights[0], scene->lights.size() * sizeof(Light));
+	Optix.lights->unmap();
 
 }
 
@@ -107,7 +138,6 @@ void Scene::optixInit(optix::Context context) {
 	Optix.sky->setReadMode(RT_TEXTURE_READ_NORMALIZED_FLOAT);
 	Optix.sky->setMaxAnisotropy(1.f);
 	Optix.sky->setFilteringModes(RT_FILTER_LINEAR, RT_FILTER_LINEAR, RT_FILTER_NONE);
-	context["sky"]->setTextureSampler(Optix.sky);
 
 }
 
@@ -118,7 +148,6 @@ void Object::optixInit(optix::Context context) {
 		// Make geometry group
 		Optix.geometryGroup = context->createGeometryGroup();
 		Optix.geometryGroup->setAcceleration(context->createAcceleration("Trbvh", "Bvh")); // TODO: change during runtime?
-
 
 		// Add geometries
 		for (uint i = 0; i < geometries.size(); i++) {

@@ -19,6 +19,7 @@ RayEngine::RayEngine() {
 	OpenGL.shdrTexture = new Shader("Texture", nullptr, "texture.vshader", "texture.fshader");
 	OpenGL.shdrNormals = new Shader("Normals", bind(&RayEngine::openglSetupNormals, this, _1, _2, _3), "normals.vshader", "normals.fshader");
 	OpenGL.shdrPhong = new Shader("Phong", bind(&RayEngine::openglSetupPhong, this, _1, _2, _3), "phong.vshader", "phong.fshader");
+
 	showGui = true;
 
 }
@@ -83,11 +84,11 @@ void RayEngine::resize() {
 
 }
 
-Scene* RayEngine::createScene(string name, Color ambient, string skyFile, Color background) {
+Scene* RayEngine::createScene(string name, string skyFile, Color ambient, float aoRadius, Color background) {
 
-	curScene = new Scene(name, ambient, skyFile, background);
-	curCamera = &curScene->camera;
-	scenes.push_back(curScene);
-	return curScene;
+	cout << "Creating scene " << name << "..." << endl;
+	Scene* scene = new Scene(name, skyFile, ambient, aoRadius, background);
+	scenes.push_back(scene);
+	return scene;
 
 }

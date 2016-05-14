@@ -121,7 +121,7 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 			lRay.primID = RTC_INVALID_GEOMETRY_ID;
 			lRay.mask = EMBREE_RAY_VALID;
 			lRay.time = 0.f;
-			lRay.attenuation = 1.f;
+			lRay.attenuation = attenuation;
 
 			// Check occlusion
 			rtcOccluded(curScene->Embree.scene, lRay);
@@ -129,17 +129,15 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 			// The ray was not fully absorbed, add light contribution
 			if (lRay.attenuation > 0.f) {
 
-				attenuation *= lRay.attenuation;
-
 				// Diffuse factor
-				float diffuseFactor = max(Vec3::dot(hit.normal, incidence), 0.f) * attenuation;
+				float diffuseFactor = max(Vec3::dot(hit.normal, incidence), 0.f) * lRay.attenuation;
 				hit.diffuse += diffuseFactor * light.color;
 
 				// Specular factor
-				if (hit.material->shineExponent > 0.0) {
+				if (hit.material->shineExponent > 0.f) {
 					Vec3 toEye = Vec3::normalize(curCamera->position - hit.pos);
 					Vec3 reflection = Vec3::reflect(incidence, hit.normal);
-					float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hit.material->shineExponent) * attenuation;
+					float specularFactor = pow(max(Vec3::dot(reflection, toEye), 0.f), hit.material->shineExponent) * lRay.attenuation;
 					hit.specular += specularFactor * hit.material->specular;
 				}
 
@@ -212,7 +210,7 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 
 	}
 
-	//result.a(1);
+	result.a(1);
 
 }
 
@@ -379,11 +377,8 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 #if EMBREE_ONE_LIGHT
 
 	Light& light = curScene->lights[0];
+	Embree::LightRayPacket& lPacket = lightPacket;
 	rtcOccluded8(lightPacket.valid, curScene->Embree.scene, lightPacket);
-
-	for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
-
-		Embree::LightRayPacket& lPacket = lightPacket;
 
 #else
 
@@ -394,10 +389,10 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 
 		rtcOccluded8(lPacket.valid, curScene->Embree.scene, lPacket);
 
+#endif
+
 		for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
 
-
-#endif
 			// Light ray was invalid or fully absorbed
 			if (lPacket.valid[i] == EMBREE_RAY_INVALID || lPacket.attenuation[i] == 0.f)
 				continue;
@@ -460,7 +455,7 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 		if (hit.transparency > 0.f && doRefractions)
 			result[i] += refractResult[i] * hit.transparency;
 
-		//result[i].a(1.f);
+		result[i].a(1.f);
 
 	}
 	

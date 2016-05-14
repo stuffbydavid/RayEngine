@@ -139,6 +139,9 @@
     <ClInclude Include="window.h">
       <Filter>RayEngine\Window</Filter>
     </ClInclude>
+    <ClInclude Include="random.cuh">
+      <Filter>RayEngine\OptiX\CUDA</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="RayEngine">

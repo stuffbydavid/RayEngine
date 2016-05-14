@@ -37,7 +37,9 @@ RT_PROGRAM void intersect(int primId) {
 			texCoord = t0 * (1.f - u - v) + t1 * u + t2 * v;
 
 			rtReportIntersection(0);
+
 		}
+
 	}
 
 }
@@ -52,4 +54,5 @@ RT_PROGRAM void bounds(int primId, float result[6]) {
 	optix::Aabb* aabb = (optix::Aabb*)result;
 	aabb->m_min = fminf(fminf(p0, p1), p2);
 	aabb->m_max = fmaxf(fmaxf(p0, p1), p2);
+
 }

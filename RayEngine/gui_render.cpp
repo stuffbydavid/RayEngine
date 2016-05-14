@@ -2,7 +2,7 @@
 
 void RayEngine::guiRender() {
 
-	OpenGL.shdrColor->render2DBox(window.ortho, 10, 10, 250, 300, 0, { 0.f, 0.f, 0.f, 0.5f });
+	OpenGL.shdrColor->render2DBox(window.ortho, 10, 10, 250, 300, 0, { 0.f, 0.f, 0.f, 0.75f });
 
 	int dx = 20, dy = 20;
 	guiRenderTextBold("RayEngine 0.1 Alpha", dx, dy, { 1.f }); dy += 30;
@@ -10,6 +10,7 @@ void RayEngine::guiRender() {
 	guiRenderText("Fps: " + to_string(window.fps), dx, dy, { 1.f }); dy += 16;
 	guiRenderText("Screen: " + to_string(window.width) + "x" + to_string(window.height), dx, dy, { 1.f }); dy += 30;
 
+	guiRenderSetting(settingScene, dx, dy);
 	guiRenderSetting(settingRenderMode, dx, dy);
 	guiRenderSetting(settingMaxReflections, dx, dy);
 	guiRenderSetting(settingMaxRefractions, dx, dy);

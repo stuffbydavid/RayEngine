@@ -3,7 +3,7 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-#define RENDER_MODE RM_EMBREE
+#define RENDER_MODE RM_OPTIX
 #define MAX_REFLECTIONS 1
 #define MAX_REFRACTIONS 4
 
@@ -25,7 +25,7 @@
 
 //// Embree compile settings ////
 
-#define EMBREE_HIGHLIGHT_COLOR Color(0.8f, 0.8f, 1.f)
+#define EMBREE_HIGHLIGHT_COLOR Color(0.6f, 0.6f, 1.f)
 #define EMBREE_ONE_LIGHT 1 // Limit to one light to get rid of some loops
 #define EMBREE_PACKET_SIZE 8
 #define EMBREE_PACKET_TYPE RTCRay8
@@ -38,7 +38,7 @@
 
 //// OptiX compile settings ////
 
-#define OPTIX_HIGHLIGHT_COLOR Color(1.f, 0.8f, 0.8f)
+#define OPTIX_HIGHLIGHT_COLOR Color(1.f, 0.6f, 0.6f)
 #define OPTIX_ENABLE 1
 #define OPTIX_USE_OPENGL_TEXTURE 1 // This is broken with the normal attribute in OpenGL shaders?
 #define OPTIX_USE_GEOMETRY_VBO 1   // Can't combine VBOs

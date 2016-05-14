@@ -13,4 +13,5 @@ RT_PROGRAM void miss() {
 	float u = (theta + M_PIf) * (0.5f * M_1_PIf);
 	float v = 0.5f * (1.0f + sin(phi));
 	curColorData.result = tex2D(sky, u, v);
+
 }

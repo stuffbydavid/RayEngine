@@ -199,6 +199,7 @@
     <ClCompile Include="rayengine.cpp" />
     <ClInclude Include="common.cuh" />
     <ClInclude Include="image.h" />
+    <ClInclude Include="random.cuh" />
     <ClInclude Include="rayengine.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="optix_render.cpp" />

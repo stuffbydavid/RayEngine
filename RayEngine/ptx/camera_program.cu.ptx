@@ -153,7 +153,7 @@
 	cvta.to.local.u64 	%rd19, %rd1;
 	st.local.v2.u32 	[%rd19+16], {%r2, %r2};
 	ldu.global.u32 	%r1, [sceneObj];
-	mov.f32 	%f7, 0f3C23D70A;
+	mov.f32 	%f7, 0f3DCCCCCD;
 	mov.f32 	%f8, 0f6C4ECB8F;
 	mov.u32 	%r3, 32;
 	// inline asm

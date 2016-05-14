@@ -1,4 +1,5 @@
 #include "common.cuh"
+#include "random.cuh"
 
 rtBuffer<Light> lights;
 rtTextureSampler<float4, 2> sampler;
@@ -13,6 +14,8 @@ rtDeclareVariable(float4, sceneAmbient, , );
 rtDeclareVariable(rtObject, sceneObj, , );
 rtDeclareVariable(int, maxReflections, , );
 rtDeclareVariable(int, maxRefractions, , );
+rtDeclareVariable(float, aoRadius, , );
+rtTextureSampler<float4, 2> aoNoise;
 
 rtDeclareVariable(float3, normal, attribute normal, );
 rtDeclareVariable(float2, texCoord, attribute texCoord, );
@@ -20,6 +23,9 @@ rtDeclareVariable(float2, texCoord, attribute texCoord, );
 rtDeclareVariable(Ray, ray, rtCurrentRay, );
 rtDeclareVariable(RayColorData, curColorData, rtPayload, );
 rtDeclareVariable(RayShadowData, curShadowData, rtPayload, );
+
+rtDeclareVariable(uint2, launchIndex, rtLaunchIndex, );
+rtDeclareVariable(uint2, launchDim, rtLaunchDim, );
 
 RT_PROGRAM void anyHit() {
 
@@ -45,6 +51,7 @@ RT_PROGRAM void closestHit() {
 	//// Light contribution ////
 
 	for (int i = 0; i < lights.size(); i++) {
+
 		Light light = lights[i];
 		float3 incidence = normalize(light.position - hitPos);
 
@@ -56,39 +63,44 @@ RT_PROGRAM void closestHit() {
 
 			// Cast ray to find blocking objects
 			RayShadowData shadowData;
-			shadowData.attenuation = 1.f;
-			Ray shadowRay(hitPos, incidence, 1, 0.01f, distance);
+			shadowData.attenuation = attenuation;
+			Ray shadowRay(hitPos, incidence, 1, 0.1f, distance);
 			rtTrace(sceneObj, shadowRay, shadowData);
 
 			// The ray was not fully absorbed, add light contribution
 			if (shadowData.attenuation > 0.f) {
 
-				attenuation *= shadowData.attenuation;
-
 				// Diffuse factor
-				float diffuseFactor = max(dot(normal, incidence), 0.f) * attenuation;
+				float diffuseFactor = max(dot(normal, incidence), 0.f) * shadowData.attenuation;
 				totalDiffuse += diffuseFactor * light.color;
 
 				// Specular factor
-				if (shineExponent > 0.0) {
+				if (shineExponent > 0.f) {
 					float3 reflection = -reflect(incidence, normal);
-					float specularFactor = pow(max(dot(reflection, toEye), 0.f), shineExponent) * attenuation;
+					float specularFactor = pow(max(dot(reflection, toEye), 0.f), shineExponent) * shadowData.attenuation;
 					totalSpecular += specularFactor * specular;
 				}
 
 			}
 
 		}
+
 	}
 
 	//// Reflection ////
 
 	if (reflectIntensity > 0.f && curColorData.reflectDepth < maxReflections) {
+
+		float3 reflectVector = reflect(ray.direction, normal);
+
 		RayColorData reflectData;
 		reflectData.reflectDepth = curColorData.reflectDepth + 1;
-		Ray reflectRay(hitPos, reflect(ray.direction, normal), 0, 0.01f);
+		reflectData.refractDepth = curColorData.refractDepth;
+
+		Ray reflectRay(hitPos, reflectVector, 0, 0.1f);
 		rtTrace(sceneObj, reflectRay, reflectData);
-		totalReflect = reflectData.result * reflectIntensity; // TODO: Use material reflectiveness
+		totalReflect = reflectData.result * reflectIntensity;
+
 	}
 
 	//// Refraction ////
@@ -100,15 +112,46 @@ RT_PROGRAM void closestHit() {
 			refractVector = ray.direction;
 
 		RayColorData refractData;
-		refractData.refractDepth = curColorData.refractDepth+ 1;
-		Ray refractRay(hitPos, refractVector, 0, 0.01f);
+		refractData.reflectDepth = curColorData.reflectDepth;
+		refractData.refractDepth = curColorData.refractDepth + 1;
+
+		Ray refractRay(hitPos, refractVector, 0, 0.1f);
 		rtTrace(sceneObj, refractRay, refractData);
 		totalRefract = refractData.result * transparency;
 
 	}
 
+	/// Ambient occlusion ////
+
+	float2 pos = (make_float2(launchIndex) / make_float2(launchDim)) * 20.f;
+	float4 noise = tex2D(aoNoise, pos.x, pos.y);
+	float occluded = 0.f;
+	Onb onb(normal);
+
+	int samples = 16;
+	float invSamples = 1.f / samples;
+	for (int i = 0; i < samples; i++) {
+
+		float u1 = (float(i % 4) + noise.x) * (1.f / 5.f);
+		float u2 = (float(i / 4) + noise.y) * (1.f / 5.f);
+		float3 sampleVector;
+		cosine_sample_hemisphere(u1, u2, sampleVector);
+		onb.inverse_transform(sampleVector);
+
+		RayShadowData sampleData;
+		sampleData.attenuation = 1.f;
+		Ray sampleRay(hitPos, sampleVector, 1, 0.01f, aoRadius);
+		rtTrace(sceneObj, sampleRay, sampleData);
+
+		occluded += 1.f - sampleData.attenuation;
+
+	}
+
+	float aoPower = 2.f;
+	occluded = 1.f - pow(1.f - occluded * invSamples, aoPower);
+
 	// Create color
-	curColorData.result = texture * (sceneAmbient + ambient + totalDiffuse) * (1.f - transparency) + totalSpecular + totalReflect + totalRefract;
-	//curColorData.result.w = 1.f;
+	curColorData.result = texture * (sceneAmbient + ambient + totalDiffuse) * (1.f - occluded) * (1.f - transparency) + totalSpecular + totalReflect + totalRefract;
+	curColorData.result.w = 1.f;
 
 }

@@ -7,7 +7,7 @@
 
 struct Scene {
 
-	Scene(string name, Color ambient, string skyFile, Color skyColor);
+	Scene(string name, string skyFile, Color ambient, float aoRadius, Color skyColor);
 
 	// Loads object(s) from a file and adds it to the scene.
 	Object* loadObject(string file);
@@ -26,6 +26,7 @@ struct Scene {
 	Camera camera;
 	vector<Object*> objects;
 	vector<Light> lights;
+	float aoRadius;
 
 	//// Embree ////
 
