@@ -8,13 +8,15 @@ void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 	Vec3 rayDir = dx * rayXaxis + dy * rayYaxis + rayZaxis;
 
 	Embree::Ray ray;
+	ray.x = x;
+	ray.y = y;
 	ray.org[0] = rayOrg.x();
 	ray.org[1] = rayOrg.y();
 	ray.org[2] = rayOrg.z();
 	ray.dir[0] = rayDir.x();
 	ray.dir[1] = rayDir.y();
 	ray.dir[2] = rayDir.z();
-	ray.tnear = 0.1f;
+	ray.tnear = 0.01f;
 	ray.tfar = FLT_MAX;
 	ray.instID =
 	ray.geomID =
@@ -34,6 +36,8 @@ void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 
 	Embree::RayPacket packet;
+	packet.x = x;
+	packet.y = y;
 
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
 
@@ -54,7 +58,7 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 		packet.dirx[i] = rayDir.x();
 		packet.diry[i] = rayDir.y();
 		packet.dirz[i] = rayDir.z();
-		packet.tnear[i] = 0.1f;
+		packet.tnear[i] = 0.01f;
 		packet.tfar[i] = FLT_MAX;
 		packet.instID[i] =
 		packet.geomID[i] =
@@ -83,6 +87,8 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 				continue;
 
 			Embree::Ray ray;
+			ray.x = x;
+			ray.y = y;
 			ray.org[0] = packet.orgx[i];
 			ray.org[1] = packet.orgy[i];
 			ray.org[2] = packet.orgz[i];

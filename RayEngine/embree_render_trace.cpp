@@ -4,7 +4,7 @@
 struct RayHit {
 
 	Color texture, diffuse, specular;
-	float transparency;
+	float transparency, occluded;
 	Vec3 pos, normal;
 	Vec2 texCoord;
 	Object* obj;
@@ -114,7 +114,7 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 			lRay.dir[0] = incidence.x();
 			lRay.dir[1] = incidence.y();
 			lRay.dir[2] = incidence.z();
-			lRay.tnear = 0.1f;
+			lRay.tnear = 0.01f;
 			lRay.tfar = distance;
 			lRay.instID =
 			lRay.geomID =
@@ -153,7 +153,7 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 	result = hit.texture * (curScene->ambient + hit.material->ambient + hit.diffuse) * (1.f - hit.transparency) + hit.specular;
 
 	// Add reflections
-	if (hit.material->reflectIntensity > 0.f && reflectDepth < maxReflections) {
+	if (enableReflections && hit.material->reflectIntensity > 0.f && reflectDepth < maxReflections) {
 
 		Vec3 reflDir = Vec3::reflect(-Vec3(ray.dir), hit.normal);
 
@@ -164,7 +164,7 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 		rRay.dir[0] = reflDir.x();
 		rRay.dir[1] = reflDir.y();
 		rRay.dir[2] = reflDir.z();
-		rRay.tnear = 0.1f;
+		rRay.tnear = 0.01f;
 		rRay.tfar = FLT_MAX;
 		rRay.instID =
 		rRay.geomID =
@@ -182,7 +182,7 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 	}
 
 	// Add refractions
-	if (hit.transparency > 0.f && refractDepth < maxRefractions) {
+	if (enableRefractions && hit.transparency > 0.f && refractDepth < maxRefractions) {
 
 		Vec3 refrDir = Vec3::refract(ray.dir, hit.normal, hit.material->refractIndex);
 
@@ -193,7 +193,7 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 		rRay.dir[0] = refrDir.x();
 		rRay.dir[1] = refrDir.y();
 		rRay.dir[2] = refrDir.z();
-		rRay.tnear = 0.1f;
+		rRay.tnear = 0.01f;
 		rRay.tfar = FLT_MAX;
 		rRay.instID =
 		rRay.geomID =
@@ -239,15 +239,32 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 	bool doReflections = false;
 	Embree::RayPacket reflectPacket;
 	Color reflectResult[EMBREE_PACKET_SIZE];
-	for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
-		reflectPacket.valid[i] = EMBREE_RAY_INVALID;
+	if (enableReflections) {
+		reflectPacket.x = packet.x;
+		reflectPacket.y = packet.y;
+		for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
+			reflectPacket.valid[i] = EMBREE_RAY_INVALID;
+	}
 
 	// Refraction packet (invalid by default)
 	bool doRefractions = false;
 	Embree::RayPacket refractPacket;
 	Color refractResult[EMBREE_PACKET_SIZE];
-	for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
-		refractPacket.valid[i] = EMBREE_RAY_INVALID;
+	if (enableRefractions) {
+		refractPacket.x = packet.x;
+		refractPacket.y = packet.y;
+		for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
+			refractPacket.valid[i] = EMBREE_RAY_INVALID;
+	}
+
+	// Ambient occlusion packets
+	Embree::LightRayPacket aoPackets[AO_SAMPLES_MAX];
+	float invSamples = 1.f / aoSamples;
+	float invSamplesSqrt = 1.f / aoSamplesSqrt;
+	if (enableAo)
+		for (int a = 0; a < AO_SAMPLES_MAX; a++)
+			for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
+				aoPackets[a].valid[i] = EMBREE_RAY_INVALID;
 	
 	//// Store hits ////
 	
@@ -278,6 +295,7 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 		hit.texCoord = hit.mesh->getTexCoord(packet.primID[i], packet.u[i], packet.v[i]);
 		hit.texture = hit.material->diffuse * hit.material->image->getPixel(hit.texCoord);
 		hit.transparency = 1.f - hit.texture.a();
+		hit.occluded = 0.f;
 		hit.hitSky = false;
 
 		// Check lights
@@ -311,7 +329,7 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 				lPacket.dirx[i] = incidence.x();
 				lPacket.diry[i] = incidence.y();
 				lPacket.dirz[i] = incidence.z();
-				lPacket.tnear[i] = 0.1f;
+				lPacket.tnear[i] = 0.01f;
 				lPacket.tfar[i] = distance;
 				lPacket.instID[i] =
 				lPacket.geomID[i] =
@@ -327,7 +345,7 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 #endif
 
 		// Create reflection rays
-		if (hit.material->reflectIntensity > 0.f && reflectDepth < maxReflections) {
+		if (enableReflections && hit.material->reflectIntensity > 0.f && reflectDepth < maxReflections) {
 
 			Vec3 reflDir = Vec3::reflect(-rayDir, hit.normal);
 			reflectPacket.orgx[i] = hit.pos.x();
@@ -336,7 +354,7 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 			reflectPacket.dirx[i] = reflDir.x();
 			reflectPacket.diry[i] = reflDir.y();
 			reflectPacket.dirz[i] = reflDir.z();
-			reflectPacket.tnear[i] = 0.1f;
+			reflectPacket.tnear[i] = 0.01f;
 			reflectPacket.tfar[i] = FLT_MAX;
 			reflectPacket.instID[i] =
 			reflectPacket.geomID[i] =
@@ -349,7 +367,7 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 		}
 
 		// Create refraction rays
-		if (hit.transparency > 0.f && refractDepth < maxRefractions) {
+		if (enableRefractions && hit.transparency > 0.f && refractDepth < maxRefractions) {
 
 			Vec3 refrDir = Vec3::refract(rayDir, hit.normal, hit.material->refractIndex);
 			refractPacket.orgx[i] = hit.pos.x();
@@ -358,7 +376,7 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 			refractPacket.dirx[i] = refrDir.x();
 			refractPacket.diry[i] = refrDir.y();
 			refractPacket.dirz[i] = refrDir.z();
-			refractPacket.tnear[i] = 0.1f;
+			refractPacket.tnear[i] = 0.01f;
 			refractPacket.tfar[i] = FLT_MAX;
 			refractPacket.instID[i] =
 			refractPacket.geomID[i] =
@@ -367,6 +385,41 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 			refractPacket.valid[i] = EMBREE_RAY_VALID;
 			refractPacket.time[i] = 0.f;
 			doRefractions = true;
+
+		}
+
+		// Create ambient occlusion samples
+		if (enableAo) {
+
+			Color noise = aoNoiseImage->getPixel(Vec2((float)(Embree.offset + packet.x + i) / window.width, (float)packet.y / window.height) * aoNoiseScale);
+			optix::Onb onb(optix::make_float3(hit.normal.x(), hit.normal.y(), hit.normal.z()));
+
+			for (int a = 0; a < aoSamples; a++) {
+
+				float u1 = (float(a % aoSamplesSqrt) + noise.r()) * invSamplesSqrt;
+				float u2 = (float(a / aoSamplesSqrt) + noise.g()) * invSamplesSqrt;
+				optix::float3 sampleVector;
+				cosine_sample_hemisphere(u1, u2, sampleVector);
+				onb.inverse_transform(sampleVector);
+
+				Embree::LightRayPacket& aoPacket = aoPackets[a];
+				aoPacket.attenuation[i] = 1.f;
+				aoPacket.orgx[i] = hit.pos.x();
+				aoPacket.orgy[i] = hit.pos.y();
+				aoPacket.orgz[i] = hit.pos.z();
+				aoPacket.dirx[i] = sampleVector.x;
+				aoPacket.diry[i] = sampleVector.y;
+				aoPacket.dirz[i] = sampleVector.z;
+				aoPacket.tnear[i] = 0.01f;
+				aoPacket.tfar[i] = curScene->aoRadius;
+				aoPacket.instID[i] =
+				aoPacket.geomID[i] =
+				aoPacket.primID[i] = RTC_INVALID_GEOMETRY_ID;
+				aoPacket.mask[i] = EMBREE_RAY_VALID;
+				aoPacket.time[i] = 0.f;
+				aoPacket.valid[i] = EMBREE_RAY_VALID;
+
+			}
 
 		}
 		
@@ -435,6 +488,22 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 
 	}
 
+	// Ambient occlusion
+
+	if (enableAo) {
+
+		for (int a = 0; a < aoSamples; a++) {
+
+			rtcOccluded8(aoPackets[a].valid, curScene->Embree.scene, aoPackets[a]);
+
+			for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
+				if (aoPackets[a].valid[i] == EMBREE_RAY_VALID)
+					hits[i].occluded += 1.f - aoPackets[a].attenuation[i];
+
+		}
+
+	}
+
 	//// Calculate hit colors ////
 
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
@@ -445,15 +514,15 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 			continue;
 
 		// Create color
-		result[i] = hit.texture * (curScene->ambient + hit.material->ambient + hit.diffuse) * (1.f - hit.transparency) + hit.specular;
+		result[i] = hit.texture * (curScene->ambient + hit.material->ambient + hit.diffuse) * (1.f - hit.occluded * invSamples * aoPower) * (1.f - hit.transparency) + hit.specular;
 
 		// Add reflections
-		if (hit.material->reflectIntensity > 0.f && doReflections)
+		/*if (hit.material->reflectIntensity > 0.f && doReflections)
 			result[i] += reflectResult[i] * hit.material->reflectIntensity;
 
 		// Add reflections
 		if (hit.transparency > 0.f && doRefractions)
-			result[i] += refractResult[i] * hit.transparency;
+			result[i] += refractResult[i] * hit.transparency;*/
 
 		result[i].a(1.f);
 

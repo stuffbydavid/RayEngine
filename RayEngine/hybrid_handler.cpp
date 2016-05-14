@@ -9,11 +9,11 @@ void RayEngine::hybridInit() {
 
 void RayEngine::hybridRenderUpdatePartition() {
 
-	if (Hybrid.balanceMode == BM_TIME) {
+	if (Hybrid.balanceMode == BM_RENDER_TIME) {
 
 		float dif = Optix.lastTime - Embree.lastTime;
 		Hybrid.partition = max(0.f, min(1.f, Hybrid.partition + dif * 0.25f));
-		resize();
+		resize(); // TODO: Does this take time?
 
 	}
 

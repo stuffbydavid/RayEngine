@@ -59,20 +59,18 @@ void RayEngine::optixInit() {
 		materialClosestHitProgram = Optix.context->createProgramFromPTXFile("ptx/material_program.cu.ptx", "closestHit");
 		materialAnyHitProgram = Optix.context->createProgramFromPTXFile("ptx/material_program.cu.ptx", "anyHit");
 
-		// Make AO noise
-		int noiseWid, noiseHei;
-		noiseWid = noiseHei = 50;
-		Color* noise = new Color[noiseWid * noiseHei];
-		for (int i = 0; i < noiseWid * noiseHei; i++)
-			noise[i] = { frand(), frand(), frand() };
-		optix::Buffer buf = Optix.context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_FLOAT4, noiseWid, noiseHei);
-		memcpy(buf->map(), noise, noiseWid * noiseHei * sizeof(Color));
+		// Make AO noise sampler
+#if OPTIX_USE_OPENGL_TEXTURE
+		Optix.aoNoise = Optix.context->createTextureSamplerFromGLImage(aoNoiseImage->texture, RT_TARGET_GL_TEXTURE_2D);
+#else
+		optix::Buffer buf = context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_FLOAT4, AO_NOISE_WIDTH, AO_NOISE_HEIGHT);
+		memcpy(buf->map(), aoNoiseImage->pixels, AO_NOISE_WIDTH * AO_NOISE_HEIGHT * sizeof(Color));
 		buf->unmap();
-		delete noise;
-		Optix.aoNoise = Optix.context->createTextureSampler();
+		Optix.aoNoise = context->createTextureSampler();
 		Optix.aoNoise->setArraySize(1);
 		Optix.aoNoise->setMipLevelCount(1);
 		Optix.aoNoise->setBuffer(0, 0, buf);
+#endif
 		Optix.aoNoise->setWrapMode(0, RT_WRAP_REPEAT);
 		Optix.aoNoise->setWrapMode(1, RT_WRAP_REPEAT);
 		Optix.aoNoise->setIndexingMode(RT_TEXTURE_INDEX_NORMALIZED_COORDINATES);
@@ -101,7 +99,6 @@ void RayEngine::optixSetScene(Scene* scene) {
 	Optix.context["sceneAmbient"]->setFloat(scene->ambient.r(), scene->ambient.g(), scene->ambient.b(), scene->ambient.a());
 	Optix.context["sceneObj"]->set(scene->Optix.group);
 	Optix.context["sky"]->setTextureSampler(scene->Optix.sky);
-	Optix.context["aoRadius"]->setFloat(scene->aoRadius);
 
 	Optix.lights->setSize(scene->lights.size());
 	memcpy(Optix.lights->map(), &scene->lights[0], scene->lights.size() * sizeof(Light));

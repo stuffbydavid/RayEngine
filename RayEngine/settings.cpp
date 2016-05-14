@@ -2,74 +2,80 @@
 
 void RayEngine::settingsInit() {
 
+	showGui = true;
+	guiHeight = 100;
 	selectedSetting = 0;
 
-	//// Scene ////
+	// Scene
+	settingScene = addSetting("Scene", [this]() { optixSetScene(curScene); });
 
-	settingScene = addSetting("Scene");
-	for (int i = 0; i < scenes.size(); i++)
-		settingScene->addOption(scenes[i]->name, [this, i]() { curScene = scenes[i]; curCamera = &curScene->camera; optixSetScene(curScene); }, i == 0);
-
-
-	//// Render mode ////
-
+	// Render mode
 	settingRenderMode = addSetting("Render mode");
-	settingRenderMode->addOption("OpenGL", [this]() { renderMode = RM_OPENGL; }, RENDER_MODE == RM_OPENGL);
-	settingRenderMode->addOption("Embree", [this]() { renderMode = RM_EMBREE; resize(); }, RENDER_MODE == RM_EMBREE);
-	settingRenderMode->addOption("OptiX", [this]() { renderMode = RM_OPTIX;  resize(); }, RENDER_MODE == RM_OPTIX);
-	settingRenderMode->addOption("Hybrid", [this]() { renderMode = RM_HYBRID; resize(); }, RENDER_MODE == RM_HYBRID);
+	settingRenderMode->addOption("OpenGL", RENDER_MODE == RM_OPENGL, [this]() { renderMode = RM_OPENGL; });
+	settingRenderMode->addOption("Embree", RENDER_MODE == RM_EMBREE, [this]() { renderMode = RM_EMBREE; resize(); });
+	settingRenderMode->addOption("OptiX",  RENDER_MODE == RM_OPTIX,  [this]() { renderMode = RM_OPTIX;  resize(); });
+	settingRenderMode->addOption("Hybrid", RENDER_MODE == RM_HYBRID, [this]() { renderMode = RM_HYBRID; resize(); });
 
-	//// Max reflections ////
-
-	settingMaxReflections = addSetting("Max reflections");
-	settingMaxRefractions = addSetting("Max refractions");
+	// Reflections/Refractions
+	settingEnableReflections = addSettingVariableBool("Reflections", &enableReflections, ENABLE_REFLECTIONS);
+	settingMaxReflections = addSetting("Max iterations");
+	settingEnableRefractions = addSettingVariableBool("Refractions", &enableRefractions, ENABLE_REFRACTIONS);
+	settingMaxRefractions = addSetting("Max iterations");
 	for (int i = 0; i < 32; i++) {
-		settingMaxReflections->addOption(to_string(i), [this, i]() { maxReflections = i; }, MAX_REFLECTIONS == i);
-		settingMaxRefractions->addOption(to_string(i), [this, i]() { maxRefractions = i; }, MAX_REFRACTIONS == i);
+		settingMaxReflections->addOption(to_string(i), MAX_REFLECTIONS == i, [this, i]() { maxReflections = i; });
+		settingMaxRefractions->addOption(to_string(i), MAX_REFRACTIONS == i, [this, i]() { maxRefractions = i; });
 	}
 
-	//// Embree settings ////
-	settingEmbreeRenderTiles = addSetting("Render tiles");
-	settingEmbreeRenderTiles->addOption("Yes", [this]() { Embree.renderTiles = true; },   EMBREE_RENDER_TILES);
-	settingEmbreeRenderTiles->addOption("No",  [this]() { Embree.renderTiles = false; }, !EMBREE_RENDER_TILES);
+	// Ambient occlusion
+	settingEnableAo = addSettingVariableBool("AO", &enableAo, ENABLE_AO);
+	settingAoSamples = addSetting("Samples");
+	for (int i = 2; i <= AO_SAMPLES_SQRT_MAX; i++)
+		settingAoSamples->addOption(to_string(i * i), AO_SAMPLES_SQRT == i, [this, i]() { aoSamplesSqrt = i; aoSamples = i * i; });
+	settingAoRadius = addSettingVariable("Radius", nullptr, 0.05f, 0.f, 1000.f, 0.f, [this]() { settingAoRadius->delta = *((float*)settingAoRadius->variable) * 0.1f; });
+	settingAoPower = addSettingVariable("Power", &aoPower, 0.025f, 0.f, 10.f, AO_POWER);
+	settingAoNoiseScale = addSettingVariable("Noise scale", &aoNoiseScale, 2.f, 1.f, 100.f, AO_NOISE_SCALE);
 
+	// Embree settings
+	settingEmbreeRenderTiles = addSettingVariableBool("Render tiles", &Embree.renderTiles, EMBREE_RENDER_TILES);
 	settingEmbreeTileWidth = addSetting("Width");
 	settingEmbreeTileHeight = addSetting("Height");
 	for (int i = 1; i <= 256; i *= 2) {
-		settingEmbreeTileWidth->addOption(to_string(i),  [this, i]() { Embree.tileWidth = i; },  EMBREE_TILE_WIDTH == i);
-		settingEmbreeTileHeight->addOption(to_string(i), [this, i]() { Embree.tileHeight = i; }, EMBREE_TILE_HEIGHT == i);
+		settingEmbreeTileWidth->addOption(to_string(i),  EMBREE_TILE_WIDTH == i,  [this, i]() { Embree.tileWidth = i; });
+		settingEmbreeTileHeight->addOption(to_string(i), EMBREE_TILE_HEIGHT == i, [this, i]() { Embree.tileHeight = i; });
 	}
+	settingEmbreePacketPrimary = addSettingVariableBool("Primary packets", &Embree.packetPrimary, EMBREE_PACKET_PRIMARY);
+	settingEmbreePacketSecondary = addSettingVariableBool("Secondary packets", &Embree.packetSecondary, EMBREE_PACKET_SECONDARY);
 
-	settingEmbreePacketPrimary = addSetting("Primary packets");
-	settingEmbreePacketPrimary->addOption("Yes", [this]() { Embree.packetPrimary = true; },   EMBREE_PACKET_PRIMARY);
-	settingEmbreePacketPrimary->addOption("No",  [this]() { Embree.packetPrimary = false; }, !EMBREE_PACKET_PRIMARY);
-
-	settingEmbreePacketSecondary = addSetting("Secondary packets");
-	settingEmbreePacketSecondary->addOption("Yes", [this]() { Embree.packetSecondary = true; },   EMBREE_PACKET_SECONDARY);
-	settingEmbreePacketSecondary->addOption("No", [this]() { Embree.packetSecondary = false; }, !EMBREE_PACKET_SECONDARY);
-
-	//// OptiX settings ////
-
+	// OptiX settings
 	settingOptixStackSize = addSetting("Stack size");
 	for (int i = 1024; i <= 65536; i *= 2)
-		settingOptixStackSize->addOption(to_string(i), [this, i]() { Optix.context->setStackSize(i); }, OPTIX_STACK_SIZE == i);
+		settingOptixStackSize->addOption(to_string(i), OPTIX_STACK_SIZE == i, [this, i]() { Optix.context->setStackSize(i); });
 
-	//// Hybrid settings ////
-
+	// Hybrid settings
 	settingHybridBalanceMode = addSetting("Balance mode");
-	settingHybridBalanceMode->addOption("Time",   [this]() { Hybrid.balanceMode = BM_TIME; },   HYBRID_BALANCE_MODE == BM_TIME);
-	settingHybridBalanceMode->addOption("Manual", [this]() { Hybrid.balanceMode = BM_MANUAL; }, HYBRID_BALANCE_MODE == BM_MANUAL);
+	settingHybridBalanceMode->addOption("Render time",   HYBRID_BALANCE_MODE == BM_RENDER_TIME,   [this]() { Hybrid.balanceMode = BM_RENDER_TIME; });
+	settingHybridBalanceMode->addOption("Manual", HYBRID_BALANCE_MODE == BM_MANUAL, [this]() { Hybrid.balanceMode = BM_MANUAL; });
+	settingHybridPartition = addSettingVariable("Partition", &Hybrid.partition, 0.01f, 0.f, 1.f, HYBRID_PARTITION, [this]() {resize(); });
+	settingHybridDisplayPartition = addSettingVariableBool("Display partition", &Hybrid.displayPartition, HYBRID_DISPLAY_PARTITION);
 
-	settingHybridDisplayPartition = addSetting("Display partition");
-	settingHybridDisplayPartition->addOption("Yes", [this]() { Hybrid.displayPartition = true; },   HYBRID_DISPLAY_PARTITION);
-	settingHybridDisplayPartition->addOption("No",  [this]() { Hybrid.displayPartition = false; }, !HYBRID_DISPLAY_PARTITION);
+	// Add scenes
+	for (int i = 0; i < scenes.size(); i++)
+		settingScene->addOption(scenes[i]->name, i == 0, [this, i]() { curScene = scenes[i]; curCamera = &curScene->camera; settingAoRadius->variable = &curScene->aoRadius; });
 
 }
 
-RayEngine::Setting::Setting(string name) :
-    name(name)
+RayEngine::Setting::Setting(string name, void* variable, bool isBool, float delta, float mi, float ma, float def, function<void()> func) :
+    name(name),
+	variable(variable),
+	isBool(isBool),
+	delta(delta),
+	mi(mi),
+	ma(ma),
+	def(def),
+	func(func)
 {
 	selectedOption = 0;
+	visible = false;
 }
 
 RayEngine::Setting::Option::Option(string name, function<void()> func) :
@@ -77,15 +83,39 @@ RayEngine::Setting::Option::Option(string name, function<void()> func) :
     func(func)
 {}
 
-RayEngine::Setting* RayEngine::addSetting(string name) {
+RayEngine::Setting* RayEngine::addSetting(string name, function<void()> func) {
 
-	RayEngine::Setting* setting = new RayEngine::Setting(name);
+	RayEngine::Setting* setting = new RayEngine::Setting(name, nullptr, 1.f, false, 0, 0, 0, func);
 	settings.push_back(setting);
 	return setting;
 
 }
 
-void RayEngine::Setting::addOption(string name, function<void()> func, bool selected) {
+RayEngine::Setting* RayEngine::addSettingVariable(string name, void* variable, float delta, float mi, float ma, float def, function<void()> func) {
+
+	RayEngine::Setting* setting = new RayEngine::Setting(name, variable, false, delta, mi, ma, def, func);
+	settings.push_back(setting);
+	if (variable) {
+		*((float*)variable) = def;
+		if (setting->func)
+			setting->func();
+	}
+	return setting;
+
+}
+
+RayEngine::Setting* RayEngine::addSettingVariableBool(string name, void* variable, bool def, function<void()> func) {
+
+	RayEngine::Setting* setting = new RayEngine::Setting(name, variable, true, 1.f, false, true, def, func);
+	settings.push_back(setting);
+	*((bool*)variable) = def;
+	if (setting->func)
+		setting->func();
+	return setting;
+
+}
+
+void RayEngine::Setting::addOption(string name, bool selected, function<void()> func) {
 
 	Option option(name, func);
 	options.push_back(option);
@@ -114,46 +144,84 @@ void RayEngine::settingsInput() {
 		cout << endl;
 	}
 
-	// Hybrid partition
-
-	if (Hybrid.balanceMode == BM_MANUAL) {
-
-		if (window.keyDown[GLFW_KEY_PAGE_DOWN]) {
-			Hybrid.partition = max(Hybrid.partition - 0.01f, 0.f);
-			resize();
-		}
-
-		if (window.keyDown[GLFW_KEY_PAGE_UP]) {
-			Hybrid.partition = min(Hybrid.partition + 0.01f, 1.f);
-			resize();
-		}
-
-	}
-
 	// Settings
 
-	if (window.keyPressed[GLFW_KEY_UP])
-		selectedSetting = mod(selectedSetting - 1, settings.size());
+	if (showGui) {
 
-	if (window.keyPressed[GLFW_KEY_DOWN])
-		selectedSetting = mod(selectedSetting + 1, settings.size());
-
-	if (window.keyPressed[GLFW_KEY_LEFT]) {
 		Setting* curSetting = settings[selectedSetting];
-		if (curSetting->options.size() > 2)
-			curSetting->selectedOption = clamp(curSetting->selectedOption - 1, 0, curSetting->options.size() - 1);
-		else
-			curSetting->selectedOption = mod(curSetting->selectedOption - 1, curSetting->options.size());
-		curSetting->options[curSetting->selectedOption].func();
-	}
 
-	if (window.keyPressed[GLFW_KEY_RIGHT]) {
-		Setting* curSetting = settings[selectedSetting];
-		if (curSetting->options.size() > 2)
-			curSetting->selectedOption = clamp(curSetting->selectedOption + 1, 0, curSetting->options.size() - 1);
-		else
-			curSetting->selectedOption = mod(curSetting->selectedOption + 1, curSetting->options.size());
-		curSetting->options[curSetting->selectedOption].func();
+		// Scroll settings list
+
+		if (window.keyPressed[GLFW_KEY_UP]) {
+			do {
+				selectedSetting = mod(selectedSetting - 1, settings.size());
+				curSetting = settings[selectedSetting];
+			} while (!curSetting->visible);
+		}
+
+		if (window.keyPressed[GLFW_KEY_DOWN]) {
+			do {
+				selectedSetting = mod(selectedSetting + 1, settings.size());
+				curSetting = settings[selectedSetting];
+			} while (!curSetting->visible);
+		}
+
+		if (curSetting->variable) { // Increase/decrease variable value
+
+			if (curSetting->isBool) { // Switch between false and true
+
+				if (window.keyPressed[GLFW_KEY_LEFT] || window.keyPressed[GLFW_KEY_RIGHT]) {
+					*((bool*)curSetting->variable) = !*((bool*)curSetting->variable);
+					if (curSetting->func)
+						curSetting->func();
+				}
+
+			} else { // Increase/decrease
+
+				if (window.keyDown[GLFW_KEY_LEFT]) {
+					*((float*)curSetting->variable) = clamp(*((float*)curSetting->variable) - curSetting->delta, curSetting->mi, curSetting->ma);
+					if (curSetting->func)
+						curSetting->func();
+				}
+
+				if (window.keyDown[GLFW_KEY_RIGHT]) {
+					*((float*)curSetting->variable) = clamp(*((float*)curSetting->variable) + curSetting->delta, curSetting->mi, curSetting->ma);
+					if (curSetting->func)
+						curSetting->func();
+				}
+
+			}
+
+		} else { // Scroll options list
+
+			if (window.keyPressed[GLFW_KEY_LEFT]) {
+
+				if (curSetting->options.size() > 2)
+					curSetting->selectedOption = clamp(curSetting->selectedOption - 1, 0, curSetting->options.size() - 1);
+				else
+					curSetting->selectedOption = mod(curSetting->selectedOption - 1, curSetting->options.size());
+
+				curSetting->options[curSetting->selectedOption].func();
+				if (curSetting->func)
+					curSetting->func();
+
+			}
+
+			if (window.keyPressed[GLFW_KEY_RIGHT]) {
+
+				if (curSetting->options.size() > 2)
+					curSetting->selectedOption = clamp(curSetting->selectedOption + 1, 0, curSetting->options.size() - 1);
+				else
+					curSetting->selectedOption = mod(curSetting->selectedOption + 1, curSetting->options.size());
+				curSetting->options[curSetting->selectedOption].func();
+
+				if (curSetting->func)
+					curSetting->func();
+
+			}
+
+		}
+
 	}
 
 }

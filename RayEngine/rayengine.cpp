@@ -20,8 +20,6 @@ RayEngine::RayEngine() {
 	OpenGL.shdrNormals = new Shader("Normals", bind(&RayEngine::openglSetupNormals, this, _1, _2, _3), "normals.vshader", "normals.fshader");
 	OpenGL.shdrPhong = new Shader("Phong", bind(&RayEngine::openglSetupPhong, this, _1, _2, _3), "phong.vshader", "phong.fshader");
 
-	showGui = true;
-
 }
 
 RayEngine::~RayEngine() {
@@ -30,6 +28,7 @@ RayEngine::~RayEngine() {
 
 void RayEngine::launch() {
 
+	aoInit();
 	embreeInit();
 	optixInit();
 	hybridInit();
@@ -90,5 +89,15 @@ Scene* RayEngine::createScene(string name, string skyFile, Color ambient, float 
 	Scene* scene = new Scene(name, skyFile, ambient, aoRadius, background);
 	scenes.push_back(scene);
 	return scene;
+
+}
+
+void RayEngine::aoInit() {
+
+	// Create noise
+	Color* noise = new Color[AO_NOISE_WIDTH * AO_NOISE_HEIGHT];
+	for (int i = 0; i < AO_NOISE_WIDTH * AO_NOISE_HEIGHT; i++)
+		noise[i] = { frand(), frand(), frand() };
+	aoNoiseImage = new Image(noise, AO_NOISE_WIDTH, AO_NOISE_HEIGHT, GL_LINEAR);
 
 }

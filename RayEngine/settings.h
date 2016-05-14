@@ -3,19 +3,30 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 
-#define RENDER_MODE RM_OPTIX
+#define RENDER_MODE RM_EMBREE
+#define ENABLE_REFLECTIONS 1
+#define ENABLE_REFRACTIONS 1
+#define ENABLE_AO 1
+
 #define MAX_REFLECTIONS 1
 #define MAX_REFRACTIONS 4
+#define AO_SAMPLES_SQRT 5
+#define AO_SAMPLES_SQRT_MAX 10
+#define AO_SAMPLES_MAX AO_SAMPLES_SQRT_MAX * AO_SAMPLES_SQRT_MAX
+#define AO_NOISE_SCALE 100
+#define AO_NOISE_WIDTH 50
+#define AO_NOISE_HEIGHT 50
+#define AO_POWER 1.f
 
 #define EMBREE_RENDER_TILES 1     // 1 = Split into tiles, 0 = Use a single loop
-#define EMBREE_PACKET_PRIMARY 1   // 1 = Use packets for primary rays, 0 = Shoot single rays
-#define EMBREE_PACKET_SECONDARY 1 // 1 = Use packets for secondary rays (eg. shadows, reflections), 0 = use single rays
 #define EMBREE_TILE_WIDTH 16
 #define EMBREE_TILE_HEIGHT 16
+#define EMBREE_PACKET_PRIMARY 1   // 1 = Use packets for primary rays, 0 = Shoot single rays
+#define EMBREE_PACKET_SECONDARY 1 // 1 = Use packets for secondary rays (eg. shadows, reflections), 0 = use single rays
 
 #define OPTIX_STACK_SIZE 4096
 
-#define HYBRID_BALANCE_MODE BM_TIME
+#define HYBRID_BALANCE_MODE BM_RENDER_TIME
 #define HYBRID_DISPLAY_PARTITION 0
 #define HYBRID_PARTITION 0.4
 

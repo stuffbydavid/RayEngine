@@ -15,8 +15,16 @@ void RayEngine::optixRender() {
 		Optix.context["zaxis"]->setFloat(rayZaxis.x(), rayZaxis.y(), rayZaxis.z());
 		Optix.context["offset"]->setFloat(Optix.offset);
 		Optix.context["windowWidth"]->setFloat(window.width);
+		Optix.context["enableReflections"]->setInt(enableReflections);
 		Optix.context["maxReflections"]->setInt(maxReflections);
+		Optix.context["enableRefractions"]->setInt(enableRefractions);
 		Optix.context["maxRefractions"]->setInt(maxRefractions);
+		Optix.context["enableAo"]->setInt(enableAo);
+		Optix.context["aoSamples"]->setInt(aoSamples);
+		Optix.context["aoSamplesSqrt"]->setInt(aoSamplesSqrt);
+		Optix.context["aoNoiseScale"]->setFloat(aoNoiseScale);
+		Optix.context["aoPower"]->setFloat(aoPower);
+		Optix.context["aoRadius"]->setFloat(curScene->aoRadius);
 		Optix.context->launch(0, Optix.width, window.height);
 
 	} catch (optix::Exception e) {

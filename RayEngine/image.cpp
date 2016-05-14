@@ -75,6 +75,15 @@ Image::Image(Color color) {
 
 }
 
+Image::Image(Color* pixels, int width, int height, GLuint filter) :
+    pixels(pixels),
+	width(width),
+	height(height),
+	filter(filter)
+{
+	createTexture();
+}
+
 
 void Image::createTexture() {
 

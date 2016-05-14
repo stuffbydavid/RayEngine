@@ -42,13 +42,17 @@ struct RayEngine {
 	};
 
 	RenderMode renderMode;
+	bool enableReflections, enableRefractions, enableAo;
 	int maxReflections, maxRefractions;
-	vector<Vec3> aoSamples;
+	int aoSamples, aoSamplesSqrt;
+	float aoPower, aoNoiseScale;
+	void aoInit();
+	Image* aoNoiseImage;
 
 	struct Setting {
 
-		Setting(string name);
-		void addOption(string name, function<void()> func, bool selected = false);
+		Setting(string name, void* variable, bool isBool, float delta, float mi, float ma, float def, function<void()> func);
+		void addOption(string name, bool selected, function<void()> func);
 
 		struct Option {
 			Option(string name, function<void()> func);
@@ -57,22 +61,37 @@ struct RayEngine {
 		};
 
 		vector<Option> options;
-		string name;
 		int selectedOption;
+
+		string name;
+		void* variable;
+		bool isBool, visible;
+		float delta, mi, ma, def;
+		function<void()> func;
 
 	};
 
 	Setting* settingScene;
 	Setting* settingRenderMode;
+	Setting* settingEnableReflections;
 	Setting* settingMaxReflections;
+	Setting* settingEnableRefractions;
 	Setting* settingMaxRefractions;
+	Setting* settingEnableAo;
+	Setting* settingAoSamples;
+	Setting* settingAoRadius;
+	Setting* settingAoPower;
+	Setting* settingAoNoiseScale;
 	Setting* settingEmbreeRenderTiles;
 	Setting* settingEmbreePacketPrimary;
 	Setting* settingEmbreePacketSecondary;
 	Setting* settingEmbreeTileWidth;
 	Setting* settingEmbreeTileHeight;
 	Setting* settingOptixStackSize;
+	Setting* settingOptixBuilder;
+	Setting* settingOptixTraverser;
 	Setting* settingHybridBalanceMode;
+	Setting* settingHybridPartition;
 	Setting* settingHybridDisplayPartition;
 	vector<Setting*> settings;
 	int selectedSetting;
@@ -80,16 +99,19 @@ struct RayEngine {
 	void settingsInit();
 	void settingsInput();
 	void settingsUpdate();
-	Setting* addSetting(string name);
+	Setting* addSetting(string name, function<void()> func = nullptr);
+	Setting* addSettingVariable(string name, void* variable, float delta, float mi, float ma, float def, function<void()> func = nullptr);
+	Setting* addSettingVariableBool(string name, void* variable, bool def, function<void()> func = nullptr);
 
 	//// GUI ////
 
 	Font* fntGui;
 	Font* fntGuiBold;
+	int guiHeight;
 
 	bool showGui;
 	void guiRender();
-	void guiRenderSetting(Setting* setting, int x, int& y, bool indent = false);
+	void guiRenderSetting(Setting* setting, int x, int& y);
 	void guiRenderText(string text, int x, int& y, Color color);
 	void guiRenderTextBold(string text, int x, int& y, Color color);
 
@@ -112,13 +134,19 @@ struct RayEngine {
 
 	struct Embree {
 
-		struct Ray : RTCRay {};
+		struct Ray : RTCRay {
+			int x, y;
+		};
+
 		struct LightRay : Ray {
 			float attenuation;
 		};
+
 		struct RayPacket : EMBREE_PACKET_TYPE {
 			int valid[EMBREE_PACKET_SIZE];
+			int x, y;
 		};
+
 		struct LightRayPacket : RayPacket {
 			float attenuation[EMBREE_PACKET_SIZE];
 			float distance[EMBREE_PACKET_SIZE];
@@ -171,7 +199,7 @@ struct RayEngine {
 	//// Hybrid ////
 
 	enum BalanceMode {
-		BM_TIME,
+		BM_RENDER_TIME,
 		BM_MANUAL
 	};
 

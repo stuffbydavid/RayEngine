@@ -8,6 +8,9 @@ struct Image {
 	// Create an image from a single color.
 	Image(Color color);
 
+	// Create an image from a buffer
+	Image(Color* pixels, int width, int height, GLuint filter);
+
 	// Creates an OpenGL texture object.
 	void createTexture();
 

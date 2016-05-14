@@ -10,6 +10,7 @@
 #pragma comment(lib, "freetype.lib")
 #pragma comment(lib, "CORE_RL_Magick++_.lib")
 
+#include <sstream>
 #include <functional>
 #include <string>
 #include <vector>
@@ -43,7 +44,7 @@ inline long mod(long a, long b) {
 	return (a % b + b) % b;
 }
 
-inline long clamp(long x, long mi, long ma) {
+inline float clamp(float x, float mi, float ma) {
 	return min(ma, max(mi, x));
 }
 
