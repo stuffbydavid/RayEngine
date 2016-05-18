@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "object.h"
 #include "light.h"
+#include "path.h"
 
 struct Scene {
 
@@ -18,9 +19,15 @@ struct Scene {
 	// Adds a new light.
 	void addLight(Vec3 position, Color color, float range);
 
+	// Set the path for the camera.
+	void setCameraPath(Path* path);
+
+	void updateCameraPath();
+
 	//// Variables ////
 
 	string name;
+	Path* cameraPath;
 	Color ambient;
 	Image* sky;
 	Camera camera;

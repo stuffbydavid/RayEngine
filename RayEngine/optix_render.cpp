@@ -2,10 +2,8 @@
 
 void RayEngine::optixRender() {
 
-	if (!OPTIX_ENABLE || Optix.width == 0)
+	if (!OPTIX_ENABLE || Optix.width == 0 || (renderMode == RM_HYBRID && !Hybrid.optix))
 		return;
-
-	float start = glfwGetTime();
 
 	try {
 
@@ -14,7 +12,6 @@ void RayEngine::optixRender() {
 		Optix.context["yaxis"]->setFloat(rayYaxis.x(), rayYaxis.y(), rayYaxis.z());
 		Optix.context["zaxis"]->setFloat(rayZaxis.x(), rayZaxis.y(), rayZaxis.z());
 		Optix.context["offset"]->setFloat(Optix.offset);
-		Optix.context["windowWidth"]->setFloat(window.width);
 		Optix.context["enableReflections"]->setInt(enableReflections);
 		Optix.context["maxReflections"]->setInt(maxReflections);
 		Optix.context["enableRefractions"]->setInt(enableRefractions);
@@ -25,43 +22,81 @@ void RayEngine::optixRender() {
 		Optix.context["aoNoiseScale"]->setFloat(aoNoiseScale);
 		Optix.context["aoPower"]->setFloat(aoPower);
 		Optix.context["aoRadius"]->setFloat(curScene->aoRadius);
-		Optix.context->launch(0, Optix.width, window.height);
 
+		if (Optix.progressive) {
+
+			Optix.context["renderBuffer"]->set(Optix.streamRenderBuffer);
+			Optix.context->launchProgressive(0, window.width, window.height, 1);
+
+		} else {
+
+			Optix.renderTimer.start();
+
+			Optix.context["renderBuffer"]->set(Optix.renderBuffer);
+			Optix.context->launch(0, window.width, window.height);
+			
+			Optix.renderTimer.stop();
+
+		}
+		
 	} catch (optix::Exception e) {
 
 		cout << "OptiX error: " << e.getErrorString() << endl;
 		system("pause");
 	}
 
-	float end = glfwGetTime();
-	Optix.lastTime = end - start;
-	Optix.time += Optix.lastTime;
-	Optix.frames++;
-	if (Optix.frames > 30) {
-		Optix.avgTime = Optix.time / Optix.frames;
-		Optix.time = 0.f;
-		Optix.frames = 0;
-	}
-
 }
 
 void RayEngine::optixRenderUpdateTexture() {
 
-	if (!OPTIX_ENABLE)
+	if (!OPTIX_ENABLE || (renderMode == RM_HYBRID && !Hybrid.optix))
 		return;
 
-	glBindTexture(GL_TEXTURE_2D, Optix.texture);
-#if OPTIX_USE_OUTPUT_VBO
-	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, Optix.vbo);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Optix.width, window.height, GL_RGBA, GL_FLOAT, 0);
-	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-#else
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, Optix.width, window.height, GL_RGBA, GL_FLOAT, Optix.buffer->map());
-	Optix.buffer->unmap();
-#endif
-	glBindTexture(GL_TEXTURE_2D, 0);
+	Optix.textureTimer.start();
 
-	OpenGL.shdrTexture->render2DBox(window.ortho, Optix.offset, 0, Optix.width, window.height, Optix.texture, (renderMode == RM_HYBRID && Hybrid.displayPartition) ? OPTIX_HIGHLIGHT_COLOR : Color(1.f));
+	if (Optix.progressive) {
+
+		//give more to optix
+
+		int ready = false;
+		uint subFrames, maxSubFrames;
+
+		Optix.streamBuffer->getProgressiveUpdateReady(&ready, &subFrames, &maxSubFrames);
+
+		if (ready) {
+
+			Optix.renderTimer.stop();
+
+			glBindTexture(GL_TEXTURE_2D, Optix.texture);
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, window.width, window.height, GL_RGBA, GL_UNSIGNED_BYTE, Optix.streamBuffer->map());
+			Optix.streamBuffer->unmap();
+			glBindTexture(GL_TEXTURE_2D, 0);
+
+			Optix.renderTimer.start();
+
+		}
+		else {
+			//give more to embree
+		}
+
+	} else {
+
+		glBindTexture(GL_TEXTURE_2D, Optix.texture);
+#if OPTIX_USE_OUTPUT_VBO
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, Optix.vbo);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, window.width, window.height, GL_RGBA, GL_FLOAT, 0);
+		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+#else
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, window.width, window.height, GL_RGBA, GL_FLOAT, Optix.renderBuffer->map());
+		Optix.renderBuffer->unmap();
+#endif
+		glBindTexture(GL_TEXTURE_2D, 0);
+
+	}
+
+	OpenGL.shdrTexture->render2DBox(window.ortho, 0, 0, window.width, window.height, Optix.texture, (renderMode == RM_HYBRID && Hybrid.displayPartition) ? OPTIX_HIGHLIGHT_COLOR : Color(1.f));
+
+	Optix.textureTimer.stop();
 
 }

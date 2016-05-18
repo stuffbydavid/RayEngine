@@ -42,6 +42,8 @@ void RayEngine::loop() {
 
 	cameraInput();
 	settingsInput();
+	if (enableCameraPath)
+		curScene->updateCameraPath();
 	
 	rayOrg = curCamera->position;
 	rayXaxis = curCamera->xaxis * window.ratio * curCamera->tFov;
@@ -79,7 +81,9 @@ void RayEngine::loop() {
 void RayEngine::resize() {
 
 	embreeResize();
+	embreeUpdatePartition();
 	optixResize();
+	optixUpdatePartition();
 
 }
 

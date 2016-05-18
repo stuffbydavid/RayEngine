@@ -517,12 +517,12 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 		result[i] = hit.texture * (curScene->ambient + hit.material->ambient + hit.diffuse) * (1.f - hit.occluded * invSamples * aoPower) * (1.f - hit.transparency) + hit.specular;
 
 		// Add reflections
-		/*if (hit.material->reflectIntensity > 0.f && doReflections)
+		if (hit.material->reflectIntensity > 0.f && doReflections)
 			result[i] += reflectResult[i] * hit.material->reflectIntensity;
 
 		// Add reflections
 		if (hit.transparency > 0.f && doRefractions)
-			result[i] += refractResult[i] * hit.transparency;*/
+			result[i] += refractResult[i] * hit.transparency;
 
 		result[i].a(1.f);
 

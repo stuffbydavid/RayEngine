@@ -22,9 +22,7 @@ void RayEngine::optixInit() {
 		Optix.context = optix::Context::create();
 		Optix.context->setRayTypeCount(2);
 		Optix.context->setEntryPointCount(1);
-		Optix.frames = 0;
-		Optix.lastTime = 0.f;
-		Optix.avgTime = 0.f;
+		Optix.context->setStackSize(OPTIX_STACK_SIZE);
 
 		// Generate texture
 		glGenTextures(1, &Optix.texture);
@@ -39,10 +37,17 @@ void RayEngine::optixInit() {
 		Optix.renderBuffer = Optix.context->createBufferFromGLBO(RT_BUFFER_OUTPUT, Optix.vbo);
 		Optix.renderBuffer->setFormat(RT_FORMAT_FLOAT4);
 		Optix.renderBuffer->setSize(window.width, window.height);
+		Optix.streamRenderBuffer = Optix.context->createBufferFromGLBO(RT_BUFFER_OUTPUT, Optix.vbo);
+		Optix.streamRenderBuffer->setFormat(RT_FORMAT_FLOAT4);
+		Optix.streamRenderBuffer->setSize(window.width, window.height);
 #else
-		Optix.buffer = Optix.context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT4, window.width, window.height);
+		Optix.renderBuffer = Optix.context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT4, window.width, window.height);
+		//Optix.streamRenderBuffer = Optix.context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT4, window.width, window.height);
 #endif
-		Optix.context["renderBuffer"]->set(Optix.renderBuffer);
+
+		// Make streaming buffer
+		//Optix.streamBuffer = Optix.context->createBuffer(RT_BUFFER_PROGRESSIVE_STREAM, RT_FORMAT_UNSIGNED_BYTE4, window.width, window.height);
+		//Optix.streamBuffer->bindProgressiveStream(Optix.streamRenderBuffer);
 
 		// Make light buffer
 		Optix.lights = Optix.context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_USER, 0);
@@ -63,10 +68,10 @@ void RayEngine::optixInit() {
 #if OPTIX_USE_OPENGL_TEXTURE
 		Optix.aoNoise = Optix.context->createTextureSamplerFromGLImage(aoNoiseImage->texture, RT_TARGET_GL_TEXTURE_2D);
 #else
-		optix::Buffer buf = context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_FLOAT4, AO_NOISE_WIDTH, AO_NOISE_HEIGHT);
+		optix::Buffer buf = Optix.context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_FLOAT4, AO_NOISE_WIDTH, AO_NOISE_HEIGHT);
 		memcpy(buf->map(), aoNoiseImage->pixels, AO_NOISE_WIDTH * AO_NOISE_HEIGHT * sizeof(Color));
 		buf->unmap();
-		Optix.aoNoise = context->createTextureSampler();
+		Optix.aoNoise = Optix.context->createTextureSampler();
 		Optix.aoNoise->setArraySize(1);
 		Optix.aoNoise->setMipLevelCount(1);
 		Optix.aoNoise->setBuffer(0, 0, buf);
@@ -85,6 +90,7 @@ void RayEngine::optixInit() {
 		optixSetScene(scenes[0]);
 
 		// Compile
+		Optix.context["renderBuffer"]->set(Optix.renderBuffer);
 		Optix.context->validate();
 		Optix.context->compile();
 
@@ -267,7 +273,7 @@ void TriangleMesh::optixInit(optix::Context context) {
 
 }
 
-void RayEngine::optixResize() {
+void RayEngine::optixUpdatePartition() {
 
 	if (!OPTIX_ENABLE)
 		return;
@@ -276,29 +282,36 @@ void RayEngine::optixResize() {
 	if (renderMode == RM_HYBRID) {
 		Optix.offset = Embree.width;
 		Optix.width = window.width - Optix.offset;
-	} else {
+	}
+	else {
 		Optix.offset = 0;
 		Optix.width = window.width;
 	}
 
-	if (Optix.width == 0)
+}
+
+void RayEngine::optixResize() {
+
+	if (!OPTIX_ENABLE)
 		return;
 
 	// Resize buffer object
-	Optix.renderBuffer->setSize(Optix.width, window.height);
+	Optix.renderBuffer->setSize(window.width, window.height);
+	//Optix.streamRenderBuffer->setSize(window.width, window.height);
+	//Optix.streamBuffer->setSize(window.width, window.height);
 
 	// Resize VBO
 #if OPTIX_USE_OUTPUT_VBO
 	Optix.renderBuffer->unregisterGLBuffer();
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, Optix.vbo);
-	glBufferData(GL_PIXEL_UNPACK_BUFFER, sizeof(float) * 4 * Optix.width * window.height, 0, GL_STREAM_DRAW);
+	glBufferData(GL_PIXEL_UNPACK_BUFFER, sizeof(float) * 4 * window.width * window.height, 0, GL_STREAM_DRAW);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 	Optix.renderBuffer->registerGLBuffer();
 #endif
 
 	// Resize texture
 	glBindTexture(GL_TEXTURE_2D, Optix.texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Optix.width, window.height, 0, GL_RGBA, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window.width, window.height, 0, GL_RGBA, GL_FLOAT, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 }

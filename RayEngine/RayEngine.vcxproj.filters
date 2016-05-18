@@ -77,6 +77,12 @@
     <ClCompile Include="window.cpp">
       <Filter>RayEngine\Window</Filter>
     </ClCompile>
+    <ClCompile Include="timer.cpp">
+      <Filter>RayEngine\Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="path.cpp">
+      <Filter>RayEngine\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -141,6 +147,9 @@
     </ClInclude>
     <ClInclude Include="random.cuh">
       <Filter>RayEngine\OptiX\CUDA</Filter>
+    </ClInclude>
+    <ClInclude Include="path.h">
+      <Filter>RayEngine\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

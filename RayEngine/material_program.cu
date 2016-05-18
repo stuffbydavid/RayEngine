@@ -138,7 +138,7 @@ RT_PROGRAM void closestHit() {
 
 		float invSamples = 1.f / aoSamples;
 		float invSamplesSqrt = 1.f / aoSamplesSqrt;
-		float2 noiseTexCoord = (make_float2(offset + launchIndex.x, launchIndex.y) / make_float2(windowWidth, launchDim.y)) * aoNoiseScale;
+		float2 noiseTexCoord = (make_float2(launchIndex) / make_float2(launchDim)) * aoNoiseScale;
 		float4 noise = tex2D(aoNoise, noiseTexCoord.x, noiseTexCoord.y);
 		Onb onb(normal);
 

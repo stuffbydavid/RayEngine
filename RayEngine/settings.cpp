@@ -13,8 +13,11 @@ void RayEngine::settingsInit() {
 	settingRenderMode = addSetting("Render mode");
 	settingRenderMode->addOption("OpenGL", RENDER_MODE == RM_OPENGL, [this]() { renderMode = RM_OPENGL; });
 	settingRenderMode->addOption("Embree", RENDER_MODE == RM_EMBREE, [this]() { renderMode = RM_EMBREE; resize(); });
-	settingRenderMode->addOption("OptiX",  RENDER_MODE == RM_OPTIX,  [this]() { renderMode = RM_OPTIX;  resize(); });
+	settingRenderMode->addOption("OptiX", RENDER_MODE == RM_OPTIX, [this]()   { renderMode = RM_OPTIX;  resize(); });
 	settingRenderMode->addOption("Hybrid", RENDER_MODE == RM_HYBRID, [this]() { renderMode = RM_HYBRID; resize(); });
+
+	// Camera path
+	settingCameraPath = addSettingVariableBool("Camera path", &enableCameraPath, false);
 
 	// Reflections/Refractions
 	settingEnableReflections = addSettingVariableBool("Reflections", &enableReflections, ENABLE_REFLECTIONS);
@@ -34,8 +37,11 @@ void RayEngine::settingsInit() {
 	settingAoRadius = addSettingVariable("Radius", nullptr, 0.05f, 0.f, 1000.f, 0.f, [this]() { settingAoRadius->delta = *((float*)settingAoRadius->variable) * 0.1f; });
 	settingAoPower = addSettingVariable("Power", &aoPower, 0.025f, 0.f, 10.f, AO_POWER);
 	settingAoNoiseScale = addSettingVariable("Noise scale", &aoNoiseScale, 2.f, 1.f, 100.f, AO_NOISE_SCALE);
-
+	
 	// Embree settings
+	settingEmbreeNumThreads = addSetting("Threads");
+	for (int i = 1; i <= 32; i++)
+		settingEmbreeNumThreads->addOption(to_string(i), EMBREE_NUM_THREADS == i, [this, i]() { omp_set_num_threads(i); });
 	settingEmbreeRenderTiles = addSettingVariableBool("Render tiles", &Embree.renderTiles, EMBREE_RENDER_TILES);
 	settingEmbreeTileWidth = addSetting("Width");
 	settingEmbreeTileHeight = addSetting("Height");
@@ -47,16 +53,21 @@ void RayEngine::settingsInit() {
 	settingEmbreePacketSecondary = addSettingVariableBool("Secondary packets", &Embree.packetSecondary, EMBREE_PACKET_SECONDARY);
 
 	// OptiX settings
+	settingOptixProgressive = addSettingVariableBool("Progressive render", &Optix.progressive, OPTIX_PROGRESSIVE);
+
 	settingOptixStackSize = addSetting("Stack size");
 	for (int i = 1024; i <= 65536; i *= 2)
 		settingOptixStackSize->addOption(to_string(i), OPTIX_STACK_SIZE == i, [this, i]() { Optix.context->setStackSize(i); });
 
 	// Hybrid settings
+	settingHybridThreaded = addSettingVariableBool("Threaded", &Hybrid.threaded, HYBRID_THREADED);
 	settingHybridBalanceMode = addSetting("Balance mode");
 	settingHybridBalanceMode->addOption("Render time",   HYBRID_BALANCE_MODE == BM_RENDER_TIME,   [this]() { Hybrid.balanceMode = BM_RENDER_TIME; });
 	settingHybridBalanceMode->addOption("Manual", HYBRID_BALANCE_MODE == BM_MANUAL, [this]() { Hybrid.balanceMode = BM_MANUAL; });
 	settingHybridPartition = addSettingVariable("Partition", &Hybrid.partition, 0.01f, 0.f, 1.f, HYBRID_PARTITION, [this]() {resize(); });
 	settingHybridDisplayPartition = addSettingVariableBool("Display partition", &Hybrid.displayPartition, HYBRID_DISPLAY_PARTITION);
+	settingHybridEmbree = addSettingVariableBool("Embree", &Hybrid.embree, HYBRID_EMBREE);
+	settingHybridOptix = addSettingVariableBool("OptiX", &Hybrid.optix, HYBRID_OPTIX);
 
 	// Add scenes
 	for (int i = 0; i < scenes.size(); i++)

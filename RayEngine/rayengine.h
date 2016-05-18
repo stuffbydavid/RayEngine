@@ -42,7 +42,7 @@ struct RayEngine {
 	};
 
 	RenderMode renderMode;
-	bool enableReflections, enableRefractions, enableAo;
+	bool enableCameraPath, enableReflections, enableRefractions, enableAo;
 	int maxReflections, maxRefractions;
 	int aoSamples, aoSamplesSqrt;
 	float aoPower, aoNoiseScale;
@@ -73,6 +73,7 @@ struct RayEngine {
 
 	Setting* settingScene;
 	Setting* settingRenderMode;
+	Setting* settingCameraPath;
 	Setting* settingEnableReflections;
 	Setting* settingMaxReflections;
 	Setting* settingEnableRefractions;
@@ -82,17 +83,20 @@ struct RayEngine {
 	Setting* settingAoRadius;
 	Setting* settingAoPower;
 	Setting* settingAoNoiseScale;
+	Setting* settingEmbreeNumThreads;
 	Setting* settingEmbreeRenderTiles;
 	Setting* settingEmbreePacketPrimary;
 	Setting* settingEmbreePacketSecondary;
 	Setting* settingEmbreeTileWidth;
 	Setting* settingEmbreeTileHeight;
+	Setting* settingOptixProgressive;
 	Setting* settingOptixStackSize;
-	Setting* settingOptixBuilder;
-	Setting* settingOptixTraverser;
+	Setting* settingHybridThreaded;
 	Setting* settingHybridBalanceMode;
 	Setting* settingHybridPartition;
-	Setting* settingHybridDisplayPartition;
+	Setting* settingHybridDisplayPartition; 
+	Setting* settingHybridEmbree;
+	Setting* settingHybridOptix;
 	vector<Setting*> settings;
 	int selectedSetting;
 
@@ -112,8 +116,8 @@ struct RayEngine {
 	bool showGui;
 	void guiRender();
 	void guiRenderSetting(Setting* setting, int x, int& y);
-	void guiRenderText(string text, int x, int& y, Color color);
-	void guiRenderTextBold(string text, int x, int& y, Color color);
+	void guiRenderText(string text, int x, int& y, Color color = { 1.f });
+	void guiRenderTextBold(string text, int x, int& y, Color color = { 1.f });
 
 	//// OpenGL ////
 
@@ -129,6 +133,21 @@ struct RayEngine {
 	void openglRender();
 	void openglSetupNormals(GLuint program, Object* object, TriangleMesh* mesh);
 	void openglSetupPhong(GLuint program, Object* object, TriangleMesh* mesh);
+
+	//// Timer ////
+
+	struct Timer {
+
+		Timer();
+
+		void start();
+		void stop();
+
+		int avgAdditions;
+		float avgTime, lastTime;
+		float startMeasure, avgTotal, lastAvgMeasure;
+
+	};
 
 	//// Embree ///
 
@@ -156,15 +175,16 @@ struct RayEngine {
 		RTCDevice device;
 		vector<Color> buffer;
 		GLuint texture;
-		int offset, width, frames;
-		float time, lastTime, avgTime;
-
+		int offset, width;
 		bool renderTiles, packetPrimary, packetSecondary;
-		int tileWidth, tileHeight;
+		int tileWidth, tileHeight, numThreads;
+
+		Timer renderTimer, textureTimer;
 
 	} Embree;
 
 	void embreeInit();
+	void embreeUpdatePartition();
 	void embreeResize();
 	void embreeRender();
 	void embreeRenderFirePrimaryRay(int x, int y);
@@ -181,17 +201,19 @@ struct RayEngine {
 	struct Optix  {
 
 		optix::Context context;
-		optix::Buffer renderBuffer, lights;
+		optix::Buffer renderBuffer, streamRenderBuffer, streamBuffer, lights;
 		optix::TextureSampler aoNoise;
 		GLuint vbo;
 		GLuint texture;
-		int offset, width, frames;
-		float time, lastTime, avgTime;
+		bool progressive;
+		int offset, width;
+		Timer renderTimer, textureTimer;
 
 	} Optix;
 
 	void optixInit();
 	void optixSetScene(Scene* scene);
+	void optixUpdatePartition();
 	void optixResize();
 	void optixRender();
 	void optixRenderUpdateTexture();
@@ -208,7 +230,8 @@ struct RayEngine {
 		BalanceMode balanceMode;
 		float partition;
 		float direction;
-		bool displayPartition;
+		bool threaded, displayPartition, embree, optix;
+		Timer timer;
 
 	} Hybrid;
 

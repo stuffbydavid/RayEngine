@@ -2,8 +2,10 @@
 
 void RayEngine::hybridRender() {
 
-	// TODO: Look into TBB
-	#if HYBRID_THREADED
+	Hybrid.timer.start();
+
+	if (Hybrid.threaded) {
+
 		omp_set_nested(true);
 		#pragma omp parallel num_threads(2)
 		{
@@ -12,11 +14,18 @@ void RayEngine::hybridRender() {
 			else
 				embreeRender();
 		}
-	#else
+		embreeRenderUpdateTexture();
+		optixRenderUpdateTexture();
+
+	} else {
+
 		optixRender();
 		embreeRender();
-	#endif
+		embreeRenderUpdateTexture();
+		optixRenderUpdateTexture();
 
-	embreeRenderUpdateTexture();
-	optixRenderUpdateTexture();
+	}
+
+	Hybrid.timer.stop();
+
 }

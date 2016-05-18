@@ -29,7 +29,7 @@ void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 	Color result;
 	embreeRenderTraceRay(ray, 0, 0, result);
 
-	Embree.buffer[y * Embree.width + x] = result;
+	Embree.buffer[y * window.width + x] = result;
 
 }
 
@@ -53,7 +53,7 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 		Vec3 rayDir = dx * rayXaxis + dy * rayYaxis + rayZaxis;
 
 		packet.orgx[i] = rayOrg.x();
-		packet.orgy[i] = rayOrg.y();
+		packet.orgy[i] = rayOrg.y(); 
 		packet.orgz[i] = rayOrg.z();
 		packet.dirx[i] = rayDir.x();
 		packet.diry[i] = rayDir.y();
@@ -77,7 +77,7 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 
 		for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
 			if (packet.valid[i] == EMBREE_RAY_VALID)
-				Embree.buffer[y * Embree.width + x + i] = result[i];
+				Embree.buffer[y * window.width + x + i] = result[i];
 
 	} else {
 
@@ -108,7 +108,7 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 			Color result;
 			embreeRenderTraceRay(ray, 0, 0, result);
 
-			Embree.buffer[y * Embree.width + x + i] = result;
+			Embree.buffer[y * window.width + x + i] = result;
 
 		}
 

@@ -1,5 +1,14 @@
 #include "rayengine.h"
 
+template <typename t>
+string to_string_prec(t val, int prec) {
+
+	stringstream ss;
+	ss << setprecision(prec) << val;
+	return ss.str();
+
+}
+
 void RayEngine::guiRender() {
 
 	for (Setting* s : settings)
@@ -7,26 +16,63 @@ void RayEngine::guiRender() {
 
 	int dx = 20, dy = 20, indent = 20;
 
+	// Background box
 	OpenGL.shdrColor->render2DBox(window.ortho, 10, 10, 250, guiHeight, 0, { 0.f, 0.f, 0.f, 0.75f });
 
-	guiRenderTextBold("RayEngine 0.1 Alpha", dx, dy, { 1.f }); dy += 30;
+	// Title
+	guiRenderTextBold("RayEngine 0.1 Alpha", dx, dy); dy += 30;
 
-	guiRenderText("Fps: " + to_string(window.fps), dx, dy, { 1.f }); dy += 16;
-	guiRenderText("Screen: " + to_string(window.width) + "x" + to_string(window.height), dx, dy, { 1.f }); dy += 30;
+	// Fps
+	guiRenderText("Fps: " + to_string(window.fps), dx, dy); dy += 16;
 
+	// Screen size
+	guiRenderText("Screen: " + to_string(window.width) + "x" + to_string(window.height), dx, dy); dy += 16;
+
+	// Embree average time
+	if (renderMode == RM_EMBREE || renderMode == RM_HYBRID) {
+		guiRenderText("Embree avg render:", dx, dy);
+		guiRenderText(to_string_prec(Embree.renderTimer.avgTime, 4) + " s", dx + 150, dy); dy += 16;
+		guiRenderText("Embree avg texture:", dx, dy);
+		guiRenderText(to_string_prec(Embree.textureTimer.avgTime, 4) + " s", dx + 150, dy); dy += 16;
+	}
+
+	// Optix average time
+	if (renderMode == RM_OPTIX || renderMode == RM_HYBRID) {
+		guiRenderText("Optix avg render:", dx, dy);
+		guiRenderText(to_string_prec(Optix.renderTimer.avgTime, 4) + " s", dx + 150, dy); dy += 16;
+		guiRenderText("Optix avg texture:", dx, dy);
+		guiRenderText(to_string_prec(Optix.textureTimer.avgTime, 4) + " s", dx + 150, dy); dy += 16;
+	}
+
+	// Hybrid average time
+	if (renderMode == RM_HYBRID) {
+		guiRenderText("Hybrid avg render:", dx, dy);
+		guiRenderText(to_string_prec(Hybrid.timer.avgTime, 4) + " s", dx + 150, dy); dy += 16;
+	}
+
+	// Settings
+	dy += 10;
+
+	// Scene/Render Mode/Camera
 	guiRenderSetting(settingScene, dx, dy);
 	guiRenderSetting(settingRenderMode, dx, dy);
+	if (curScene->cameraPath)
+		guiRenderSetting(settingCameraPath, dx, dy);
+	dy += 8;
 
 	if (renderMode != RM_OPENGL) {
 
+		// Reflections
 		guiRenderSetting(settingEnableReflections, dx, dy);
 		if (enableReflections)
 			guiRenderSetting(settingMaxReflections, dx + indent, dy);
 
+		// Refractions
 		guiRenderSetting(settingEnableRefractions, dx, dy);
 		if (enableRefractions)
 			guiRenderSetting(settingMaxRefractions, dx + indent, dy);
 
+		// Ambient Occlusion
 		guiRenderSetting(settingEnableAo, dx, dy);
 		if (enableAo) {
 			guiRenderSetting(settingAoSamples, dx + indent, dy);
@@ -34,8 +80,11 @@ void RayEngine::guiRender() {
 			guiRenderSetting(settingAoPower, dx + indent, dy);
 			guiRenderSetting(settingAoNoiseScale, dx + indent, dy);
 		}
+		dy += 8;
 
-		if (renderMode == RM_EMBREE) {
+		// Embree
+		if (renderMode == RM_EMBREE || renderMode == RM_HYBRID) {
+			guiRenderSetting(settingEmbreeNumThreads, dx, dy);
 			guiRenderSetting(settingEmbreeRenderTiles, dx, dy);
 			if (Embree.renderTiles) {
 				guiRenderSetting(settingEmbreeTileWidth, dx + indent, dy);
@@ -44,17 +93,25 @@ void RayEngine::guiRender() {
 			guiRenderSetting(settingEmbreePacketPrimary, dx, dy);
 			if (Embree.packetPrimary)
 				guiRenderSetting(settingEmbreePacketSecondary, dx + indent, dy);
+			dy += 8;
 		}
 
-		if (renderMode == RM_OPTIX)
+		// OptiX
+		if (renderMode == RM_OPTIX || renderMode == RM_HYBRID) {
+			guiRenderSetting(settingOptixProgressive, dx, dy);
 			guiRenderSetting(settingOptixStackSize, dx, dy);
+			dy += 8;
+		}
 
+		// Hybrid
 		if (renderMode == RM_HYBRID) {
+			guiRenderSetting(settingHybridThreaded, dx, dy);
 			guiRenderSetting(settingHybridBalanceMode, dx, dy);
 			if (Hybrid.balanceMode == BM_MANUAL)
 				guiRenderSetting(settingHybridPartition, dx + indent, dy);
-
 			guiRenderSetting(settingHybridDisplayPartition, dx, dy);
+			guiRenderSetting(settingHybridEmbree, dx, dy);
+			guiRenderSetting(settingHybridOptix, dx, dy);
 		}
 
 	}
@@ -83,10 +140,7 @@ void RayEngine::guiRenderSetting(Setting* setting, int x, int& y) {
 			float val = *((float*)setting->variable);
 			atFirst = (val == setting->mi);
 			atLast = (val == setting->ma);
-
-			stringstream ss;
-			ss << setprecision(3) << val;
-			valueText = ss.str();
+			valueText = to_string_prec(val, 3);
 
 		}
 

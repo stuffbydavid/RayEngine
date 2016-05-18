@@ -9,9 +9,6 @@ void RayEngine::embreeInit() {
 	cout << "Starting Embree..." << endl;
 
 	// Init library
-	Embree.frames = 0;
-	Embree.lastTime = 0.f;
-	Embree.avgTime = 0.f;
 	Embree.device = rtcNewDevice(NULL);
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 	_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
@@ -77,26 +74,31 @@ uint TriangleMesh::embreeInit(RTCScene scene) {
 
 }
 
-void RayEngine::embreeResize() {
+void RayEngine::embreeUpdatePartition() {
 
 	// Set dimensions
 	if (renderMode == RM_HYBRID) {
 		Embree.offset = 0;
-		Embree.width = ceil(window.width * Hybrid.partition);
-	} else {
+		if (Embree.renderTiles)
+			Embree.width = ceil((float)(window.width * Hybrid.partition) / (float)Embree.tileWidth) * Embree.tileWidth;
+		else
+			Embree.width = ceil(window.width * Hybrid.partition);
+	}
+	else {
 		Embree.offset = 0;
 		Embree.width = window.width;
 	}
 
-	if (Embree.width == 0)
-		return;
+}
+
+void RayEngine::embreeResize() {
 
 	// Resize buffer
-	Embree.buffer.resize(Embree.width * window.height);
+	Embree.buffer.resize(window.width * window.height);
 
 	// Resize texture
 	glBindTexture(GL_TEXTURE_2D, Embree.texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Embree.width, window.height, 0, GL_RGBA, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window.width, window.height, 0, GL_RGBA, GL_FLOAT, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 }

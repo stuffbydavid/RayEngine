@@ -1,7 +1,8 @@
-#include "Scene.h"
+#include "scene.h"
 
 Scene::Scene(string name, string skyFile, Color ambient, float aoRadius, Color skyColor) :
-    name(name),
+name(name),
+cameraPath(nullptr),
 	ambient(ambient),
 	aoRadius(aoRadius)
 {
@@ -27,6 +28,18 @@ Object* Scene::addObject(Geometry* geometry) {
 	objects.push_back(obj);
 	return obj;
 
+}
+
+void Scene::setCameraPath(Path* path) {
+
+	cameraPath = path;
+
+}
+
+void Scene::updateCameraPath() {
+
+	if (cameraPath)
+		cameraPath->update(camera, true);
 }
 
 void Scene::addLight(Vec3 position, Color color, float range) {
