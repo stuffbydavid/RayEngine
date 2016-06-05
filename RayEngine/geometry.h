@@ -1,7 +1,9 @@
 #pragma once
 
-#include "common.h"
 #include "material.h"
+
+#include <embree2/rtcore.h>
+#include <embree2/rtcore_ray.h>
 
 // Stores a mesh or custom geometry
 struct Geometry {

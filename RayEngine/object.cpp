@@ -1,6 +1,8 @@
 #include "object.h"
 #include "tiny_obj_loader.h"
 
+#define OBJECT_PRINT 0
+
 Object::Object() {}
 
 Object::~Object() {
@@ -24,8 +26,6 @@ Object* Object::scale(Vec3 vector) {
 
 
 Object* Object::load(string file) {
-
-#define OBJECT_PRINT 0
 
 	static Image defaultTexture({ 1.f });
 	vector<tinyobj::shape_t> fileShapes;

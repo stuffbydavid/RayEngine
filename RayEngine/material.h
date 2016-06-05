@@ -1,7 +1,8 @@
 #pragma once
 
-#include "common.h"
 #include "image.h"
+
+#include <optixu/optixpp_namespace.h>
 
 struct Material {
 

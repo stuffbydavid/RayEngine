@@ -1,10 +1,11 @@
 #include "rayengine.h"
+#include <omp.h>
 
 void RayEngine::hybridRender() {
 
-	Hybrid.timer.start();
+	Hybrid.renderTimer.start();
 
-	if (Hybrid.threaded) {
+	if (Hybrid.enableThreaded) {
 
 		omp_set_nested(true);
 		#pragma omp parallel num_threads(2)
@@ -26,6 +27,6 @@ void RayEngine::hybridRender() {
 
 	}
 
-	Hybrid.timer.stop();
+	Hybrid.renderTimer.stop();
 
 }

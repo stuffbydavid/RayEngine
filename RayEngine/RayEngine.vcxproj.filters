@@ -83,6 +83,15 @@
     <ClCompile Include="path.cpp">
       <Filter>RayEngine\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="benchmark_handler.cpp">
+      <Filter>RayEngine\Benchmark</Filter>
+    </ClCompile>
+    <ClCompile Include="lodepng.cpp">
+      <Filter>RayEngine\Scene\LodePNG</Filter>
+    </ClCompile>
+    <ClCompile Include="save_render.cpp">
+      <Filter>RayEngine\Settings</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -118,9 +127,6 @@
     <ClInclude Include="mat4x4.h">
       <Filter>RayEngine\Data</Filter>
     </ClInclude>
-    <ClInclude Include="common.h">
-      <Filter>RayEngine</Filter>
-    </ClInclude>
     <ClInclude Include="scene.h">
       <Filter>RayEngine\Scene</Filter>
     </ClInclude>
@@ -150,6 +156,12 @@
     </ClInclude>
     <ClInclude Include="path.h">
       <Filter>RayEngine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="lodepng.h">
+      <Filter>RayEngine\Scene\LodePNG</Filter>
+    </ClInclude>
+    <ClInclude Include="util.h">
+      <Filter>RayEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -191,6 +203,12 @@
     </Filter>
     <Filter Include="RayEngine\Window">
       <UniqueIdentifier>{163fc065-29f9-4185-9c0d-7b7c4353e1d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RayEngine\Benchmark">
+      <UniqueIdentifier>{ca7639cc-6c69-4ddf-a0d9-e30ccc62b370}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RayEngine\Scene\LodePNG">
+      <UniqueIdentifier>{81c1e3fc-9e69-4220-a9d0-2ad10e9c1a5c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

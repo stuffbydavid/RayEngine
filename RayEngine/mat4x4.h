@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vec3.h"
+
 // 4x4 Matrix
 struct Mat4x4 {
 

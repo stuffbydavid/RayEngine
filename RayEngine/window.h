@@ -1,6 +1,11 @@
 #pragma once
 
-#include "common.h"
+#include "util.h"
+#include "vec2.h"
+#include "mat4x4.h"
+
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
 
 // Window class for handling input and the program loop.
 struct Window {

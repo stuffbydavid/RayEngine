@@ -1,0 +1,135 @@
+Program start
+Settings:
+	Scene: cars
+	Render mode: OpenGL
+	Resolution: 800x600
+	Camera path: No
+	Reflections: Yes
+	Max reflections: 1
+	Refractions: Yes
+	Max refractions: 8
+	Ambient Occlusion: No
+	AO samples: 25
+	AO radius: 5
+	AO power: 1
+	AO noise scale: 100
+	Embree threads: 16
+	Embree tiles: Yes
+	Width: 16
+	Height: 16
+	Embree primary packets: Yes
+	Secondary packets: No
+	OptiX progressive render: No
+	OptiX stack size: 4096
+	Hybrid threaded: Yes
+	Hybrid balance mode: Manual
+	Partition: 0.5
+	Hybrid display partition: Yes
+	Hybrid enable Embree: Yes
+	Hybrid enable OptiX: Yes
+Changed Camera path: Yes
+Changed Render mode: Embree
+Changed Render mode: OptiX
+Changed Max refractions: 7
+Changed Max refractions: 6
+Changed Max refractions: 5
+Changed Max refractions: 4
+Changed Max refractions: 3
+Changed Max refractions: 2
+Changed Max refractions: 1
+Changed Ambient Occlusion: Yes
+Changed AO radius: 5.05
+Changed AO radius: 5.555
+Changed AO radius: 6.111
+Changed AO radius: 6.722
+Changed AO radius: 7.394
+Changed AO radius: 8.133
+Changed AO radius: 8.946
+Changed AO radius: 9.841
+Changed AO radius: 10.83
+Changed AO radius: 11.91
+Changed AO radius: 13.1
+Changed AO radius: 14.41
+Changed AO radius: 15.85
+Changed AO radius: 17.43
+Changed AO radius: 19.18
+Changed AO radius: 21.1
+Changed AO radius: 18.99
+Changed AO radius: 17.09
+Changed AO radius: 15.38
+Changed AO radius: 16.92
+Changed AO noise scale: 98
+Changed AO noise scale: 96
+Changed AO noise scale: 94
+Changed AO noise scale: 92
+Changed AO noise scale: 90
+Changed AO noise scale: 88
+Changed AO noise scale: 86
+Changed AO noise scale: 84
+Changed AO noise scale: 82
+Changed AO noise scale: 80
+Changed AO noise scale: 78
+Changed AO noise scale: 76
+Changed AO noise scale: 74
+Changed AO noise scale: 72
+Changed AO noise scale: 70
+Changed AO noise scale: 68
+Changed AO noise scale: 66
+Changed AO noise scale: 64
+Changed AO noise scale: 62
+Changed AO noise scale: 60
+Changed AO noise scale: 58
+Changed AO noise scale: 56
+Changed AO noise scale: 54
+Changed AO noise scale: 52
+Changed AO noise scale: 50
+Changed AO noise scale: 48
+Changed AO noise scale: 46
+Changed AO noise scale: 44
+Changed AO noise scale: 42
+Changed AO noise scale: 40
+Changed AO noise scale: 38
+Changed AO noise scale: 36
+Changed AO noise scale: 34
+Changed AO noise scale: 32
+Changed AO noise scale: 30
+Changed AO noise scale: 28
+Changed AO noise scale: 26
+Changed AO noise scale: 24
+Changed AO noise scale: 22
+Changed AO noise scale: 20
+Changed AO noise scale: 18
+Changed AO noise scale: 16
+Changed AO noise scale: 14
+Changed AO noise scale: 12
+Changed AO noise scale: 10
+Changed AO noise scale: 8
+Changed AO noise scale: 6
+Changed AO noise scale: 4
+Changed AO noise scale: 2
+Changed AO noise scale: 1
+Changed AO noise scale: 1
+Changed AO noise scale: 1
+Changed AO noise scale: 3
+Changed AO noise scale: 5
+Changed AO noise scale: 7
+Changed AO noise scale: 9
+Changed AO noise scale: 11
+Changed AO noise scale: 13
+Changed AO noise scale: 15
+Changed AO noise scale: 17
+Changed AO noise scale: 19
+Changed AO noise scale: 21
+Changed AO noise scale: 23
+Changed AO noise scale: 25
+Changed AO noise scale: 27
+Changed AO noise scale: 29
+Changed AO noise scale: 31
+Changed AO noise scale: 33
+Changed AO noise scale: 35
+Changed Reflections: No
+Changed Reflections: Yes
+Changed Refractions: No
+Changed Refractions: Yes
+Changed Ambient Occlusion: No
+Changed Ambient Occlusion: Yes

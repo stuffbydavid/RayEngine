@@ -1,6 +1,4 @@
 #include "rayengine.h"
-#include "triangle_mesh.h"
-#include "object.h"
 
 void* userData;
 
@@ -78,15 +76,18 @@ void RayEngine::embreeUpdatePartition() {
 
 	// Set dimensions
 	if (renderMode == RM_HYBRID) {
+
 		Embree.offset = 0;
-		if (Embree.renderTiles)
+		if (Embree.enableTiles)
 			Embree.width = ceil((float)(window.width * Hybrid.partition) / (float)Embree.tileWidth) * Embree.tileWidth;
 		else
 			Embree.width = ceil(window.width * Hybrid.partition);
-	}
-	else {
+
+	} else {
+
 		Embree.offset = 0;
 		Embree.width = window.width;
+
 	}
 
 }

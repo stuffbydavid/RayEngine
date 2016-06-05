@@ -1,11 +1,19 @@
 #pragma once
+#pragma warning(disable: 4005) // Macro redefinitions from Embree+OptiX
 
-#include "common.h"
-#include "settings.h"
+#include "util.h"
+#include "vec3.h"
 #include "window.h"
 #include "scene.h"
-#include "shader.h"
 #include "font.h"
+#include "settings.h"
+
+#include <embree2/rtcore.h>
+#include <embree2/rtcore_ray.h>
+#include <optixu/optixpp_namespace.h>
+#include <optixu/optixu_math_namespace.h>
+#include "ft2build.h"
+#include FT_FREETYPE_H
 
 struct RayEngine {
 
@@ -53,6 +61,7 @@ struct RayEngine {
 
 		Setting(string name, void* variable, bool isBool, float delta, float mi, float ma, float def, function<void()> func);
 		void addOption(string name, bool selected, function<void()> func);
+		string getLogText();
 
 		struct Option {
 			Option(string name, function<void()> func);
@@ -73,6 +82,7 @@ struct RayEngine {
 
 	Setting* settingScene;
 	Setting* settingRenderMode;
+	Setting* settingResolution;
 	Setting* settingCameraPath;
 	Setting* settingEnableReflections;
 	Setting* settingMaxReflections;
@@ -84,25 +94,26 @@ struct RayEngine {
 	Setting* settingAoPower;
 	Setting* settingAoNoiseScale;
 	Setting* settingEmbreeNumThreads;
-	Setting* settingEmbreeRenderTiles;
-	Setting* settingEmbreePacketPrimary;
-	Setting* settingEmbreePacketSecondary;
+	Setting* settingEmbreeEnableTiles;
+	Setting* settingEmbreeEnablePacketsPrimary;
+	Setting* settingEmbreeEnablePacketsSecondary;
 	Setting* settingEmbreeTileWidth;
 	Setting* settingEmbreeTileHeight;
-	Setting* settingOptixProgressive;
+	Setting* settingOptixEnableProgressive;
 	Setting* settingOptixStackSize;
-	Setting* settingHybridThreaded;
+	Setting* settingHybridEnableThreaded;
 	Setting* settingHybridBalanceMode;
 	Setting* settingHybridPartition;
 	Setting* settingHybridDisplayPartition; 
-	Setting* settingHybridEmbree;
-	Setting* settingHybridOptix;
+	Setting* settingHybridEnableEmbree;
+	Setting* settingHybridEnableOptix;
 	vector<Setting*> settings;
 	int selectedSetting;
 
 	void settingsInit();
 	void settingsInput();
 	void settingsUpdate();
+	void saveRender();
 	Setting* addSetting(string name, function<void()> func = nullptr);
 	Setting* addSettingVariable(string name, void* variable, float delta, float mi, float ma, float def, function<void()> func = nullptr);
 	Setting* addSettingVariableBool(string name, void* variable, bool def, function<void()> func = nullptr);
@@ -111,13 +122,27 @@ struct RayEngine {
 
 	Font* fntGui;
 	Font* fntGuiBold;
+	Font* fntGuiBig;
 	int guiHeight;
 
 	bool showGui;
 	void guiRender();
-	void guiRenderSetting(Setting* setting, int x, int& y);
-	void guiRenderText(string text, int x, int& y, Color color = { 1.f });
-	void guiRenderTextBold(string text, int x, int& y, Color color = { 1.f });
+	void guiRenderSetting(Setting* setting, int& x, int& y, bool indent = false);
+	void guiRenderText(string text, int x, int y, Color color = { 1.f });
+	void guiRenderTextBold(string text, int x, int y, Color color = { 1.f });
+	void guiRenderTextBig(string text, int x, int y, Color color = { 1.f });
+
+	//// Benchmarking ////
+
+	void logInit();
+	void logClose();
+	string logFileName;
+	ofstream logFileStream;
+
+	bool benchmarkMode;
+	void benchmarkUpdate();
+	void benchmarkStart();
+	void benchmarkStop();
 
 	//// OpenGL ////
 
@@ -176,7 +201,7 @@ struct RayEngine {
 		vector<Color> buffer;
 		GLuint texture;
 		int offset, width;
-		bool renderTiles, packetPrimary, packetSecondary;
+		bool enableTiles, enablePacketsPrimary, enablePacketsSecondary;
 		int tileWidth, tileHeight, numThreads;
 
 		Timer renderTimer, textureTimer;
@@ -205,7 +230,7 @@ struct RayEngine {
 		optix::TextureSampler aoNoise;
 		GLuint vbo;
 		GLuint texture;
-		bool progressive;
+		bool enableProgressive;
 		int offset, width;
 		Timer renderTimer, textureTimer;
 
@@ -230,8 +255,8 @@ struct RayEngine {
 		BalanceMode balanceMode;
 		float partition;
 		float direction;
-		bool threaded, displayPartition, embree, optix;
-		Timer timer;
+		bool enableThreaded, displayPartition, enableEmbree, enableOptix;
+		Timer renderTimer;
 
 	} Hybrid;
 

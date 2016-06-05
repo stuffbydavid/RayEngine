@@ -1,8 +1,14 @@
 #pragma once
 
-#include "common.h"
-#include "material.h"
+#include "util.h"
+#include "vec3.h"
+#include "vec2.h"
+
 #include "geometry.h"
+
+#include <embree2/rtcore.h>
+#include <embree2/rtcore_ray.h>
+#include <optixu/optixpp_namespace.h>
 
 struct TrianglePrimitive {
 

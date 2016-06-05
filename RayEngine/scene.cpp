@@ -36,10 +36,10 @@ void Scene::setCameraPath(Path* path) {
 
 }
 
-void Scene::updateCameraPath() {
+void Scene::updateCameraPath(bool benchmarkMode) {
 
 	if (cameraPath)
-		cameraPath->update(camera, true);
+		cameraPath->update(camera, benchmarkMode);
 }
 
 void Scene::addLight(Vec3 position, Color color, float range) {

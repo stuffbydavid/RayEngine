@@ -83,7 +83,7 @@ Font::Font(FT_Library* lib, string filename, uint start, uint end, uint size) {
 
 }
 
-void Font::renderText(string text, int x, int y, Color color, Shader* shader, Mat4x4 matrix) {
+void Font::renderText(Shader* shader, Mat4x4 matrix, string text, int x, int y, Color color) {
 
 	uint textLength = text.size();
 	Vec3* posData = new Vec3[textLength * 6];

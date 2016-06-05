@@ -9,10 +9,10 @@ RayEngine::RayEngine() {
 
 	// Font
 	FT_Library freeType;
-	if (FT_Init_FreeType(&freeType))
-		cout << "Could not init freetype library!";
+	FT_Init_FreeType(&freeType);
 	fntGui = new Font(&freeType, "font/tahoma.ttf", 32, 128, 12);
 	fntGuiBold = new Font(&freeType, "font/tahomabd.ttf", 32, 128, 12);
+	fntGuiBig = new Font(&freeType, "font/tahoma.ttf", 32, 128, 32);
 
 	// Shaders
 	OpenGL.shdrColor = new Shader("Color", nullptr, "texture.vshader", "texture.fshader");
@@ -20,19 +20,32 @@ RayEngine::RayEngine() {
 	OpenGL.shdrNormals = new Shader("Normals", bind(&RayEngine::openglSetupNormals, this, _1, _2, _3), "normals.vshader", "normals.fshader");
 	OpenGL.shdrPhong = new Shader("Phong", bind(&RayEngine::openglSetupPhong, this, _1, _2, _3), "phong.vshader", "phong.fshader");
 
+	benchmarkMode = false;
+
 }
 
 RayEngine::~RayEngine() {
-	// TODO
+	
+	logClose();
+
 }
 
 void RayEngine::launch() {
+
+	for (Scene* s : scenes) {
+		int t = 0;
+		for (Object* o : s->objects)
+			for (Geometry* g : o->geometries)
+				t += ((TriangleMesh*)g)->indexData.size();
+		cout << s->name << ": " << t << endl;
+	}
 
 	aoInit();
 	embreeInit();
 	optixInit();
 	hybridInit();
 	settingsInit();
+	logInit();
 
 	window.open(bind(&RayEngine::loop, this), bind(&RayEngine::resize, this));
 
@@ -43,7 +56,7 @@ void RayEngine::loop() {
 	cameraInput();
 	settingsInput();
 	if (enableCameraPath)
-		curScene->updateCameraPath();
+		curScene->updateCameraPath(benchmarkMode);
 	
 	rayOrg = curCamera->position;
 	rayXaxis = curCamera->xaxis * window.ratio * curCamera->tFov;
@@ -71,8 +84,10 @@ void RayEngine::loop() {
 
 	}
 
-	if (showGui)
-		guiRender();
+	if (benchmarkMode)
+		benchmarkUpdate();
+
+	guiRender();
 
 	window.setTitle("RayEngine" + (!showGui ? " - FPS: " + to_string(window.fps) : ""));
 

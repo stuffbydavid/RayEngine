@@ -1,0 +1,125 @@
+Program start
+Settings:
+	Scene: cars
+	Render mode: OpenGL
+	Resolution: 800x600
+	Camera path: No
+	Reflections: Yes
+	Max reflections: 1
+	Refractions: Yes
+	Max refractions: 8
+	Ambient Occlusion: No
+	AO samples: 25
+	AO radius: 5
+	AO power: 1
+	AO noise scale: 100
+	Embree threads: 16
+	Embree tiles: Yes
+	Width: 16
+	Height: 16
+	Embree primary packets: Yes
+	Secondary packets: No
+	OptiX progressive render: No
+	OptiX stack size: 4096
+	Hybrid threaded: Yes
+	Hybrid balance mode: Manual
+	Partition: 0.5
+	Hybrid display partition: Yes
+	Hybrid enable Embree: Yes
+	Hybrid enable OptiX: Yes
+Changed Camera path: Yes
+Changed Render mode: Embree
+Changed Render mode: OptiX
+Changed Max refractions: 7
+Changed Max refractions: 6
+Changed Max refractions: 5
+Changed Max refractions: 4
+Changed Max refractions: 3
+Changed Max refractions: 2
+Changed Max refractions: 1
+Changed Ambient Occlusion: Yes
+Changed AO radius: 5.05
+Changed AO radius: 5.555
+Changed AO radius: 6.111
+Changed AO radius: 6.722
+Changed AO radius: 7.394
+Changed AO radius: 8.133
+Changed AO radius: 8.946
+Changed AO radius: 9.841
+Changed AO radius: 10.83
+Changed AO radius: 11.91
+Changed AO radius: 13.1
+Changed AO radius: 14.41
+Changed AO radius: 15.85
+Changed AO radius: 17.43
+Changed AO radius: 19.18
+Changed AO radius: 21.1
+Changed AO radius: 23.2
+Changed AO radius: 25.53
+Changed AO radius: 28.08
+Changed AO radius: 25.27
+Changed AO radius: 22.74
+Changed AO radius: 20.47
+Changed AO radius: 22.52
+Changed AO radius: 24.77
+Changed AO radius: 27.24
+Changed AO radius: 29.97
+Changed AO radius: 26.97
+Changed AO radius: 24.27
+Changed AO samples: 36
+Changed AO samples: 49
+Changed AO samples: 36
+Changed AO samples: 25
+Changed AO power: 0.975
+Changed AO power: 0.95
+Changed AO power: 0.925
+Changed AO power: 0.9
+Changed AO power: 0.875
+Changed AO power: 0.85
+Changed AO power: 0.825
+Changed AO power: 0.8
+Changed AO power: 0.775
+Changed AO power: 0.75
+Changed AO power: 0.725
+Changed AO power: 0.7
+Changed AO power: 0.675
+Changed AO power: 0.65
+Changed AO power: 0.625
+Changed AO power: 0.65
+Changed AO power: 0.675
+Changed AO power: 0.65
+Changed Ambient Occlusion: No
+Changed Ambient Occlusion: Yes
+Changed Ambient Occlusion: No
+Changed Ambient Occlusion: Yes
+Changed AO power: 0.675
+Changed AO power: 0.7
+Changed AO power: 0.725
+Changed AO power: 0.75
+Changed AO power: 0.775
+Changed AO power: 0.8
+Changed AO power: 0.825
+Changed AO power: 0.85
+Changed AO power: 0.875
+Changed AO power: 0.9
+Changed AO power: 0.925
+Changed AO power: 0.95
+Changed AO power: 0.975
+Changed AO power: 0.95
+Changed Ambient Occlusion: No
+Changed Ambient Occlusion: Yes
+Changed AO radius: 21.85
+Changed AO radius: 19.66
+Changed AO radius: 17.7
+Changed AO radius: 15.93
+Changed AO radius: 14.33
+Changed AO radius: 12.9
+Changed AO radius: 11.61
+Changed AO radius: 12.77
+Changed AO radius: 14.05
+Changed AO samples: 16
+Changed AO samples: 25
+Changed Ambient Occlusion: No
+Changed Ambient Occlusion: Yes
+Changed Ambient Occlusion: No
+Changed Ambient Occlusion: Yes

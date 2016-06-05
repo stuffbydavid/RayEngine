@@ -2,6 +2,7 @@
 *.opensdf
 x64/
 Release/
+renders/
 
 
 # Windows image file caches

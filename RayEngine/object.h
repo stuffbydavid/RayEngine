@@ -1,9 +1,12 @@
 #pragma once
 
-#include "common.h"
+#include "util.h"
+#include "mat4x4.h"
+#include "vec3.h"
+
 #include "geometry.h"
-#include "triangle_mesh.h"
 #include "material.h"
+#include "triangle_mesh.h"
 
 struct Object {
 

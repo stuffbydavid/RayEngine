@@ -1,6 +1,10 @@
 #pragma once
 
-#include "common.h"
+#include "util.h"
+#include "mat4x4.h"
+#include "vec3.h"
+#include "vec2.h"
+
 #include "object.h"
 
 // Loads and renders using a vertex/fragment/geometry shader.

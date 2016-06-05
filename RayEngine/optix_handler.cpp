@@ -42,12 +42,12 @@ void RayEngine::optixInit() {
 		Optix.streamRenderBuffer->setSize(window.width, window.height);
 #else
 		Optix.renderBuffer = Optix.context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT4, window.width, window.height);
-		//Optix.streamRenderBuffer = Optix.context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT4, window.width, window.height);
+		Optix.streamRenderBuffer = Optix.context->createBuffer(RT_BUFFER_OUTPUT, RT_FORMAT_FLOAT4, window.width, window.height);
 #endif
 
 		// Make streaming buffer
-		//Optix.streamBuffer = Optix.context->createBuffer(RT_BUFFER_PROGRESSIVE_STREAM, RT_FORMAT_UNSIGNED_BYTE4, window.width, window.height);
-		//Optix.streamBuffer->bindProgressiveStream(Optix.streamRenderBuffer);
+		Optix.streamBuffer = Optix.context->createBuffer(RT_BUFFER_PROGRESSIVE_STREAM, RT_FORMAT_UNSIGNED_BYTE4, window.width, window.height);
+		Optix.streamBuffer->bindProgressiveStream(Optix.streamRenderBuffer);
 
 		// Make light buffer
 		Optix.lights = Optix.context->createBuffer(RT_BUFFER_INPUT, RT_FORMAT_USER, 0);
@@ -116,7 +116,7 @@ void Scene::optixInit(optix::Context context) {
 
 	// Group containing each object transform
 	Optix.group = context->createGroup();
-	Optix.group->setAcceleration(context->createAcceleration("Sbvh", "Bvh")); // TODO: change during runtime?
+	Optix.group->setAcceleration(context->createAcceleration(OPTIX_SCENE_BUILDER, OPTIX_SCENE_TRAVERSER)); // TODO: Look into different traversers/builders
 
 	for (uint i = 0; i < objects.size(); i++) {
 		objects[i]->optixInit(context);
@@ -150,7 +150,7 @@ void Object::optixInit(optix::Context context) {
 		
 		// Make geometry group
 		Optix.geometryGroup = context->createGeometryGroup();
-		Optix.geometryGroup->setAcceleration(context->createAcceleration("Trbvh", "Bvh")); // TODO: change during runtime?
+		Optix.geometryGroup->setAcceleration(context->createAcceleration(OPTIX_GEOMETRY_BUILDER, OPTIX_GEOMETRY_TRAVERSER)); // TODO: Look into different traversers/builders
 
 		// Add geometries
 		for (uint i = 0; i < geometries.size(); i++) {
@@ -282,8 +282,7 @@ void RayEngine::optixUpdatePartition() {
 	if (renderMode == RM_HYBRID) {
 		Optix.offset = Embree.width;
 		Optix.width = window.width - Optix.offset;
-	}
-	else {
+	} else {
 		Optix.offset = 0;
 		Optix.width = window.width;
 	}
@@ -297,8 +296,8 @@ void RayEngine::optixResize() {
 
 	// Resize buffer object
 	Optix.renderBuffer->setSize(window.width, window.height);
-	//Optix.streamRenderBuffer->setSize(window.width, window.height);
-	//Optix.streamBuffer->setSize(window.width, window.height);
+	Optix.streamRenderBuffer->setSize(window.width, window.height);
+	Optix.streamBuffer->setSize(window.width, window.height);
 
 	// Resize VBO
 #if OPTIX_USE_OUTPUT_VBO

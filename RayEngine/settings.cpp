@@ -1,4 +1,5 @@
 #include "rayengine.h"
+#include <omp.h>
 
 void RayEngine::settingsInit() {
 
@@ -13,61 +14,67 @@ void RayEngine::settingsInit() {
 	settingRenderMode = addSetting("Render mode");
 	settingRenderMode->addOption("OpenGL", RENDER_MODE == RM_OPENGL, [this]() { renderMode = RM_OPENGL; });
 	settingRenderMode->addOption("Embree", RENDER_MODE == RM_EMBREE, [this]() { renderMode = RM_EMBREE; resize(); });
-	settingRenderMode->addOption("OptiX", RENDER_MODE == RM_OPTIX, [this]()   { renderMode = RM_OPTIX;  resize(); });
+	settingRenderMode->addOption("OptiX",  RENDER_MODE == RM_OPTIX,  [this]() { renderMode = RM_OPTIX;  resize(); });
 	settingRenderMode->addOption("Hybrid", RENDER_MODE == RM_HYBRID, [this]() { renderMode = RM_HYBRID; resize(); });
 
+	// Window size
+	settingResolution = addSetting("Resolution");
+	settingResolution->addOption("800x600",  true,   [this]() { glfwSetWindowSize(window.handle, 800, 600); });
+	settingResolution->addOption("1280x720", false,  [this]() { glfwSetWindowSize(window.handle, 1280, 720); });
+	settingResolution->addOption("1920x1080", false, [this]() { glfwSetWindowSize(window.handle, 1920, 1080); });
+	
 	// Camera path
 	settingCameraPath = addSettingVariableBool("Camera path", &enableCameraPath, false);
 
 	// Reflections/Refractions
 	settingEnableReflections = addSettingVariableBool("Reflections", &enableReflections, ENABLE_REFLECTIONS);
-	settingMaxReflections = addSetting("Max iterations");
+	settingMaxReflections = addSetting("Max reflections");
 	settingEnableRefractions = addSettingVariableBool("Refractions", &enableRefractions, ENABLE_REFRACTIONS);
-	settingMaxRefractions = addSetting("Max iterations");
+	settingMaxRefractions = addSetting("Max refractions");
 	for (int i = 0; i < 32; i++) {
 		settingMaxReflections->addOption(to_string(i), MAX_REFLECTIONS == i, [this, i]() { maxReflections = i; });
 		settingMaxRefractions->addOption(to_string(i), MAX_REFRACTIONS == i, [this, i]() { maxRefractions = i; });
 	}
 
 	// Ambient occlusion
-	settingEnableAo = addSettingVariableBool("AO", &enableAo, ENABLE_AO);
-	settingAoSamples = addSetting("Samples");
+	settingEnableAo = addSettingVariableBool("Ambient Occlusion", &enableAo, ENABLE_AO);
+	settingAoSamples = addSetting("AO samples");
 	for (int i = 2; i <= AO_SAMPLES_SQRT_MAX; i++)
 		settingAoSamples->addOption(to_string(i * i), AO_SAMPLES_SQRT == i, [this, i]() { aoSamplesSqrt = i; aoSamples = i * i; });
-	settingAoRadius = addSettingVariable("Radius", nullptr, 0.05f, 0.f, 1000.f, 0.f, [this]() { settingAoRadius->delta = *((float*)settingAoRadius->variable) * 0.1f; });
-	settingAoPower = addSettingVariable("Power", &aoPower, 0.025f, 0.f, 10.f, AO_POWER);
-	settingAoNoiseScale = addSettingVariable("Noise scale", &aoNoiseScale, 2.f, 1.f, 100.f, AO_NOISE_SCALE);
+	settingAoRadius = addSettingVariable("AO radius", nullptr, 0.05f, 0.f, 1000.f, 0.f, [this]() { settingAoRadius->delta = *((float*)settingAoRadius->variable) * 0.1f; });
+	settingAoPower = addSettingVariable("AO power", &aoPower, 0.025f, 0.f, 10.f, AO_POWER);
+	settingAoNoiseScale = addSettingVariable("AO noise scale", &aoNoiseScale, 2.f, 1.f, 100.f, AO_NOISE_SCALE);
 	
 	// Embree settings
-	settingEmbreeNumThreads = addSetting("Threads");
+	settingEmbreeNumThreads = addSetting("Embree threads");
 	for (int i = 1; i <= 32; i++)
 		settingEmbreeNumThreads->addOption(to_string(i), EMBREE_NUM_THREADS == i, [this, i]() { omp_set_num_threads(i); });
-	settingEmbreeRenderTiles = addSettingVariableBool("Render tiles", &Embree.renderTiles, EMBREE_RENDER_TILES);
+	settingEmbreeEnableTiles = addSettingVariableBool("Embree tiles", &Embree.enableTiles, EMBREE_ENABLE_TILES);
 	settingEmbreeTileWidth = addSetting("Width");
 	settingEmbreeTileHeight = addSetting("Height");
 	for (int i = 1; i <= 256; i *= 2) {
 		settingEmbreeTileWidth->addOption(to_string(i),  EMBREE_TILE_WIDTH == i,  [this, i]() { Embree.tileWidth = i; });
 		settingEmbreeTileHeight->addOption(to_string(i), EMBREE_TILE_HEIGHT == i, [this, i]() { Embree.tileHeight = i; });
 	}
-	settingEmbreePacketPrimary = addSettingVariableBool("Primary packets", &Embree.packetPrimary, EMBREE_PACKET_PRIMARY);
-	settingEmbreePacketSecondary = addSettingVariableBool("Secondary packets", &Embree.packetSecondary, EMBREE_PACKET_SECONDARY);
+	settingEmbreeEnablePacketsPrimary = addSettingVariableBool("Embree primary packets", &Embree.enablePacketsPrimary, EMBREE_ENABLE_PACKETS_PRIMARY);
+	settingEmbreeEnablePacketsSecondary = addSettingVariableBool("Secondary packets", &Embree.enablePacketsSecondary, EMBREE_ENABLE_PACKETS_SECONDARY);
 
 	// OptiX settings
-	settingOptixProgressive = addSettingVariableBool("Progressive render", &Optix.progressive, OPTIX_PROGRESSIVE);
+	settingOptixEnableProgressive = addSettingVariableBool("OptiX progressive render", &Optix.enableProgressive, OPTIX_ALLOW_PROGRESSIVE && OPTIX_ENABLE_PROGRESSIVE);
 
-	settingOptixStackSize = addSetting("Stack size");
+	settingOptixStackSize = addSetting("OptiX stack size");
 	for (int i = 1024; i <= 65536; i *= 2)
 		settingOptixStackSize->addOption(to_string(i), OPTIX_STACK_SIZE == i, [this, i]() { Optix.context->setStackSize(i); });
 
 	// Hybrid settings
-	settingHybridThreaded = addSettingVariableBool("Threaded", &Hybrid.threaded, HYBRID_THREADED);
-	settingHybridBalanceMode = addSetting("Balance mode");
+	settingHybridEnableThreaded = addSettingVariableBool("Hybrid threaded", &Hybrid.enableThreaded, HYBRID_ENABLE_THREADED);
+	settingHybridBalanceMode = addSetting("Hybrid balance mode");
 	settingHybridBalanceMode->addOption("Render time",   HYBRID_BALANCE_MODE == BM_RENDER_TIME,   [this]() { Hybrid.balanceMode = BM_RENDER_TIME; });
 	settingHybridBalanceMode->addOption("Manual", HYBRID_BALANCE_MODE == BM_MANUAL, [this]() { Hybrid.balanceMode = BM_MANUAL; });
 	settingHybridPartition = addSettingVariable("Partition", &Hybrid.partition, 0.01f, 0.f, 1.f, HYBRID_PARTITION, [this]() {resize(); });
-	settingHybridDisplayPartition = addSettingVariableBool("Display partition", &Hybrid.displayPartition, HYBRID_DISPLAY_PARTITION);
-	settingHybridEmbree = addSettingVariableBool("Embree", &Hybrid.embree, HYBRID_EMBREE);
-	settingHybridOptix = addSettingVariableBool("OptiX", &Hybrid.optix, HYBRID_OPTIX);
+	settingHybridDisplayPartition = addSettingVariableBool("Hybrid display partition", &Hybrid.displayPartition, HYBRID_DISPLAY_PARTITION);
+	settingHybridEnableEmbree = addSettingVariableBool("Hybrid enable Embree", &Hybrid.enableEmbree, HYBRID_ENABLE_EMBREE);
+	settingHybridEnableOptix = addSettingVariableBool("Hybrid enable OptiX", &Hybrid.enableOptix, HYBRID_ENABLE_OPTIX);
 
 	// Add scenes
 	for (int i = 0; i < scenes.size(); i++)
@@ -138,12 +145,39 @@ void RayEngine::Setting::addOption(string name, bool selected, function<void()> 
 
 }
 
+string RayEngine::Setting::getLogText() {
+
+	if (variable) {
+		if (isBool)
+			return name + ": " + (*(bool*)variable ? "Yes" : "No");
+		else
+			return name + ": " + to_string_prec(*(float*)variable, 4);
+	}
+	return name + ": " + options[selectedOption].name;
+
+}
+
 void RayEngine::settingsInput() {
 
 	// Toggle GUI
 
 	if (window.keyPressed[GLFW_KEY_F1])
 		showGui = !showGui;
+
+	// Start/stop benchmarking
+
+	if (window.keyPressed[GLFW_KEY_F2]) {
+		benchmarkMode = !benchmarkMode;
+		if (benchmarkMode)
+			benchmarkStart();
+		else
+			benchmarkStop();
+	}
+
+	// Save screenshot
+
+	if (window.keyPressed[GLFW_KEY_F3])
+		saveRender();
 
 	// Print camera
 
@@ -185,6 +219,7 @@ void RayEngine::settingsInput() {
 					*((bool*)curSetting->variable) = !*((bool*)curSetting->variable);
 					if (curSetting->func)
 						curSetting->func();
+					LOG("Changed " + curSetting->getLogText());
 				}
 
 			} else { // Increase/decrease
@@ -193,12 +228,14 @@ void RayEngine::settingsInput() {
 					*((float*)curSetting->variable) = clamp(*((float*)curSetting->variable) - curSetting->delta, curSetting->mi, curSetting->ma);
 					if (curSetting->func)
 						curSetting->func();
+					LOG("Changed " + curSetting->getLogText());
 				}
 
 				if (window.keyDown[GLFW_KEY_RIGHT]) {
 					*((float*)curSetting->variable) = clamp(*((float*)curSetting->variable) + curSetting->delta, curSetting->mi, curSetting->ma);
 					if (curSetting->func)
 						curSetting->func();
+					LOG("Changed " + curSetting->getLogText());
 				}
 
 			}
@@ -215,6 +252,7 @@ void RayEngine::settingsInput() {
 				curSetting->options[curSetting->selectedOption].func();
 				if (curSetting->func)
 					curSetting->func();
+				LOG("Changed " + curSetting->getLogText());
 
 			}
 
@@ -228,6 +266,7 @@ void RayEngine::settingsInput() {
 
 				if (curSetting->func)
 					curSetting->func();
+				LOG("Changed " + curSetting->getLogText());
 
 			}
 

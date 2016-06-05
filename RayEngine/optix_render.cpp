@@ -2,7 +2,7 @@
 
 void RayEngine::optixRender() {
 
-	if (!OPTIX_ENABLE || Optix.width == 0 || (renderMode == RM_HYBRID && !Hybrid.optix))
+	if (!OPTIX_ENABLE || Optix.width == 0 || (renderMode == RM_HYBRID && !Hybrid.enableOptix))
 		return;
 
 	try {
@@ -23,12 +23,19 @@ void RayEngine::optixRender() {
 		Optix.context["aoPower"]->setFloat(aoPower);
 		Optix.context["aoRadius"]->setFloat(curScene->aoRadius);
 
-		if (Optix.progressive) {
+		if (Optix.enableProgressive) {
+
+			// Non-blocking, progressive launch
+
+			// The hybrid balancing won't work with this since there's no way
+			// to accurately measure the time taken for progressive rendering.
 
 			Optix.context["renderBuffer"]->set(Optix.streamRenderBuffer);
 			Optix.context->launchProgressive(0, window.width, window.height, 1);
 
 		} else {
+
+			// Blocking launch
 
 			Optix.renderTimer.start();
 
@@ -49,14 +56,12 @@ void RayEngine::optixRender() {
 
 void RayEngine::optixRenderUpdateTexture() {
 
-	if (!OPTIX_ENABLE || (renderMode == RM_HYBRID && !Hybrid.optix))
+	if (!OPTIX_ENABLE || (renderMode == RM_HYBRID && !Hybrid.enableOptix))
 		return;
 
 	Optix.textureTimer.start();
 
-	if (Optix.progressive) {
-
-		//give more to optix
+	if (Optix.enableProgressive) {
 
 		int ready = false;
 		uint subFrames, maxSubFrames;
@@ -64,6 +69,8 @@ void RayEngine::optixRenderUpdateTexture() {
 		Optix.streamBuffer->getProgressiveUpdateReady(&ready, &subFrames, &maxSubFrames);
 
 		if (ready) {
+
+			// A frame is done, load into texture
 
 			Optix.renderTimer.stop();
 
@@ -74,9 +81,6 @@ void RayEngine::optixRenderUpdateTexture() {
 
 			Optix.renderTimer.start();
 
-		}
-		else {
-			//give more to embree
 		}
 
 	} else {

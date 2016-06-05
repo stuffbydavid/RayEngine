@@ -1,5 +1,6 @@
 #include "rayengine.h"
 
+// Fires a single primary ray and stores its color in the buffer
 void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 
 	float dx = ((float)(Embree.offset + x) / window.width) * 2.f - 1.f;
@@ -33,6 +34,7 @@ void RayEngine::embreeRenderFirePrimaryRay(int x, int y) {
 
 }
 
+// Fires a packet of rays and calculates each color together/individually and stores in the buffer
 void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 
 	Embree::RayPacket packet;
@@ -70,7 +72,9 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 
 	rtcIntersect8(packet.valid, curScene->Embree.scene, packet);
 
-	if (Embree.packetSecondary) {
+	if (Embree.enablePacketsSecondary) {
+
+		// Continue with the same packet for reflections, shadows etc.
 
 	    Color result[EMBREE_PACKET_SIZE];
 		embreeRenderTracePacket(packet, 0, 0, result);
@@ -81,13 +85,16 @@ void RayEngine::embreeRenderFirePrimaryPacket(int x, int y) {
 
 	} else {
 
+		// Split up the packet into rays and calculate each separately.
+		// Has shown to give better performance, probably due to incoherence.
+
 		for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
 
 			if (packet.valid[i] == EMBREE_RAY_INVALID)
 				continue;
 
 			Embree::Ray ray;
-			ray.x = x;
+			ray.x = x + i;
 			ray.y = y;
 			ray.org[0] = packet.orgx[i];
 			ray.org[1] = packet.orgy[i];

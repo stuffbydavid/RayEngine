@@ -1,0 +1,31 @@
+Program start
+Settings:
+	Scene: Glass
+	Render mode: OptiX
+	Resolution: 800x600
+	Camera path: No
+	Reflections: Yes
+	Max reflections: 1
+	Refractions: Yes
+	Max refractions: 8
+	Ambient Occlusion: No
+	AO samples: 25
+	AO radius: 5
+	AO power: 1
+	AO noise scale: 100
+	Embree threads: 16
+	Embree tiles: Yes
+	Width: 16
+	Height: 16
+	Embree primary packets: Yes
+	Secondary packets: No
+	OptiX progressive render: No
+	OptiX stack size: 4096
+	Hybrid threaded: Yes
+	Hybrid balance mode: Manual
+	Partition: 0.5
+	Hybrid display partition: Yes
+	Hybrid enable Embree: Yes
+	Hybrid enable OptiX: Yes
+Changed Render mode: Embree
+Changed Render mode: OpenGL

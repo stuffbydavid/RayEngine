@@ -1,0 +1,82 @@
+Program start
+Settings:
+	Scene: Glass
+	Render mode: OptiX
+	Resolution: 800x600
+	Camera path: No
+	Reflections: Yes
+	Max reflections: 1
+	Refractions: Yes
+	Max refractions: 8
+	Ambient Occlusion: No
+	AO samples: 25
+	AO radius: 5
+	AO power: 1
+	AO noise scale: 100
+	Embree threads: 16
+	Embree tiles: Yes
+	Width: 16
+	Height: 16
+	Embree primary packets: Yes
+	Secondary packets: No
+	OptiX progressive render: No
+	OptiX stack size: 4096
+	Hybrid threaded: Yes
+	Hybrid balance mode: Manual
+	Partition: 0.5
+	Hybrid display partition: Yes
+	Hybrid enable Embree: Yes
+	Hybrid enable OptiX: Yes
+Changed Render mode: Embree
+Changed Render mode: OpenGL
+Changed Render mode: Embree
+Changed Render mode: OptiX
+Changed Render mode: Embree
+Changed Reflections: No
+Changed Refractions: No
+Changed Reflections: Yes
+Changed Reflections: No
+Changed Ambient Occlusion: Yes
+Changed Ambient Occlusion: No
+Changed Render mode: OptiX
+Changed Render mode: Hybrid
+Changed Render mode: OptiX
+Changed Render mode: Hybrid
+Changed Partition: 0.49
+Changed Partition: 0.48
+Changed Partition: 0.47
+Changed Partition: 0.46
+Changed Partition: 0.45
+Changed Partition: 0.44
+Changed Partition: 0.43
+Changed Partition: 0.42
+Changed Partition: 0.41
+Changed Partition: 0.4
+Changed Partition: 0.39
+Changed Partition: 0.38
+Changed Partition: 0.37
+Changed Partition: 0.36
+Changed Partition: 0.35
+Changed Partition: 0.34
+Changed Partition: 0.33
+Changed Partition: 0.32
+Changed Partition: 0.31
+Changed Partition: 0.32
+Changed Partition: 0.33
+Changed Partition: 0.34
+Changed Partition: 0.35
+Changed Partition: 0.36
+Changed Partition: 0.37
+Changed Partition: 0.38
+Changed Partition: 0.39
+Changed Partition: 0.4
+Changed Partition: 0.41
+Changed Partition: 0.42
+Changed Partition: 0.43
+Changed Partition: 0.44
+Changed Partition: 0.45
+Changed Partition: 0.46
+Changed Partition: 0.47
+Changed Partition: 0.48
+Changed Partition: 0.49
+Changed Render mode: OptiX

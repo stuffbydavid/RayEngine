@@ -1,4 +1,11 @@
-#include "common.h"
+#pragma once
+
+#include "util.h"
+#include "vec2.h"
+#include "color.h"
+
+#include "GL/glew.h"
+#include <Magick++.h>
 
 struct Image {
 

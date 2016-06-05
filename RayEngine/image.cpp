@@ -1,3 +1,4 @@
+#include "util.h"
 #include "image.h"
 
 #define IMAGE_PRINT 0

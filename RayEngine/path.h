@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "vec3.h"
 #include "camera.h"
 
 struct Path {
@@ -8,7 +8,7 @@ struct Path {
 	Path(float speed);
 	virtual void update(Camera& camera, bool animate) = 0;
 
-	float progress;
+	float frame;
 	float time;
 	bool done;
 

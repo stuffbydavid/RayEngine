@@ -1,6 +1,8 @@
 #pragma once
 
-#include "common.h"
+#include "util.h"
+#include "color.h"
+
 #include "camera.h"
 #include "object.h"
 #include "light.h"
@@ -22,7 +24,7 @@ struct Scene {
 	// Set the path for the camera.
 	void setCameraPath(Path* path);
 
-	void updateCameraPath();
+	void updateCameraPath(bool benchmarkMode);
 
 	//// Variables ////
 

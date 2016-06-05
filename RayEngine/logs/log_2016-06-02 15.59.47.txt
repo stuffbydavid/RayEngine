@@ -1,0 +1,53 @@
+Program start
+Settings:
+	Scene: Sibenik
+	Render mode: OpenGL
+	Resolution: 800x600
+	Camera path: No
+	Reflections: Yes
+	Max reflections: 1
+	Refractions: Yes
+	Max refractions: 8
+	Ambient Occlusion: No
+	AO samples: 25
+	AO radius: 45
+	AO power: 1
+	AO noise scale: 100
+	Embree threads: 16
+	Embree tiles: Yes
+	Width: 16
+	Height: 16
+	Embree primary packets: Yes
+	Secondary packets: No
+	OptiX progressive render: No
+	OptiX stack size: 4096
+	Hybrid threaded: Yes
+	Hybrid balance mode: Manual
+	Partition: 0.5
+	Hybrid display partition: Yes
+	Hybrid enable Embree: Yes
+	Hybrid enable OptiX: Yes
+Changed Render mode: Embree
+Changed Render mode: OpenGL
+Changed Camera path: Yes
+Changed Camera path: No
+Changed Render mode: Embree
+Changed Render mode: OptiX
+Changed Max refractions: 7
+Changed Max refractions: 6
+Changed Max refractions: 5
+Changed Max refractions: 4
+Changed Max refractions: 3
+Changed Max refractions: 2
+Changed Max refractions: 1
+Changed Ambient Occlusion: Yes
+Changed AO radius: 45.05
+Changed AO radius: 49.56
+Changed AO radius: 54.51
+Changed AO radius: 59.96
+Changed AO radius: 65.96
+Changed AO radius: 59.36
+Changed AO radius: 53.43
+Changed Ambient Occlusion: No
+Changed Camera path: Yes
+Changed Ambient Occlusion: Yes

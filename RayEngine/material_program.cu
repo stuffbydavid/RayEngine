@@ -38,7 +38,8 @@ rtDeclareVariable(uint2, launchDim, rtLaunchDim, );
 
 RT_PROGRAM void anyHit() {
 
-	curShadowData.attenuation *= 1.f - diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
+	//curShadowData.attenuation *= 1.f - diffuse.w * tex2D(sampler, texCoord.x, texCoord.y).w;
+	curShadowData.attenuation = 0.f;
 
 	if (curShadowData.attenuation == 0.f)
 		rtTerminateRay();

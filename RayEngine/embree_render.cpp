@@ -1,19 +1,20 @@
 #include "rayengine.h"
+#include <omp.h>
 
 void RayEngine::embreeRender() {
 
-	if (renderMode == RM_HYBRID && !Hybrid.embree)
+	if (renderMode == RM_HYBRID && !Hybrid.enableEmbree)
 		return;
 
 	Embree.renderTimer.start();
 
 	if (Embree.width > 0) {
 
-		fill(std::begin(Embree.buffer), std::end(Embree.buffer), 0.f);
+		fill(begin(Embree.buffer), end(Embree.buffer), 0.f);
 
 		SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST); // TODO: Find out if this does anything
 	
-		if (Embree.renderTiles) {
+		if (Embree.enableTiles) {
 
 			int numTilesX = ceil((float)Embree.width / Embree.tileWidth);
 			int numTilesY = ceil((float)window.height / Embree.tileHeight);
@@ -30,7 +31,7 @@ void RayEngine::embreeRender() {
 				int y0 = tileY * Embree.tileHeight;
 				int y1 = min(y0 + Embree.tileHeight, window.height);
 
-				if (Embree.packetPrimary) {
+				if (Embree.enablePacketsPrimary) {
 
 					for (int y = y0; y < y1; y++)
 						for (int x = x0; x < x1; x += EMBREE_PACKET_SIZE)
@@ -48,7 +49,7 @@ void RayEngine::embreeRender() {
 
 		} else {
 
-			if (Embree.packetPrimary) {
+			if (Embree.enablePacketsPrimary) {
 
 				#pragma omp parallel for schedule(dynamic)
 				for (int y = 0; y < window.height; y++)
@@ -74,7 +75,7 @@ void RayEngine::embreeRender() {
 
 void RayEngine::embreeRenderUpdateTexture() {
 
-	if (renderMode == RM_HYBRID && !Hybrid.embree)
+	if (renderMode == RM_HYBRID && !Hybrid.enableEmbree)
 		return;
 
 	Embree.textureTimer.start();

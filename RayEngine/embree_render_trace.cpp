@@ -26,6 +26,7 @@ Color RayEngine::embreeRenderSky(Vec3 dir) {
 
 }
 
+// Lowers the attenuation of light rays
 void RayEngine::embreeOcclusionFilter(void* data, Embree::LightRay& ray) {
 	
 	if (ray.geomID == RTC_INVALID_GEOMETRY_ID)
@@ -46,6 +47,7 @@ void RayEngine::embreeOcclusionFilter(void* data, Embree::LightRay& ray) {
 
 }
 
+// Lowers the attenuation of a packet of light rays
 void RayEngine::embreeOcclusionFilter8(int* valid, void* data, Embree::LightRayPacket& packet) {
 
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++) {
@@ -71,6 +73,7 @@ void RayEngine::embreeOcclusionFilter8(int* valid, void* data, Embree::LightRayP
 
 }
 
+// Processes a single ray
 void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int refractDepth, Color& result) {
 
 	// No object hit, return sky color
@@ -90,6 +93,7 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 	hit.texCoord = hit.mesh->getTexCoord(ray.primID, ray.u, ray.v);
 	hit.texture = hit.material->diffuse * hit.material->image->getPixel(hit.texCoord);
 	hit.transparency = 1.f - hit.texture.a();
+	hit.occluded = 0.f;
 
 	// Check lights
 #if EMBREE_ONE_LIGHT
@@ -149,10 +153,60 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 	}
 #endif
 
-	// Create color
-	result = hit.texture * (curScene->ambient + hit.material->ambient + hit.diffuse) * (1.f - hit.transparency) + hit.specular;
+	//// Ambient occlusion ////
 
-	// Add reflections
+	if (enableAo) {
+
+		float invSamples = 1.f / aoSamples;
+		float invSamplesSqrt = 1.f / aoSamplesSqrt;
+		Vec2 noiseTexCoord = Vec2((float)(Embree.offset + ray.x) / window.width, (float)ray.y / window.height) * aoNoiseScale;
+		Color noise = aoNoiseImage->getPixel(noiseTexCoord);
+		optix::Onb onb(optix::make_float3(hit.normal.x(), hit.normal.y(), hit.normal.z())); // Re-use OptiX's orthogonal base cus I'm lazy
+
+		// TODO: Find out if occluded8 is worse
+		for (int a = 0; a < aoSamples; a++) {
+
+			// Define sample vector
+			float u1 = (float(a % aoSamplesSqrt) + noise.r()) * invSamplesSqrt;
+			float u2 = (float(a / aoSamplesSqrt) + noise.g()) * invSamplesSqrt;
+			optix::float3 sampleVector;
+			cosine_sample_hemisphere(u1, u2, sampleVector);
+			onb.inverse_transform(sampleVector);
+
+			// Define sample ray
+			Embree::LightRay aoRay;
+			aoRay.org[0] = hit.pos.x();
+			aoRay.org[1] = hit.pos.y();
+			aoRay.org[2] = hit.pos.z();
+			aoRay.dir[0] = sampleVector.x;
+			aoRay.dir[1] = sampleVector.y;
+			aoRay.dir[2] = sampleVector.z;
+			aoRay.tnear = 0.01f;
+			aoRay.tfar = curScene->aoRadius;
+			aoRay.instID =
+			aoRay.geomID =
+			aoRay.primID = RTC_INVALID_GEOMETRY_ID;
+			aoRay.mask = EMBREE_RAY_VALID;
+			aoRay.time = 0.f;
+			aoRay.attenuation = 1.f;
+
+			// Check occlusion
+			rtcOccluded(curScene->Embree.scene, aoRay);
+
+			hit.occluded += 1.f - aoRay.attenuation;
+
+		}
+
+		hit.occluded *= invSamples * aoPower;
+
+	}
+
+	//// Create color ////
+
+	result = hit.texture * (curScene->ambient + hit.material->ambient + hit.diffuse) * (1.f - hit.occluded) * (1.f - hit.transparency) + hit.specular;
+
+	//// Reflections ////
+
 	if (enableReflections && hit.material->reflectIntensity > 0.f && reflectDepth < maxReflections) {
 
 		Vec3 reflDir = Vec3::reflect(-Vec3(ray.dir), hit.normal);
@@ -181,7 +235,8 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 
 	}
 
-	// Add refractions
+	//// Add refractions ////
+
 	if (enableRefractions && hit.transparency > 0.f && refractDepth < maxRefractions) {
 
 		Vec3 refrDir = Vec3::refract(ray.dir, hit.normal, hit.material->refractIndex);
@@ -214,10 +269,12 @@ void RayEngine::embreeRenderTraceRay(Embree::Ray& ray, int reflectDepth, int ref
 
 }
 
+// Processes a packet of rays
 void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDepth, int refractDepth, Color* result) {
 	
 #if EMBREE_ONE_LIGHT
 
+	// Create light packet
 	Embree::LightRayPacket lightPacket;
 	for (int i = 0; i < EMBREE_PACKET_SIZE; i++)
 		lightPacket.valid[i] = EMBREE_RAY_INVALID;
@@ -344,7 +401,7 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 		}
 #endif
 
-		// Create reflection rays
+		// Create reflection ray
 		if (enableReflections && hit.material->reflectIntensity > 0.f && reflectDepth < maxReflections) {
 
 			Vec3 reflDir = Vec3::reflect(-rayDir, hit.normal);
@@ -366,7 +423,7 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 
 		}
 
-		// Create refraction rays
+		// Create refraction ray
 		if (enableRefractions && hit.transparency > 0.f && refractDepth < maxRefractions) {
 
 			Vec3 refrDir = Vec3::refract(rayDir, hit.normal, hit.material->refractIndex);
@@ -391,17 +448,20 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 		// Create ambient occlusion samples
 		if (enableAo) {
 
-			Color noise = aoNoiseImage->getPixel(Vec2((float)(Embree.offset + packet.x + i) / window.width, (float)packet.y / window.height) * aoNoiseScale);
-			optix::Onb onb(optix::make_float3(hit.normal.x(), hit.normal.y(), hit.normal.z()));
+			Vec2 noiseTexCoord = Vec2((float)(Embree.offset + packet.x + i) / window.width, (float)packet.y / window.height) * aoNoiseScale;
+			Color noise = aoNoiseImage->getPixel(noiseTexCoord);
+			optix::Onb onb(optix::make_float3(hit.normal.x(), hit.normal.y(), hit.normal.z())); // Re-use OptiX's orthogonal base cus I'm lazy
 
 			for (int a = 0; a < aoSamples; a++) {
 
+				// Define sample vector
 				float u1 = (float(a % aoSamplesSqrt) + noise.r()) * invSamplesSqrt;
 				float u2 = (float(a / aoSamplesSqrt) + noise.g()) * invSamplesSqrt;
 				optix::float3 sampleVector;
 				cosine_sample_hemisphere(u1, u2, sampleVector);
 				onb.inverse_transform(sampleVector);
 
+				// Define sample ray
 				Embree::LightRayPacket& aoPacket = aoPackets[a];
 				aoPacket.attenuation[i] = 1.f;
 				aoPacket.orgx[i] = hit.pos.x();
@@ -488,7 +548,7 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 
 	}
 
-	// Ambient occlusion
+	//// Ambient occlusion ////
 
 	if (enableAo) {
 
@@ -514,7 +574,8 @@ void RayEngine::embreeRenderTracePacket(Embree::RayPacket& packet, int reflectDe
 			continue;
 
 		// Create color
-		result[i] = hit.texture * (curScene->ambient + hit.material->ambient + hit.diffuse) * (1.f - hit.occluded * invSamples * aoPower) * (1.f - hit.transparency) + hit.specular;
+		hit.occluded *= invSamples * aoPower;
+		result[i] = hit.texture * (curScene->ambient + hit.material->ambient + hit.diffuse) * (1.f - hit.occluded) * (1.f - hit.transparency) + hit.specular;
 
 		// Add reflections
 		if (hit.material->reflectIntensity > 0.f && doReflections)
