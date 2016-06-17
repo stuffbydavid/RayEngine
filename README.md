@@ -1,5 +1,5 @@
 # RayEngine
-Rendering engine for CPU/GPU accelerated ray tracing utilizing [Embree](https://embree.github.io/) and [OptiX](https://developer.nvidia.com/optix).
+RayEngine is a rendering engine for CPU/GPU accelerated ray tracing utilizing [Embree](https://embree.github.io/) and [OptiX](https://developer.nvidia.com/optix). It was created for a Thesis in Computer Science and the report can be found here:
 
 ## Running the program
 RayEngine is for Windows only and requires a NVIDIA GPU to be able to launch. The executable can be found in the "RayEngine" folder as "RayEngine.exe". The following must also be installed:
