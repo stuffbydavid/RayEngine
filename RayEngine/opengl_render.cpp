@@ -2,7 +2,7 @@
 
 void RayEngine::openglRender() {
 
-	glClearColor(0.3f, 0.9f, 0.3f, 1.f);
+	glClearColor(0.3f, 0.3f, 0.9f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	Mat4x4 proj = curCamera->getMatrix(window.ratio);

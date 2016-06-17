@@ -37,17 +37,17 @@ int main(int argc, char **argv) {
 	//// Glass ///
 
 #if 1
-	Scene* glassScene = rayEngine.createScene("Glass", "img/sky.jpg", { 0.4f });
+	Scene* glassScene = rayEngine.createScene("Glass", "img/sky.jpg", { 0.4f }, 5.f, { 0.3f, 0.3f, 0.9f });
 	glassScene->addLight({ 100.f, 1000.f, 100.f }, { 1.f, 1.f, 1.f }, 10000.f);
 	glassScene->loadObject("obj/floor.obj");
 	glassScene->loadObject("obj/Glass/GlassPack.obj")->scale(0.1f);
 	glassScene->loadObject("obj/teapot/teapot.obj")->translate({ 20.f, 0.f, -40.f });
 	glassScene->loadObject("obj/bunny.obj")->scale(200.f)->translate({ -30.f, -8.f, -40.f });
 	glassScene->loadObject("obj/TorusKnot/TorusKnot.obj")->scale(2.5f)->translate({ -10.f, 10.f, 40.f });
-	glassScene->camera.position = { -16.432f, 18.3147f, 43.6698f };
-	glassScene->camera.xaxis = { 0.99995f, 0.0023377f, 0.00968323f };
-	glassScene->camera.yaxis = { -0.00196563f, 0.999266f, -0.0382575f };
-	glassScene->camera.zaxis = { 0.00976554f, -0.0382365f, -0.999222f };
+	glassScene->camera.position = { -58.7811f, 61.4856f, 42.2966f };
+	glassScene->camera.xaxis = { 0.805777f, 0.0269571f, 0.591605f };
+	glassScene->camera.yaxis = { 0.379608f, 0.743242f, -0.550899f };
+	glassScene->camera.zaxis = { 0.454557f, -0.668479f, -0.588655f };
 	glassScene->setCameraPath(new CirclePath({ 0.f, 10.f, 0.f }, 80.f, M_PIf / 10.f, 10.f));
 #endif
 
