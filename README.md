@@ -5,10 +5,6 @@ RayEngine is a C++ rendering engine for CPU/GPU accelerated ray tracing utilizin
 RayEngine is for Windows only (64-bit) and requires a NVIDIA GPU to be able to launch. The executable can be found in the "RayEngine" folder as "RayEngine.exe". The following must also be installed:
 * **ImageMagick 6.9.4**: http://www.imagemagick.org/download/binaries/ImageMagick-6.9.4-9-Q16-x64-dll.exe
 
-Currently only the Glass Scene is loaded, but other scenes can be enabled or built by editing the main.cpp file and recompiling. To build from source (Visual Studio), the following are also needed:
-* **ImageMagick 6.9.4**: Same as above, just make sure "Install development headers and libraries for C and C++" is checked when installing.
-* **CUDA Toolkit 7.0**: https://developer.nvidia.com/cuda-toolkit-70
-
 ## Controls and settings
 The camera is oriented by left clicking and moving the mouse around.
 While the left button is pressed, the following key commands become active:
@@ -82,3 +78,14 @@ When enabled, the Embree and OptiX images will be highlighted blue and red.
 Enables/Disables Embree. Used for debugging purposes.
 * **Hybrid Enable OptiX**
 Enables/Disables OptiX. Used for debugging purposes.
+
+## Building the program
+Currently only the Glass Scene is loaded, but other scenes can be enabled or built by editing the main.cpp file and recompiling. This requires C++ library knowledge. To build from source (Visual Studio), the following are needed:
+* **ImageMagick 6.9.4**: Same link as above, just make sure "Install development headers and libraries for C and C++" is checked when installing.
+* **OptiX**: https://developer.nvidia.com/optix
+* **Embree**: https://embree.github.io/
+* **CUDA Toolkit 7.0**: https://developer.nvidia.com/cuda-toolkit-70
+* **GLFW**: https://github.com/glfw/glfw/releases/download/3.1.2/glfw-3.1.2.bin.WIN64.zip
+* **GLEW**: https://sourceforge.net/projects/glew/files/glew/1.13.0/glew-1.13.0-win32.zip/download
+* **FreeType**: https://www.freetype.org/ (you need to build .lib files from source for Win64, email me if you have issues)
+After installing these requirements, make sure the Include and Library directories are correct.
