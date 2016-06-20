@@ -89,4 +89,4 @@ Currently only the Glass Scene is loaded, but other scenes can be enabled or bui
 * **GLEW**: https://sourceforge.net/projects/glew/files/glew/1.13.0/glew-1.13.0-win32.zip/download
 * **FreeType**: https://www.freetype.org/ (you need to build .lib files from source for Win64, email me if you have issues)
 
-After installing these requirements, make sure the Include and Library directories are correct in Project Properties of the Visual Studio solution.
+After installing these requirements, make sure the Include and Library directories are correct in Project Properties of the Visual Studio solution and that the .exe can access the correct .dll files.
