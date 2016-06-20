@@ -1,5 +1,5 @@
 # RayEngine
-RayEngine is a C++ rendering engine for CPU/GPU accelerated ray tracing utilizing [Embree](https://embree.github.io/) and [OptiX](https://developer.nvidia.com/optix). It was created for a Bachelor's Thesis in Computer Science and the report can be found here:
+RayEngine is a C++ rendering engine for CPU/GPU accelerated ray tracing utilizing [Embree](https://embree.github.io/) and [OptiX](https://developer.nvidia.com/optix). It was created for a Bachelor's Thesis in Computer Science and the report can be found here: <link>
 
 ## Running the program
 RayEngine is for Windows only (64-bit) and requires a NVIDIA GPU to be able to launch. The executable can be found in the "RayEngine" folder as "RayEngine.exe". The following must also be installed:
@@ -88,4 +88,5 @@ Currently only the Glass Scene is loaded, but other scenes can be enabled or bui
 * **GLFW**: https://github.com/glfw/glfw/releases/download/3.1.2/glfw-3.1.2.bin.WIN64.zip
 * **GLEW**: https://sourceforge.net/projects/glew/files/glew/1.13.0/glew-1.13.0-win32.zip/download
 * **FreeType**: https://www.freetype.org/ (you need to build .lib files from source for Win64, email me if you have issues)
-After installing these requirements, make sure the Include and Library directories are correct.
+
+After installing these requirements, make sure the Include and Library directories are correct in Project Properties of the Visual Studio solution.
