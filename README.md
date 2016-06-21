@@ -1,8 +1,8 @@
 # RayEngine
-RayEngine is a C++ rendering engine for CPU/GPU accelerated ray tracing utilizing [Embree](https://embree.github.io/) and [OptiX](https://developer.nvidia.com/optix). It was created for a Bachelor's Thesis in Computer Science and the report can be found [here](http://www.stuffbydavid.com/dl/thesis).
+RayEngine is a C++ rendering engine for CPU/GPU accelerated ray tracing utilizing [Embree](https://embree.github.io/) and [OptiX](https://developer.nvidia.com/optix). It was created for a Bachelor's Thesis in Computer Science and the report, described [here](http://www.stuffbydavid.com/dl/thesis).
 
 ## Running the program
-RayEngine is for Windows only (64-bit) and requires a NVIDIA GPU to be able to launch. The executable can be found in the "RayEngine" folder as "RayEngine.exe". The following must also be installed:
+RayEngine is for Windows only (64-bit) and requires a NVIDIA GPU to be able to launch. Click the green "Clone or download" button and "Download ZIP". The executable can be found in the "RayEngine" folder as "RayEngine.exe" after extracting. The following must also be installed:
 * **ImageMagick 6.9.4**: http://www.imagemagick.org/download/binaries/ImageMagick-6.9.4-9-Q16-x64-dll.exe
 
 ## Controls and settings
