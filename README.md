@@ -1,4 +1,10 @@
 # RayEngine
+<p align="center">
+   <img width=260 src="https://www.stuffbydavid.com/data/img/screenshot/small/24-1.png"/>
+   <img width=260 src="https://www.stuffbydavid.com/data/img/screenshot/small/24-2.png"/>
+   <img width=260 src="https://www.stuffbydavid.com/data/img/screenshot/small/24-3.png"/>
+</p>
+
 RayEngine is a C++ rendering engine for CPU/GPU accelerated ray tracing utilizing [Embree](https://embree.github.io/) and [OptiX](https://developer.nvidia.com/optix). It was created for a Bachelor's Thesis in Computer Science, described [here](http://www.stuffbydavid.com/dl/thesis).
 
 ## Running the program
