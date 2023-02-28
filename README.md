@@ -1,11 +1,11 @@
 # RayEngine
 <p align="center">
-   <img width=260 src="https://www.stuffbydavid.com/data/img/screenshot/small/24-1.png"/>
-   <img width=260 src="https://www.stuffbydavid.com/data/img/screenshot/small/24-2.png"/>
-   <img width=260 src="https://www.stuffbydavid.com/data/img/screenshot/small/24-3.png"/>
+   <img width=260 src="https://github.com/stuffbydavid/RayEngine/blob/master/render-1.png"/>
+   <img width=260 src="https://github.com/stuffbydavid/RayEngine/blob/master/render-2.png"/>
+   <img width=260 src="https://github.com/stuffbydavid/RayEngine/blob/master/render-3.png"/>
 </p>
 
-RayEngine is a C++ rendering engine for CPU/GPU accelerated ray tracing utilizing [Embree](https://embree.github.io/) and [OptiX](https://developer.nvidia.com/optix). It was created for a Bachelor's Thesis in Computer Science, described [here](http://www.stuffbydavid.com/dl/thesis).
+RayEngine is a C++ rendering engine for CPU/GPU accelerated ray tracing utilizing [Embree](https://embree.github.io/) and [OptiX](https://developer.nvidia.com/optix). It was created for a Bachelor's Thesis in Computer Science, described [here](https://github.com/stuffbydavid/RayEngine/blob/master/thesis.pdf).
 
 ## Running the program
 RayEngine is for Windows only (64-bit) and requires a NVIDIA GPU to be able to launch. Click the green "Clone or download" button and "Download ZIP". The executable can be found in the "RayEngine" folder as "RayEngine.exe" after extracting. The following must also be installed:
